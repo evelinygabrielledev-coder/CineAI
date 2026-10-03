@@ -1,0 +1,560 @@
+[
+    {
+        "nome": "Interestelar",
+        "genero": "Ficção Científica",
+        "ano": 2014,
+        "diretor": "Christopher Nolan",
+        "elenco": [
+            "Matthew McConaughey",
+            "Anne Hathaway",
+            "Jessica Chastain"
+        ],
+        "premios": [
+            "Oscar de Melhores Efeitos Visuais"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Trilha Sonora Original",
+            "Oscar de Melhor Design de Produção",
+            "Oscar de Melhor Edição de Som",
+            "Oscar de Melhor Mixagem de Som"
+        ],
+        "rotten_tomatoes": {
+            "critica": 0,
+            "publico": 0
+        },
+        "sinopse": "Em um futuro distópico onde as reservas alimentares da Terra estão quase esgotadas devido a pragas globais e tempestades de areia, a humanidade enfrenta a extinção iminente. Um grupo de astronautas e cientistas da NASA, liderado pelo ex-piloto Cooper, é enviado em uma missão espacial desesperada. Utilizando um buraco de minhoca recém-descoberto perto de Saturno, eles viajam para outra galáxia em busca de um novo planeta habitável que possa servir de lar para a raça humana."
+    },
+    {
+        "nome": "Os Vingadores",
+        "genero": "Ação, Aventura, Ficção Científica",
+        "ano": 2012,
+        "diretor": "Joss Whedon",
+        "elenco": [
+            "Robert Downey Jr",
+            "Chris Evans",
+            "Mark Ruffalo",
+            "Chris Hemsworth",
+            "Scarlett Johansson",
+            "Jeremy Renner",
+            "Tom Hiddleston",
+            "Samuel L. Jackson"
+        ],
+        "premios": [
+            "MTV Movie Award de Filme do Ano",
+            "MTV Movie Award de Melhor Vilão",
+            "People's Choice Award de Filme Favorito",
+            "Saturn Award de Melhor Filme de Ficção Científica"
+        ],
+        "indicacoes": [
+            "Oscar de Melhores Efeitos Visuais",
+            "BAFTA de Melhores Efeitos Visuais",
+            "Critics' Choice Awards"
+        ],
+        "rotten_tomatoes": {
+            "critica": 0,
+            "publico": 0
+        },
+        "sinopse": "Quando Loki rouba o Tesseract, Nick Fury ativa a Iniciativa Vingadores. Heróis com personalidades fortes — como Homem de Ferro, Capitão América, Thor e Hulk — precisam aprender a trabalhar em equipe para deter a invasão alienígena em Nova York."
+    },
+    {
+        "nome": "O Diabo Veste Prada",
+        "genero": "Comédia, Drama",
+        "ano": 2006,
+        "diretor": "David Frankel",
+        "elenco": [
+            "Meryl Streep",
+            "Anne Hathaway",
+            "Emily Blunt",
+            "Stanley Tucci",
+            "Adrian Grenier",
+            "Simon Baker"
+        ],
+        "premios": [
+            "Globo de Ouro de Melhor Atriz em Comédia para Meryl Streep"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Atriz para Meryl Streep",
+            "Oscar de Melhor Figurino",
+            "5 indicações ao BAFTA"
+        ],
+        "rotten_tomatoes": {
+            "critica": 0,
+            "publico": 0
+        },
+        "sinopse": "Andy Sachs é uma jovem jornalista recém-formada que consegue emprego como assistente de Miranda Priestly, a implacável e temida editora-chefe da revista de moda Runway. Para sobreviver nesse ambiente altamente competitivo, Andy precisa transformar seu estilo de vida e seu visual."
+    },
+    {
+        "nome": "Clube da Luta",
+        "genero": "Drama, Suspense, Thriller Psicológico",
+        "ano": 1999,
+        "diretor": "David Fincher",
+        "elenco": [
+            "Brad Pitt",
+            "Edward Norton",
+            "Helena Bonham Carter",
+            "Meat Loaf",
+            "Jared Leto"
+        ],
+        "premios": [
+            "Empire Award de Melhor Atriz Britânica para Helena Bonham Carter"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Edição de Som"
+        ],
+        "rotten_tomatoes": {
+            "critica": 0,
+            "publico": 0
+        },
+        "sinopse": "Um homem deprimido e insone conhece o anárquico vendedor de sabonetes Tyler Durden. Juntos, eles criam um clube de lutas clandestino como terapia anticapitalista e de liberação pessoal, mas o movimento rapidamente sai de controle e evolui para uma organização revolucionária destrutiva."
+    },
+    {
+        "nome": "Não Olhe para Cima",
+        "genero": "Comédia, Sátira, Ficção Científica",
+        "ano": 2021,
+        "diretor": "Adam McKay",
+        "elenco": [
+            "Leonardo DiCaprio",
+            "Jennifer Lawrence",
+            "Meryl Streep",
+            "Jonah Hill",
+            "Cate Blanchett",
+            "Rob Morgan",
+            "Timothée Chalamet",
+            "Ariana Grande"
+        ],
+        "premios": [
+            "Writers Guild of America de Melhor Roteiro Original"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Roteiro Original",
+            "Oscar de Melhor Trilha Sonora",
+            "4 indicações ao Globo de Ouro"
+        ],
+        "rotten_tomatoes": {
+            "critica": 0,
+            "publico": 0
+        },
+        "sinopse": "Dois astrônomos descobrem um cometa gigante em rota de colisão direta com a Terra. Ao tentarem fazer um tour midiático e governamental para alertar a humanidade sobre o fim do mundo, eles se deparam com a total apatia política, ganância corporativa e futilidade das redes sociais."
+    },
+    {
+        "nome": "Barbie",
+        "genero": "Comédia, Fantasia, Aventura",
+        "ano": 2023,
+        "diretor": "Greta Gerwig",
+        "elenco": [
+            "Margot Robbie",
+            "Ryan Gosling",
+            "America Ferrera",
+            "Kate McKinnon",
+            "Issa Rae"
+        ],
+        "premios": [
+            "Oscar de Melhor Canção Original (\"What Was I Made For?\")"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Ator Coadjuvante para Ryan Gosling",
+            "Oscar de Melhor Atriz Coadjuvante para America Ferrera",
+            "Oscar de Melhor Roteiro Adaptado",
+            "Oscar de Melhor Direção de Arte",
+            "Oscar de Melhor Figurino"
+        ],
+        "rotten_tomatoes": {
+            "critica": 88,
+            "publico": 83
+        },
+        "sinopse": "Depois de ser expulsa da Barbieland por ser uma boneca de aparência menos do que perfeita, Barbie parte para o mundo humano em busca da verdadeira felicidade e de sua autêntica identidade."
+    },
+    {
+        "nome": "Oppenheimer",
+        "genero": "Biografia, Drama, História",
+        "ano": 2023,
+        "diretor": "Christopher Nolan",
+        "elenco": [
+            "Cillian Murphy",
+            "Emily Blunt",
+            "Matt Damon",
+            "Robert Downey Jr.",
+            "Florence Pugh"
+        ],
+        "premios": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Diretor para Christopher Nolan",
+            "Oscar de Melhor Ator para Cillian Murphy",
+            "Oscar de Melhor Ator Coadjuvante para Robert Downey Jr.",
+            "Oscar de Melhor Fotografia",
+            "Oscar de Melhor Edição",
+            "Oscar de Melhor Trilha Sonora Original"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Atriz Coadjuvante para Emily Blunt",
+            "Oscar de Melhor Roteiro Adaptado",
+            "Oscar de Melhor Figurino",
+            "Oscar de Melhor Maquiagem e Penteado",
+            "Oscar de Melhor Som",
+            "Oscar de Melhor Design de Produção"
+        ],
+        "rotten_tomatoes": {
+            "critica": 93,
+            "publico": 91
+        },
+        "sinopse": "A história do físico americano J. Robert Oppenheimer, seu papel no Projeto Manhattan e o desenvolvimento da bomba atômica durante a Segunda Guerra Mundial, além das consequências políticas e pessoais de sua invenção."
+    },
+    {
+        "nome": "Parasita",
+        "genero": "Drama, Suspense, Comédia Sombria",
+        "ano": 2019,
+        "diretor": "Bong Joon-ho",
+        "elenco": [
+            "Song Kang-ho",
+            "Lee Sun-kyun",
+            "Cho Yeo-jeong",
+            "Choi Woo-shik",
+            "Park So-dam"
+        ],
+        "premios": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Diretor para Bong Joon-ho",
+            "Oscar de Melhor Roteiro Original",
+            "Oscar de Melhor Filme Internacional",
+            "Palma de Ouro no Festival de Cannes"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Design de Produção",
+            "Oscar de Melhor Edição"
+        ],
+        "rotten_tomatoes": {
+            "critica": 99,
+            "publico": 90
+        },
+        "sinopse": "A família Kim, que vive em condições precárias, infiltra-se gradualmente na luxuosa e rica residência da família Park, fingindo não ter parentesco entre si e assumindo diferentes identidades profissionais para sobreviver."
+    },
+    {
+        "nome": "Corra!",
+        "genero": "Terror, Suspense, Mistério",
+        "ano": 2017,
+        "diretor": "Jordan Peele",
+        "elenco": [
+            "Daniel Kaluuya",
+            "Allison Williams",
+            "Catherine Keener",
+            "Bradley Whitford",
+            "Lakeith Stanfield"
+        ],
+        "premios": [
+            "Oscar de Melhor Roteiro Original"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Diretor para Jordan Peele",
+            "Oscar de Melhor Ator para Daniel Kaluuya"
+        ],
+        "rotten_tomatoes": {
+            "critica": 98,
+            "publico": 86
+        },
+        "sinopse": "Um jovem fotógrafo afro-americano viaja com sua namorada branca para conhecer os pais dela em um fim de semana isolado. Inicialmente recebido com uma hospitalidade excessiva e estranha, ele logo descobre segredos macabros e perturbadores sobre a família."
+    },
+    {
+        "nome": "Titanic",
+        "genero": "Romance, Drama",
+        "ano": 1997,
+        "diretor": "James Cameron",
+        "elenco": [
+            "Leonardo DiCaprio",
+            "Kate Winslet",
+            "Billy Zane",
+            "Kathy Bates",
+            "Frances Fisher"
+        ],
+        "premios": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Diretor para James Cameron",
+            "Oscar de Melhor Canção Original (\"My Heart Will Go On\")",
+            "Oscar de Melhores Efeitos Visuais",
+            "Oscar de Melhor Fotografia",
+            "Oscar de Melhor Figurino"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Atriz para Kate Winslet",
+            "Oscar de Melhor Atriz Coadjuvante para Gloria Stuart",
+            "Oscar de Melhor Maquiagem"
+        ],
+        "rotten_tomatoes": {
+            "critica": 87,
+            "publico": 69
+        },
+        "sinopse": "Uma aristocrata de 17 anos apaixona-se por um artista pobre e de espírito livre a bordo do luxuoso e infeliz transatlântico RMS Titanic durante sua viagem inaugural."
+    },
+    {
+        "nome": "Avatar",
+        "genero": "Ficção Científica, Ação, Aventura",
+        "ano": 2009,
+        "diretor": "James Cameron",
+        "elenco": [
+            "Sam Worthington",
+            "Zoe Saldana",
+            "Sigourney Weaver",
+            "Stephen Lang",
+            "Michelle Rodriguez"
+        ],
+        "premios": [
+            "Oscar de Melhor Direção de Arte",
+            "Oscar de Melhor Fotografia",
+            "Oscar de Melhores Efeitos Visuais"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Diretor para James Cameron",
+            "Oscar de Melhor Edição",
+            "Oscar de Melhor Trilha Sonora Original"
+        ],
+        "rotten_tomatoes": {
+            "critica": 82,
+            "publico": 82
+        },
+        "sinopse": "Um fuzileiro naval paraplégico é enviado ao planeta alienígena Pandora em uma missão única, mas acaba dividido entre seguir ordens corporativas e proteger a cultura e o lar da raça nativa Na'vi."
+    },
+    {
+        "nome": "Matrix",
+        "genero": "Ficção Científica, Ação",
+        "ano": 1999,
+        "diretor": "Lana Wachowski, Lilly Wachowski",
+        "elenco": [
+            "Keanu Reeves",
+            "Laurence Fishburne",
+            "Carrie-Anne Moss",
+            "Hugo Weaving",
+            "Joe Pantoliano"
+        ],
+        "premios": [
+            "Oscar de Melhores Efeitos Visuais",
+            "Oscar de Melhor Edição",
+            "Oscar de Melhor Som",
+            "Oscar de Melhor Edição de Efeitos Sonoros"
+        ],
+        "indicacoes": [],
+        "rotten_tomatoes": {
+            "critica": 83,
+            "publico": 85
+        },
+        "sinopse": "Um hacker de computador aprende com misteriosos rebeldes sobre a verdadeira natureza de sua realidade e seu papel na guerra contra seus controladores cibernéticos."
+    },
+    {
+        "nome": "Shrek",
+        "genero": "Animação, Comédia, Fantasia, Aventura",
+        "ano": 2001,
+        "diretor": "Andrew Adamson, Vicky Jenson",
+        "elenco": [
+            "Mike Myers",
+            "Eddie Murphy",
+            "Cameron Diaz",
+            "John Lithgow"
+        ],
+        "premios": [
+            "Oscar de Melhor Filme de Animação"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Roteiro Adaptado"
+        ],
+        "rotten_tomatoes": {
+            "critica": 88,
+            "publico": 90
+        },
+        "sinopse": "Para recuperar seu pântano, um ogro mal-humorado aceita resgatar uma princesa prisioneira para um lorde bajulador, acompanhado por um burro falante muito tagarela."
+    },
+    {
+        "nome": "Toy Story",
+        "genero": "Animação, Comédia, Aventura",
+        "ano": 1995,
+        "diretor": "John Lasseter",
+        "elenco": [
+            "Tom Hanks",
+            "Tim Allen",
+            "Don Rickles",
+            "Jim Varney",
+            "Wallace Shawn"
+        ],
+        "premios": [
+            "Prêmio Especial de Contribuição para o Cinema para John Lasseter"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Roteiro Original",
+            "Oscar de Melhor Trilha Sonora Original",
+            "Oscar de Melhor Canção Original (\"You've Got a Friend in Me\")"
+        ],
+        "rotten_tomatoes": {
+            "critica": 100,
+            "publico": 92
+        },
+        "sinopse": "Um boneco caubói lidera os brinquedos de um quarto infantil que ganham vida quando os humanos não estão olhando, sentindo-se ameaçado quando um novo boneco astronauta se torna o favorito do garoto Andy."
+    },
+    {
+        "nome": "Homem-Aranha no Aranhaverso",
+        "genero": "Animação, Ação, Aventura, Ficção Científica",
+        "ano": 2018,
+        "diretor": "Bob Persichetti, Peter Ramsey, Rodney Rothman",
+        "elenco": [
+            "Shameik Moore",
+            "Jake Johnson",
+            "Hailee Steinfeld",
+            "Mahershala Ali",
+            "Brian Tyree Henry"
+        ],
+        "premios": [
+            "Oscar de Melhor Filme de Animação",
+            "Globo de Ouro de Melhor Filme de Animação",
+            "BAFTA de Melhor Filme de Animação"
+        ],
+        "indicacoes": [],
+        "rotten_tomatoes": {
+            "critica": 97,
+            "publico": 93
+        },
+        "sinopse": "Miles Morales se torna o Homem-Aranha de sua realidade e cruza caminhos com contrapartes de dimensões paralelas para deter uma ameaça catastrófica que coloca em risco todas as realidades do multiverso."
+    },
+    {
+        "nome": "Harry Potter e a Pedra Filosofal",
+        "genero": "Fantasia, Aventura, Família",
+        "ano": 2001,
+        "diretor": "Chris Columbus",
+        "elenco": [
+            "Daniel Radcliffe",
+            "Rupert Grint",
+            "Emma Watson",
+            "Richard Harris",
+            "Maggie Smith",
+            "Alan Rickman"
+        ],
+        "premios": [
+            "BAFTA Award de Melhor Filme Infantil"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Direção de Arte",
+            "Oscar de Melhor Figurino",
+            "Oscar de Melhor Trilha Sonora Original"
+        ],
+        "rotten_tomatoes": {
+            "critica": 81,
+            "publico": 82
+        },
+        "sinopse": "Um jovem órfão descobre em seu décimo primeiro aniversário que é um bruxo famoso e foi aceito na Escola de Magia e Bruxaria de Hogwarts, onde embarca em uma jornada repleta de amizade, mistérios e perigos."
+    },
+    {
+        "nome": "O Senhor dos Anéis: A Sociedade do Anel",
+        "genero": "Fantasia, Aventura, Ação",
+        "ano": 2001,
+        "diretor": "Peter Jackson",
+        "elenco": [
+            "Elijah Wood",
+            "Ian McKellen",
+            "Viggo Mortensen",
+            "Orlando Bloom",
+            "Sean Bean"
+        ],
+        "premios": [
+            "Oscar de Melhor Fotografia",
+            "Oscar de Melhores Efeitos Visuais",
+            "Oscar de Melhor Maquiagem",
+            "Oscar de Melhor Trilha Sonora Original"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Diretor para Peter Jackson",
+            "Oscar de Melhor Ator Coadjuvante para Ian McKellen",
+            "Oscar de Melhor Roteiro Adaptado"
+        ],
+        "rotten_tomatoes": {
+            "critica": 91,
+            "publico": 95
+        },
+        "sinopse": "Em uma terra fantástica e antiga, um jovem hobbit recebe a missão de destruir um anel mágico onipotente e corrompido antes que ele caia nas mãos do Senhor do Escuro, Sauron."
+    },
+    {
+        "nome": "Jurassic Park",
+        "genero": "Ficção Científica, Aventura, Suspense",
+        "ano": 1993,
+        "diretor": "Steven Spielberg",
+        "elenco": [
+            "Sam Neill",
+            "Laura Dern",
+            "Jeff Goldblum",
+            "Richard Attenborough",
+            "Samuel L. Jackson"
+        ],
+        "premios": [
+            "Oscar de Melhores Efeitos Visuais",
+            "Oscar de Melhor Edição de Som",
+            "Oscar de Melhor Mixagem de Som"
+        ],
+        "indicacoes": [],
+        "rotten_tomatoes": {
+            "critica": 92,
+            "publico": 91
+        },
+        "sinopse": "Durante um reconhecimento prévio, um grupo seleto de cientistas e especialistas visita um parque temático isolado habitado por dinossauros clonados através de engenharia genética. O plano vai por água abaixo quando os sistemas de segurança falham."
+    },
+    {
+        "nome": "Gladiador",
+        "genero": "Ação, Drama, Épico",
+        "ano": 2000,
+        "diretor": "Ridley Scott",
+        "elenco": [
+            "Russell Crowe",
+            "Joaquin Phoenix",
+            "Connie Nielsen",
+            "Oliver Reed",
+            "Richard Harris"
+        ],
+        "premios": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Ator para Russell Crowe",
+            "Oscar de Melhores Efeitos Visuais",
+            "Oscar de Melhor Figurino",
+            "Oscar de Melhor Som"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Diretor para Ridley Scott",
+            "Oscar de Melhor Ator Coadjuvante para Joaquin Phoenix",
+            "Oscar de Melhor Roteiro Original"
+        ],
+        "rotten_tomatoes": {
+            "critica": 80,
+            "publico": 87
+        },
+        "sinopse": "Um general romano traído e com sua família assassinada busca vingança contra o corrupto imperador que ascendeu ao poder, infiltrando-se nas arenas de gladiadores do Império."
+    },
+    {
+        "nome": "La La Land: Cantando Estações",
+        "genero": "Romance, Musical, Drama",
+        "ano": 2016,
+        "diretor": "Damien Chazelle",
+        "elenco": [
+            "Ryan Gosling",
+            "Emma Stone",
+            "John Legend",
+            "Rosemarie DeWitt",
+            "J.K. Simmons"
+        ],
+        "premios": [
+            "Oscar de Melhor Diretor para Damien Chazelle",
+            "Oscar de Melhor Atriz para Emma Stone",
+            "Oscar de Melhor Fotografia",
+            "Oscar de Melhor Direção de Arte",
+            "Oscar de Melhor Trilha Sonora Original",
+            "Oscar de Melhor Canção Original (\"City of Stars\")"
+        ],
+        "indicacoes": [
+            "Oscar de Melhor Filme",
+            "Oscar de Melhor Ator para Ryan Gosling",
+            "Oscar de Melhor Roteiro Original",
+            "Oscar de Melhor Figurino"
+        ],
+        "rotten_tomatoes": {
+            "critica": 91,
+            "publico": 81
+        },
+        "sinopse": "Enquanto navegam em suas carreiras profissionais e em suas aspirações artísticas na cidade de Los Angeles, um pianista de jazz e uma aspirante a atriz se apaixonam, enfrentando os desafios e sacrifícios que o sucesso exige."
+    }
+]

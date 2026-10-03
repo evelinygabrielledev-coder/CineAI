@@ -1,0 +1,45 @@
+# ---------------------------------------------------------
+# Segredos — NUNCA subir
+# ---------------------------------------------------------
+.env
+.env.txt
+*.env
+tmdb_chave.txt
+!.env.example
+
+# ---------------------------------------------------------
+# Dados pessoais (favoritos, assistidos, notas, conversas)
+# ---------------------------------------------------------
+usuario.json
+usuario.corrompido.json
+conversas.json
+conversas.corrompido.json
+
+# ---------------------------------------------------------
+# Gerados automaticamente (cada um recria na própria máquina)
+# ---------------------------------------------------------
+# Cache de embeddings: o filmes.py recria na primeira execução.
+embeddings_cache.pkl
+
+# Pôsteres: são quase 2.000 imagens. Cada um baixa com os importar_*.py.
+posters/
+
+# Cópias de segurança dos importadores.
+filmes_backup.json
+
+# Arquivos temporários do importador e do cache.
+*.tmp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ---------------------------------------------------------
+# Sistema / editores
+# ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

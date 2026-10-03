@@ -1,0 +1,121 @@
+# 🎬 CineAI
+
+Assistente de filmes e séries para desktop, com visual de **diário de cinema** (scrapbook).
+Você conversa com o CineAI em português, ele recomenda títulos do catálogo, explica
+por que escolheu cada um e aprende o seu gosto pelas notas que você dá.
+
+Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
+
+---
+
+## ✨ O que ele faz
+
+- **Chat de recomendações**: "quero uma animação de 2001 com Eddie Murphy", "uma série de comédia",
+  "algo mais leve", "um do mesmo diretor", "me surpreenda".
+- **Busca por assunto (RAG)**: "um filme sobre um ogro que resgata uma princesa" encontra o título
+  pela sinopse, usando embeddings.
+- **Painel do RAG**: mostra cada etapa da resposta (regras, filtros, IA, ranking de similaridade)
+  e o tempo de cada uma.
+- **Catálogo com filmes e séries**: filtros de gênero, década, nota da crítica, ordem e
+  "esconder os que já vi".
+- **Comparar títulos**: "Breaking Bad ou Interestelar?".
+- **Perfil de gosto**: as estrelas que você dá (1 a 5) formam um perfil por gênero, diretor e ator,
+  usado em "me recomenda algo".
+- **Meu diário**: favoritos, assistidos (com data e número da entrada), notas e anotações pessoais.
+- **Trailers**, notas do IMDb / Rotten Tomatoes e títulos semelhantes em cada página.
+
+## 🧠 Como funciona
+
+1. **Regras primeiro**: saudações, perguntas sobre o filme atual ("quem dirigiu?"), notas e
+   pedidos relativos são resolvidos sem IA, de forma rápida e previsível.
+2. **Filtros exatos**: gênero, ano, década, diretor, ator e tipo (filme/série) são detectados no texto.
+3. **IA local (Ollama, qwen3:1.7b)**: quando é preciso, extrai o *assunto* do pedido.
+4. **Busca semântica**: o assunto é comparado com as sinopses (sentence-transformers,
+   similaridade de cosseno + bônus por palavras em comum).
+5. **Ranking**: o resultado é ordenado pela qualidade e pelo seu perfil.
+
+## 🛠️ Tecnologias
+
+Python · customtkinter · Pillow · sentence-transformers · NumPy · Ollama · API do TMDB · API da OMDb
+
+---
+
+## 🚀 Como rodar
+
+### 1. Instalar as bibliotecas
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Instalar a IA local
+
+Instale o [Ollama](https://ollama.com) e baixe o modelo:
+
+```bash
+ollama pull qwen3:1.7b
+```
+
+### 3. Configurar as chaves (só para importar o catálogo)
+
+Copie o arquivo `.env.example` para `.env` e coloque suas chaves:
+
+```
+TMDB_API_KEY=sua_chave_tmdb_aqui
+OMDB_API_KEY=sua_chave_omdb_aqui
+```
+
+> O `.env` nunca vai para o GitHub (está no `.gitignore`).
+
+### 4. Baixar os pôsteres e montar o catálogo
+
+```bash
+python importar_tmdb.py          # filmes + pôsteres
+python importar_series.py        # séries + pôsteres
+python importar_avaliacoes.py    # IMDb / Rotten Tomatoes (limite de 1.000 por dia no plano grátis)
+python importar_trailers.py      # trailers que faltarem
+```
+
+### 5. Abrir o CineAI
+
+```bash
+python interface.py
+```
+
+Na primeira vez ele calcula os embeddings do catálogo (demora um pouco); depois fica salvo
+em `embeddings_cache.pkl`.
+
+---
+
+## ✅ Testes
+
+```bash
+python testes.py              # modo rápido: catálogo pequeno de teste, sem IA de verdade
+python testes.py --completo   # usa o catálogo real
+```
+
+Os testes usam uma pasta temporária e **nunca mexem** no seu `usuario.json` nem no `conversas.json`.
+
+---
+
+## 📁 Estrutura
+
+| Arquivo | O que faz |
+|---|---|
+| `interface.py` | Janela do programa (chat, catálogo, diário, painel do RAG) |
+| `filmes.py` | Cérebro do CineAI: regras, filtros, busca semântica e respostas |
+| `perfil.py` | Perfil de gosto a partir das suas notas |
+| `usuario.py` | Favoritos, assistidos, notas e anotações (`usuario.json`) |
+| `conversas.py` | Conversas salvas (`conversas.json`) |
+| `rastreio.py` | Grava as etapas de cada resposta para o Painel do RAG |
+| `importar_*.py` | Montam o catálogo a partir do TMDB e da OMDb |
+| `testes.py` | Testes automáticos |
+| `filmes.json` | Catálogo (filmes e séries) |
+
+---
+
+## 📜 Créditos
+
+Este produto usa a API do TMDB, mas não é endossado nem certificado pelo
+[TMDB](https://www.themoviedb.org). Notas do IMDb, Rotten Tomatoes e Metacritic via
+[OMDb API](https://www.omdbapi.com).

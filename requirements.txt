@@ -1,0 +1,6 @@
+customtkinter
+Pillow
+numpy
+requests
+sentence-transformers
+ollama
