@@ -292,3 +292,55 @@ def numero_da_entrada(filme):
         if chave_vista == chave:
             return posicao
     return None
+
+
+
+# =========================================================
+# DIÁRIO AUTOMÁTICO (uma entrada para cada título visto)
+# =========================================================
+ORDEM_DIARIO_RECENTES = "recentes"
+ORDEM_DIARIO_ANTIGOS = "antigos"
+ORDEM_DIARIO_NOTA = "nota"
+
+
+def data_em_que_assistiu(filme):
+    """A data guardada quando você marcou como visto (um date), ou None."""
+    registro = dados_usuario["assistidos"].get(chave_filme(filme)) or {}
+    try:
+        return date.fromisoformat(registro.get("adicionado_em") or "")
+    except ValueError:
+        return None
+
+
+def entradas_do_diario(catalogo, ordem=ORDEM_DIARIO_RECENTES):
+    """
+    Cada título visto vira uma entrada do diário:
+        {"filme", "numero", "data", "nota", "anotacao"}
+
+    O número da entrada segue a ordem em que você marcou (1º visto = #1),
+    e nunca muda, mesmo que você troque a ordem de exibição.
+    Ordens: "recentes" (padrão), "antigos" ou "nota" (5★ primeiro; sem nota no fim).
+    """
+    filmes_por_chave = {chave_filme(filme): filme for filme in catalogo}
+
+    entradas = []
+    for numero, chave in enumerate(dados_usuario["assistidos"], start=1):
+        filme = filmes_por_chave.get(chave)
+        if filme is None:
+            continue  # saiu do catálogo: o número dele continua reservado
+        entradas.append({
+            "filme": filme,
+            "numero": numero,
+            "data": data_em_que_assistiu(filme),
+            "nota": obter_nota(filme),
+            "anotacao": obter_anotacao(filme),
+        })
+
+    if ordem == ORDEM_DIARIO_ANTIGOS:
+        return entradas
+
+    entradas.reverse()  # mais recentes primeiro
+    if ordem == ORDEM_DIARIO_NOTA:
+        # sort é estável: no empate, o visto por último continua na frente
+        entradas.sort(key=lambda entrada: entrada["nota"] or 0, reverse=True)
+    return entradas

@@ -583,6 +583,57 @@ class TestAnotacoes(TesteCineAI):
         self.assertEqual(usuario.carregar_dados()["anotacoes"], {})
 
 
+class TestDiario(TesteCineAI):
+    """Diário automático: cada título visto vira uma entrada (Meu diário)."""
+
+    def marcar_tres(self):
+        usuario.alternar_assistido(self.filme("Titanic"))
+        usuario.definir_nota(self.filme("Shrek"), 5)
+        usuario.definir_nota(self.filme("Dunkirk"), 3)
+        usuario.definir_anotacao(self.filme("Shrek"), "Ri do começo ao fim.")
+
+    def nomes(self, entradas):
+        return [entrada["filme"]["nome"] for entrada in entradas]
+
+    def test_entrada_tem_tudo(self):
+        """A entrada traz número, data de hoje, nota e anotação."""
+        from datetime import date
+        self.marcar_tres()
+        shrek = next(e for e in usuario.entradas_do_diario(filmes.filmes) if e["filme"]["nome"] == "Shrek")
+        self.assertEqual(shrek["numero"], 2)
+        self.assertEqual(shrek["data"], date.today())
+        self.assertEqual(shrek["nota"], 5)
+        self.assertEqual(shrek["anotacao"], "Ri do começo ao fim.")
+
+    def test_ordens(self):
+        """Mais recentes, mais antigos e por nota (sem nota vai para o fim)."""
+        self.marcar_tres()
+        self.assertEqual(self.nomes(usuario.entradas_do_diario(filmes.filmes)), ["Dunkirk", "Shrek", "Titanic"])
+        self.assertEqual(
+            self.nomes(usuario.entradas_do_diario(filmes.filmes, usuario.ORDEM_DIARIO_ANTIGOS)),
+            ["Titanic", "Shrek", "Dunkirk"]
+        )
+        self.assertEqual(
+            self.nomes(usuario.entradas_do_diario(filmes.filmes, usuario.ORDEM_DIARIO_NOTA)),
+            ["Shrek", "Dunkirk", "Titanic"]
+        )
+
+    def test_numero_nao_muda_com_a_ordem(self):
+        """Titanic é sempre a entrada #1, em qualquer ordem."""
+        self.marcar_tres()
+        for ordem in (usuario.ORDEM_DIARIO_RECENTES, usuario.ORDEM_DIARIO_ANTIGOS, usuario.ORDEM_DIARIO_NOTA):
+            titanic = next(e for e in usuario.entradas_do_diario(filmes.filmes, ordem) if e["filme"]["nome"] == "Titanic")
+            self.assertEqual(titanic["numero"], 1)
+
+    def test_diario_vazio_e_data_estranha(self):
+        """Sem nada visto: lista vazia. Data inválida no arquivo: data None (não quebra)."""
+        self.assertEqual(usuario.entradas_do_diario(filmes.filmes), [])
+        titanic = self.filme("Titanic")
+        usuario.alternar_assistido(titanic)
+        usuario.dados_usuario["assistidos"][usuario.chave_filme(titanic)]["adicionado_em"] = "ontem"
+        self.assertIsNone(usuario.entradas_do_diario(filmes.filmes)[0]["data"])
+
+
 # =========================================================
 # 8. ESTRELAS
 # =========================================================

@@ -340,7 +340,7 @@ def ao_mudar_listas():
     # Com "esconder os que já vi" ou ordem "Combina comigo", o Catálogo muda junto.
     if esconder_assistidos_var.get() or filtro_ordem.get() == "Combina comigo":
         atualizar_catalogo(manter_pagina=True)
-    atualizar_meus_filmes()
+    atualizar_meus_filmes(voltar_ao_topo=False)
     atualizar_pagina_perfil()
 
 
@@ -926,6 +926,7 @@ def abrir_detalhes(filme):
             detalhes.after_cancel(estado_anotacao["agendamento"])
             salvar_anotacao()
         detalhes.destroy()
+        atualizar_meus_filmes(voltar_ao_topo=False)  # a anotação aparece na entrada do diário
 
     detalhes.protocol("WM_DELETE_WINDOW", ao_fechar)
 
@@ -3300,16 +3301,31 @@ def criar_card_filme(container, filme, linha, coluna, widgets, imagens):
     widgets.append(card)
 
 
+TAMANHO_ESPACO_VAZIO = (110, 160)
+
+
 def mostrar_mensagem_vazia(container, texto, widgets):
-    mensagem = ctk.CTkLabel(
-        container,
+    """Página quase vazia: um espaço tracejado "cole aqui" e um recado escrito à mão."""
+    escala = escala_da_tela(container)
+    cor_pagina = COR_FUNDO
+
+    area_vazia = tk.Frame(container, bg=cor_pagina)
+    area_vazia.grid(row=0, column=0, columnspan=COLUNAS_CARDS, pady=int(50 * escala))
+
+    imagem = imagem_do_recorte_vazio(1, escala, cor_pagina, TAMANHO_ESPACO_VAZIO)
+    espaco = tk.Label(area_vazia, image=imagem, bg=cor_pagina, bd=0)
+    espaco.imagem = imagem
+    espaco.pack()
+
+    tk.Label(
+        area_vazia,
         text=texto,
-        font=(FONTE_MANUSCRITA, 20),
-        text_color=COR_TEXTO_SECUNDARIO,
+        font=(FONTE_MANUSCRITA, -int(20 * escala)),
+        fg=COR_TEXTO_SECUNDARIO,
+        bg=cor_pagina,
         justify="center"
-    )
-    mensagem.grid(row=0, column=0, columnspan=COLUNAS_CARDS, pady=85)
-    widgets.append(mensagem)
+    ).pack(pady=(int(14 * escala), 0))
+    widgets.append(area_vazia)
 
 
 def limpar_grade(widgets, imagens):
@@ -3382,8 +3398,8 @@ def desenhar_pagina_catalogo():
         widgets_catalogo,
         imagens_catalogo,
         (
-            "Nenhum filme encontrado.\n\n"
-            "Tente pesquisar outro nome, gênero, ano, diretor ou ator."
+            "Nada colado nesta página...\n\n"
+            "tente outro nome, gênero, ano, diretor ou ator."
         ),
         inicio=inicio,
         quantidade=CARDS_POR_PAGINA
@@ -3464,8 +3480,8 @@ def atualizar_recomendacoes():
         widgets_recomendacoes,
         imagens_recomendacoes,
         (
-            "Ainda não há recomendações.\n\n"
-            "Peça um filme ao CineAI e ele aparecerá aqui."
+            "Nenhuma recomendação guardada ainda...\n\n"
+            "peça um filme ao CineAI e ele vem parar aqui."
         )
     )
 
@@ -3714,8 +3730,8 @@ criar_cabecalho_pagina(
     "os filmes que fizeram parte da sua história"
 )
 
+ABA_DIARIO = "✎  Diário"
 ABA_FAVORITOS = "❤  Favoritos"
-ABA_ASSISTIDOS = "✓  Já assisti"
 
 # Abas como marcadores de couro: marrom, e vermelho na aba aberta.
 ESTILO_ABAS = {
@@ -3729,7 +3745,13 @@ ESTILO_ABAS = {
 }
 
 ORDEM_RECENTES = "Mais recentes"
+ORDEM_ANTIGOS = "Mais antigos"
 ORDEM_MINHA_NOTA = "★ Minha nota"
+ORDENS_DO_DIARIO = {
+    ORDEM_RECENTES: usuario.ORDEM_DIARIO_RECENTES,
+    ORDEM_ANTIGOS: usuario.ORDEM_DIARIO_ANTIGOS,
+    ORDEM_MINHA_NOTA: usuario.ORDEM_DIARIO_NOTA,
+}
 
 area_abas = ctk.CTkFrame(pagina_meus_filmes, fg_color="transparent")
 area_abas.grid(row=1, column=0, sticky="ew", padx=42, pady=(2, 10))
@@ -3737,23 +3759,23 @@ area_abas.grid_columnconfigure(2, weight=1)
 
 seletor_aba = ctk.CTkSegmentedButton(
     area_abas,
-    values=[ABA_FAVORITOS, ABA_ASSISTIDOS],
+    values=[ABA_DIARIO, ABA_FAVORITOS],
     height=38,
     font=(FONTE_INTERFACE, 13, "bold"),
     **ESTILO_ABAS,
     command=lambda aba_escolhida: atualizar_meus_filmes()
 )
-seletor_aba.set(ABA_FAVORITOS)
+seletor_aba.set(ABA_DIARIO)
 seletor_aba.grid(row=0, column=0, sticky="w")
 
-# Ordenação: só aparece na aba "Já assisti".
+# Ordenação: só aparece na aba do diário.
 seletor_ordem = ctk.CTkSegmentedButton(
     area_abas,
-    values=[ORDEM_RECENTES, ORDEM_MINHA_NOTA],
+    values=list(ORDENS_DO_DIARIO),
     height=32,
     font=(FONTE_INTERFACE, 11, "bold"),
     **ESTILO_ABAS,
-    command=lambda ordem_escolhida: atualizar_meus_filmes()
+    command=lambda ordem_escolhida: mudar_ordem_do_diario()
 )
 seletor_ordem.set(ORDEM_RECENTES)
 
@@ -3772,65 +3794,386 @@ widgets_meus_filmes = []
 imagens_meus_filmes = []
 
 
-def ordenar_assistidos_por_nota(lista_assistidos):
-    """Avaliados primeiro (5★ → 1★); depois os assistidos ainda sem nota."""
-    avaliados = usuario.filmes_avaliados(filmes.filmes)
-    chaves_avaliadas = {usuario.chave_filme(filme) for filme in avaliados}
+# =========================================================
+# DIÁRIO AUTOMÁTICO — uma entrada para cada título visto
+# =========================================================
+# As entradas vêm prontas do usuario.entradas_do_diario() (número, data, nota
+# e anotação). Aqui só desenhamos: separador do mês, data na margem, polaroide,
+# estrelas e a anotação, que dá para escrever ali mesmo (salva sozinha).
+MESES_EM_PORTUGUES = [
+    "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+    "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO",
+]
+ENTRADAS_POR_VEZ = 30                  # o resto aparece com "ver entradas mais antigas"
+TAMANHO_POSTER_ENTRADA = (88, 130)
+LARGURA_TEXTO_ENTRADA = 560
+COR_LINHA_DIARIO = COR_PAUTA_CADERNO
 
-    sem_nota = [
-        filme for filme in lista_assistidos
-        if usuario.chave_filme(filme) not in chaves_avaliadas
-    ]
-    return avaliados + sem_nota
+estado_diario = {"quantidade": ENTRADAS_POR_VEZ}
+edicao_no_diario = {"filme": None, "caixa": None, "agendamento": None}
 
 
-def atualizar_meus_filmes():
+def titulo_do_grupo(entrada, ordem):
+    """Separador das entradas: o mês ('OUTUBRO DE 2026') ou, na ordem por nota, as estrelas."""
+    if ordem == usuario.ORDEM_DIARIO_NOTA:
+        nota = entrada["nota"]
+        if nota is None:
+            return "ainda sem nota"
+        return f"{usuario.texto_estrelas(nota)}  {nota} estrela{'s' if nota > 1 else ''}"
+
+    data_vista = entrada["data"]
+    if data_vista is None:
+        return "sem data"
+    return f"{MESES_EM_PORTUGUES[data_vista.month - 1]} DE {data_vista.year}"
+
+
+def criar_separador_do_grupo(container, texto, imagens):
+    """'✦ OUTUBRO DE 2026' à mão, em vermelho, com a passada de marca-texto dourado."""
+    escala = escala_da_tela(container)
+
+    def px(valor):
+        return int(valor * escala)
+
+    caixa = tk.Frame(container, bg=COR_FUNDO)
+    caixa.pack(fill="x", padx=px(10), pady=(px(18), px(4)))
+
+    linha = tk.Frame(caixa, bg=COR_FUNDO)
+    linha.pack(anchor="w")
+
+    desenho = desenhar_icone("estrela", cor_rgb(COR_RABISCO) + (255,)).resize(
+        (px(22), px(22)), Image.LANCZOS
+    )
+    fundo = Image.new("RGBA", desenho.size, cor_rgb(COR_FUNDO) + (255,))
+    fundo.alpha_composite(desenho.convert("RGBA"))
+    icone = ImageTk.PhotoImage(fundo.convert("RGB"))
+    imagens.append(icone)
+    tk.Label(linha, image=icone, bg=COR_FUNDO, bd=0).pack(side="left", padx=(0, px(6)))
+
+    tk.Label(
+        linha, text=texto, font=(FONTE_MANUSCRITA, -px(23), "bold"),
+        fg=COR_TITULO_MANUSCRITO, bg=COR_FUNDO
+    ).pack(side="left")
+
+    tk.Frame(
+        caixa, bg=COR_MARCA_TEXTO, height=px(6), width=px(min(380, 12 * len(texto)))
+    ).pack(anchor="w", padx=(px(30), 0))
+
+
+def salvar_edicao_do_diario():
+    """Grava o que está escrito na caixa aberta numa entrada (se houver)."""
+    if edicao_no_diario["agendamento"] is not None:
+        janela.after_cancel(edicao_no_diario["agendamento"])
+        edicao_no_diario["agendamento"] = None
+
+    caixa = edicao_no_diario["caixa"]
+    if caixa is not None and caixa.winfo_exists():
+        usuario.definir_anotacao(edicao_no_diario["filme"], caixa.get("1.0", "end"))
+
+
+def fechar_edicao_do_diario():
+    salvar_edicao_do_diario()
+    edicao_no_diario.update({"filme": None, "caixa": None, "agendamento": None})
+
+
+def montar_anotacao_da_entrada(area, filme, escala, editando=False):
+    """
+    A anotação da entrada: o texto à mão (caneta azul) com '✎ editar', ou um
+    convite para escrever. Clicando, a própria entrada vira um caderninho.
+    """
+    def px(valor):
+        return int(valor * escala)
+
+    for widget in area.winfo_children():
+        widget.destroy()
+
+    if editando:
+        fechar_edicao_do_diario()  # só uma caixa aberta por vez
+
+        caixa = ctk.CTkTextbox(
+            area, height=px(90), wrap="word", corner_radius=2,
+            fg_color=COR_BILHETE, text_color=COR_AZUL_CANETA, border_width=1,
+            border_color=COR_BORDA_PAPEL, font=(FONTE_MANUSCRITA, 17)
+        )
+        caixa.pack(fill="x", pady=(px(4), px(2)))
+        caixa.insert("1.0", usuario.obter_anotacao(filme))
+        caixa.focus_set()
+
+        rodape = tk.Frame(area, bg=COR_CARD)
+        rodape.pack(fill="x")
+        aviso = tk.Label(
+            rodape, text="escreva à vontade: salva sozinho",
+            font=(FONTE_MANUSCRITA, -px(13)), fg=COR_TEXTO_SUAVE, bg=COR_CARD
+        )
+        aviso.pack(side="left")
+
+        def salvar_agora():
+            edicao_no_diario["agendamento"] = None
+            if caixa.winfo_exists():
+                usuario.definir_anotacao(filme, caixa.get("1.0", "end"))
+                if aviso.winfo_exists():
+                    aviso.configure(text="salvo no seu diário ✓")
+                atualizar_contador_meus_filmes()
+
+        def agendar_salvamento(event=None):
+            if edicao_no_diario["agendamento"] is not None:
+                janela.after_cancel(edicao_no_diario["agendamento"])
+            aviso.configure(text="escrevendo…")
+            edicao_no_diario["agendamento"] = janela.after(ATRASO_SALVAR_ANOTACAO_MS, salvar_agora)
+
+        def terminar(event=None):
+            fechar_edicao_do_diario()
+            atualizar_contador_meus_filmes()
+            montar_anotacao_da_entrada(area, filme, escala)
+
+        caixa.bind("<KeyRelease>", agendar_salvamento)
+        edicao_no_diario.update({"filme": filme, "caixa": caixa, "agendamento": None})
+
+        botao_pronto = tk.Label(
+            rodape, text="  pronto ✓  ", font=(FONTE_MANUSCRITA, -px(15), "bold"),
+            fg=COR_TEXTO_CAPA, bg=COR_VERMELHO, cursor="hand2"
+        )
+        botao_pronto.pack(side="right", pady=(px(2), 0))
+        botao_pronto.bind("<Button-1>", terminar)
+        return
+
+    texto = usuario.obter_anotacao(filme)
+
+    def abrir_edicao(event=None):
+        montar_anotacao_da_entrada(area, filme, escala, editando=True)
+
+    if texto:
+        rotulo = tk.Label(
+            area, text=f"“{texto}”", font=(FONTE_MANUSCRITA, -px(17)),
+            fg=COR_AZUL_CANETA, bg=COR_CARD, justify="left", anchor="w",
+            wraplength=px(LARGURA_TEXTO_ENTRADA), cursor="hand2"
+        )
+        rotulo.pack(fill="x")
+        editar = tk.Label(
+            area, text="✎ editar", font=(FONTE_MANUSCRITA, -px(14)),
+            fg=COR_TEXTO_SUAVE, bg=COR_CARD, cursor="hand2"
+        )
+        editar.pack(anchor="e")
+        vincular_clique([rotulo, editar], abrir_edicao)
+    else:
+        convite = tk.Label(
+            area, text="✎ escrever o que você achou...", font=(FONTE_MANUSCRITA, -px(16)),
+            fg=COR_TEXTO_SUAVE, bg=COR_CARD, anchor="w", cursor="hand2"
+        )
+        convite.pack(anchor="w")
+        vincular_clique([convite], abrir_edicao)
+
+
+def criar_entrada_do_diario(container, entrada, imagens):
+    """
+    Uma entrada:  [03 / OUT / 2026] [polaroide] ENTRADA #012 · SÉRIE
+                                                Nome do filme (2021)
+                                                ★★★★☆   ✓ WATCHED
+                                                “sua anotação...”   ✎ editar
+    """
+    filme = entrada["filme"]
+    escala = escala_da_tela(container)
+
+    def px(valor):
+        return int(valor * escala)
+
+    folha = tk.Frame(
+        container, bg=COR_CARD, highlightbackground=COR_BORDA_PAPEL,
+        highlightcolor=COR_BORDA_PAPEL, highlightthickness=1
+    )
+    folha.pack(fill="x", padx=px(10), pady=px(6))
+
+    # ---------- margem com a data (como a de um caderno) ----------
+    margem = tk.Frame(folha, bg=COR_CARD, width=px(78))
+    margem.pack(side="left", fill="y")
+    margem.pack_propagate(False)
+    tk.Frame(folha, bg=COR_VERMELHO, width=max(1, px(2))).pack(side="left", fill="y", pady=px(8))
+
+    data_vista = entrada["data"]
+    if data_vista is not None:
+        tk.Label(
+            margem, text=f"{data_vista.day:02d}", font=(FONTE_TITULO, -px(34)),
+            fg=COR_VERMELHO, bg=COR_CARD
+        ).pack(pady=(px(16), 0))
+        tk.Label(
+            margem, text=MESES_EM_PORTUGUES[data_vista.month - 1][:3],
+            font=(FONTE_INTERFACE, -px(12), "bold"), fg=COR_VINHO, bg=COR_CARD
+        ).pack()
+        tk.Label(
+            margem, text=str(data_vista.year), font=(FONTE_INTERFACE, -px(10)),
+            fg=COR_TEXTO_SUAVE, bg=COR_CARD
+        ).pack()
+    else:
+        tk.Label(
+            margem, text="?", font=(FONTE_TITULO, -px(30)), fg=COR_TEXTO_SUAVE, bg=COR_CARD
+        ).pack(pady=(px(18), 0))
+
+    # ---------- polaroide pequena ----------
+    imagem = imagem_do_recorte(filme, escala, COR_CARD, TAMANHO_POSTER_ENTRADA, modo="compacto")
+    imagens.append(imagem)
+    foto = tk.Label(folha, image=imagem, bg=COR_CARD, bd=0, cursor="hand2")
+    foto.imagem = imagem
+    foto.pack(side="left", padx=(px(10), px(6)), pady=px(8), anchor="n")
+
+    # ---------- textos ----------
+    textos = tk.Frame(folha, bg=COR_CARD)
+    textos.pack(side="left", fill="both", expand=True, padx=(px(8), px(16)), pady=(px(12), px(10)))
+
+    linha_etiqueta = tk.Frame(textos, bg=COR_CARD)
+    linha_etiqueta.pack(anchor="w")
+    tipo = "SÉRIE" if filmes.eh_serie(filme) else "FILME"
+    tk.Label(
+        linha_etiqueta, text=f"ENTRADA #{entrada['numero']:03d}  ·  {tipo}",
+        font=(FONTE_INTERFACE, -px(10), "bold"),
+        fg=COR_SERIE if filmes.eh_serie(filme) else COR_TEXTO_SUAVE, bg=COR_CARD
+    ).pack(side="left")
+    if usuario.eh_favorito(filme):
+        tk.Label(
+            linha_etiqueta, text="  ♥ favorito", font=(FONTE_MANUSCRITA, -px(13), "bold"),
+            fg=COR_VERMELHO, bg=COR_CARD
+        ).pack(side="left")
+
+    nome = tk.Label(
+        textos, text=f"{filme['nome']}  ({filmes.periodo_de_exibicao(filme)})",
+        font=(FONTE, -px(17), "bold"), fg=COR_TEXTO, bg=COR_CARD, anchor="w",
+        justify="left", wraplength=px(LARGURA_TEXTO_ENTRADA), cursor="hand2"
+    )
+    nome.pack(fill="x", pady=(px(2), px(2)))
+
+    linha_nota = tk.Frame(textos, bg=COR_CARD)
+    linha_nota.pack(anchor="w", pady=(0, px(6)))
+    if entrada["nota"] is not None:
+        tk.Label(
+            linha_nota, text=usuario.texto_estrelas(entrada["nota"]),
+            font=(FONTE_SIMBOLOS, -px(17)), fg=COR_ESTRELA_ACESA, bg=COR_CARD
+        ).pack(side="left")
+    else:
+        tk.Label(
+            linha_nota, text="sem nota ainda", font=(FONTE_MANUSCRITA, -px(14)),
+            fg=COR_TEXTO_SUAVE, bg=COR_CARD
+        ).pack(side="left")
+    tk.Label(
+        linha_nota, text=" ✓ WATCHED ", font=(FONTE_TITULO, -px(12)),
+        fg=COR_VERMELHO, bg=COR_CARD, highlightbackground=COR_VERMELHO, highlightthickness=1
+    ).pack(side="left", padx=(px(12), 0))
+
+    tk.Frame(textos, bg=COR_LINHA_DIARIO, height=1).pack(fill="x", pady=(0, px(6)))
+
+    area_anotacao = tk.Frame(textos, bg=COR_CARD)
+    area_anotacao.pack(fill="x")
+    montar_anotacao_da_entrada(area_anotacao, filme, escala)
+
+    def abrir(event=None):
+        abrir_detalhes(filme)
+
+    vincular_clique([foto, nome], abrir)
+
+
+def mostrar_mais_entradas(event=None):
+    estado_diario["quantidade"] += ENTRADAS_POR_VEZ
+    atualizar_meus_filmes(voltar_ao_topo=False)
+
+
+def mudar_ordem_do_diario():
+    estado_diario["quantidade"] = ENTRADAS_POR_VEZ
+    atualizar_meus_filmes()
+
+
+def desenhar_diario(voltar_ao_topo=True):
+    """Desenha as entradas do diário (no lugar da grade de pôsteres)."""
+    fechar_edicao_do_diario()  # salva o que estava sendo escrito antes de redesenhar
+    limpar_grade(widgets_meus_filmes, imagens_meus_filmes)
+
+    ordem = ORDENS_DO_DIARIO[seletor_ordem.get()]
+    entradas = usuario.entradas_do_diario(filmes.filmes, ordem)
+
+    if not entradas:
+        mostrar_mensagem_vazia(scroll_meus_filmes, TEXTO_DIARIO_VAZIO, widgets_meus_filmes)
+        return
+
+    folha_do_diario = tk.Frame(scroll_meus_filmes, bg=COR_FUNDO)
+    folha_do_diario.grid(row=0, column=0, columnspan=COLUNAS_CARDS, sticky="ew")
+    widgets_meus_filmes.append(folha_do_diario)
+
+    grupo_anterior = None
+    for entrada in entradas[:estado_diario["quantidade"]]:
+        grupo = titulo_do_grupo(entrada, ordem)
+        if grupo != grupo_anterior:
+            criar_separador_do_grupo(folha_do_diario, grupo, imagens_meus_filmes)
+            grupo_anterior = grupo
+        criar_entrada_do_diario(folha_do_diario, entrada, imagens_meus_filmes)
+
+    faltam = len(entradas) - estado_diario["quantidade"]
+    if faltam > 0:
+        botao_mais = tk.Label(
+            folha_do_diario,
+            text=f"  ↓ ver entradas mais antigas ({faltam})  ",
+            font=(FONTE_MANUSCRITA, -int(17 * escala_da_tela(folha_do_diario)), "bold"),
+            fg=COR_VERMELHO, bg=COR_PAPEL_ESCURO, cursor="hand2"
+        )
+        botao_mais.pack(pady=(14, 20))
+        botao_mais.bind("<Button-1>", mostrar_mais_entradas)
+    else:
+        tk.Label(
+            folha_do_diario, text="✦ fim do diário (por enquanto) ✦",
+            font=(FONTE_MANUSCRITA, -int(15 * escala_da_tela(folha_do_diario))),
+            fg=COR_TEXTO_SUAVE, bg=COR_FUNDO
+        ).pack(pady=(14, 20))
+
+    canvas_rolagem = getattr(scroll_meus_filmes, "_parent_canvas", None)
+    if voltar_ao_topo and canvas_rolagem is not None:
+        canvas_rolagem.yview_moveto(0)
+
+
+TEXTO_DIARIO_VAZIO = (
+    "Este diário ainda está em branco...\n\n"
+    "marque um filme como visto (ou dê estrelas a ele)\n"
+    "e a primeira entrada aparece aqui, com a data de hoje."
+)
+TEXTO_FAVORITOS_VAZIO = (
+    "Ainda não colei nenhum favorito aqui...\n\n"
+    "quando um filme te conquistar, abra a página dele\n"
+    "e toque em  ♡ favoritar."
+)
+
+
+def atualizar_contador_meus_filmes():
     quantidade_favoritos = len(usuario.filmes_da_lista("favoritos", filmes.filmes))
     quantidade_assistidos = len(usuario.filmes_da_lista("assistidos", filmes.filmes))
-    quantidade_avaliados = len(usuario.filmes_avaliados(filmes.filmes))
+    quantidade_anotacoes = len(usuario.dados_usuario.get("anotacoes", {}))
 
     contador_meus_filmes.configure(
         text=(
-            f"❤ {quantidade_favoritos} favoritos   ✓ {quantidade_assistidos} assistidos   "
-            f"★ {quantidade_avaliados} avaliados"
+            f"✎ {quantidade_assistidos} entradas   ❤ {quantidade_favoritos} favoritos   "
+            f"✍ {quantidade_anotacoes} anotações"
         )
     )
 
-    aba_assistidos_aberta = seletor_aba.get() == ABA_ASSISTIDOS
 
-    if aba_assistidos_aberta:
+def atualizar_meus_filmes(voltar_ao_topo=True):
+    atualizar_contador_meus_filmes()
+
+    aba_diario_aberta = seletor_aba.get() == ABA_DIARIO
+
+    if aba_diario_aberta:
         seletor_ordem.grid(row=0, column=1, sticky="w", padx=(15, 0))
     else:
         seletor_ordem.grid_remove()
 
-    # Só redesenha a grade se a página estiver aberta (evita trabalho à toa).
+    # Só redesenha se a página estiver aberta (evita trabalho à toa).
     if not pagina_meus_filmes.winfo_ismapped() and widgets_meus_filmes:
         return
 
-    if aba_assistidos_aberta:
-        lista_filmes = usuario.filmes_da_lista("assistidos", filmes.filmes)
+    if aba_diario_aberta:
+        desenhar_diario(voltar_ao_topo)
+        return
 
-        if seletor_ordem.get() == ORDEM_MINHA_NOTA:
-            lista_filmes = ordenar_assistidos_por_nota(lista_filmes)
-
-        texto_vazio = (
-            "Você ainda não marcou nenhum filme como assistido.\n\n"
-            "Abra um filme e clique em  👁 Marcar como assistido\n"
-            "ou dê uma nota nas estrelas."
-        )
-    else:
-        lista_filmes = usuario.filmes_da_lista("favoritos", filmes.filmes)
-        texto_vazio = (
-            "Você ainda não tem favoritos.\n\n"
-            "Abra um filme e clique em  🤍 Favoritar."
-        )
-
+    fechar_edicao_do_diario()
     preencher_grade(
         scroll_meus_filmes,
-        lista_filmes,
+        usuario.filmes_da_lista("favoritos", filmes.filmes),
         widgets_meus_filmes,
         imagens_meus_filmes,
-        texto_vazio
+        TEXTO_FAVORITOS_VAZIO
     )
 
 
