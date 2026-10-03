@@ -32,7 +32,8 @@ PASTA_DADOS = Path(os.environ.get("CINEAI_PASTA_USUARIO", Path(__file__).resolve
 CAMINHO_USUARIO = PASTA_DADOS / "usuario.json"
 
 # anotacoes = "Minhas anotações" de cada filme | quero_assistir = guardados "pra depois"
-LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir")
+# configuracoes = coisas suas que não são filmes (ex.: o nome na capa do diário)
+LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir", "configuracoes")
 
 
 # =========================================================
@@ -376,3 +377,112 @@ def entradas_do_diario(catalogo, ordem=ORDEM_DIARIO_RECENTES):
         # sort é estável: no empate, o visto por último continua na frente
         entradas.sort(key=lambda entrada: entrada["nota"] or 0, reverse=True)
     return entradas
+
+
+# =========================================================
+# CAPA DO DIÁRIO (seu nome + estatísticas)
+# =========================================================
+TAMANHO_MAXIMO_NOME = 40
+MINIMO_PARA_DESTAQUE = 2   # "diretor que mais aparece" só com 2 títulos ou mais
+
+
+def obter_nome_do_dono():
+    return dados_usuario["configuracoes"].get("nome_do_dono", "")
+
+
+def definir_nome_do_dono(nome):
+    nome = " ".join((nome or "").split())[:TAMANHO_MAXIMO_NOME]
+    if nome:
+        dados_usuario["configuracoes"]["nome_do_dono"] = nome
+    else:
+        dados_usuario["configuracoes"].pop("nome_do_dono", None)
+    salvar_dados()
+
+
+def separar_nomes(texto):
+    """'Ação, Aventura' -> ['Ação', 'Aventura']"""
+    return [parte.strip() for parte in (texto or "").split(",") if parte.strip()]
+
+
+def mais_frequente(contagem):
+    """{'Drama': 3, 'Ação': 3, 'Terror': 1} -> ('Drama', 3) (empate: o que apareceu primeiro)."""
+    if not contagem:
+        return None
+    nome = max(contagem, key=contagem.get)  # max devolve o primeiro em caso de empate
+    return nome, contagem[nome]
+
+
+def minutos_do_titulo(filme):
+    """
+    Filme: a duração. Série: episódios × duração de um episódio (uma estimativa,
+    porque não sabemos quantos episódios você viu). None se faltar informação.
+    """
+    duracao = filme.get("duracao_minutos")
+    if not duracao:
+        return None
+    if filme.get("tipo") == "serie":
+        episodios = filme.get("episodios")
+        return episodios * duracao if episodios else None
+    return duracao
+
+
+def estatisticas_do_diario(catalogo):
+    """
+    Os números da capa do diário, calculados só com o que você marcou:
+        total, filmes, series, nota_media, avaliados, horas, horas_estimadas,
+        genero (nome, quantidade), pessoa (nome, quantidade), mes (date, quantidade),
+        melhor (entrada), primeira_data, anotacoes, favoritos, quero_assistir
+    """
+    entradas = entradas_do_diario(catalogo, ORDEM_DIARIO_ANTIGOS)
+
+    contagem_generos = {}
+    contagem_pessoas = {}
+    contagem_meses = {}
+    minutos = 0
+    tem_estimativa = False
+
+    for entrada in entradas:
+        filme = entrada["filme"]
+        for genero in separar_nomes(filme.get("genero")):
+            contagem_generos[genero] = contagem_generos.get(genero, 0) + 1
+        for pessoa in separar_nomes(filme.get("diretor")):
+            contagem_pessoas[pessoa] = contagem_pessoas.get(pessoa, 0) + 1
+        if entrada["data"] is not None:
+            mes = entrada["data"].replace(day=1)
+            contagem_meses[mes] = contagem_meses.get(mes, 0) + 1
+
+        minutos_vistos = minutos_do_titulo(filme)
+        if minutos_vistos:
+            minutos += minutos_vistos
+            tem_estimativa = tem_estimativa or filme.get("tipo") == "serie"
+
+    notas = [entrada["nota"] for entrada in entradas if entrada["nota"] is not None]
+    series = sum(1 for entrada in entradas if entrada["filme"].get("tipo") == "serie")
+
+    pessoa = mais_frequente(contagem_pessoas)
+    if pessoa is not None and pessoa[1] < MINIMO_PARA_DESTAQUE:
+        pessoa = None
+
+    # Título mais bem avaliado: maior nota; no empate, o visto por último.
+    avaliadas = [entrada for entrada in entradas if entrada["nota"] is not None]
+    melhor = max(reversed(avaliadas), key=lambda entrada: entrada["nota"]) if avaliadas else None
+
+    datas = [entrada["data"] for entrada in entradas if entrada["data"] is not None]
+
+    return {
+        "total": len(entradas),
+        "filmes": len(entradas) - series,
+        "series": series,
+        "avaliados": len(notas),
+        "nota_media": round(sum(notas) / len(notas), 1) if notas else None,
+        "horas": round(minutos / 60),
+        "horas_estimadas": tem_estimativa,
+        "genero": mais_frequente(contagem_generos),
+        "pessoa": pessoa,
+        "mes": mais_frequente(contagem_meses),
+        "melhor": melhor,
+        "primeira_data": min(datas) if datas else None,
+        "anotacoes": len(dados_usuario["anotacoes"]),
+        "favoritos": len(filmes_da_lista("favoritos", catalogo)),
+        "quero_assistir": len(filmes_da_lista("quero_assistir", catalogo)),
+    }

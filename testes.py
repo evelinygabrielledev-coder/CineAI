@@ -689,6 +689,58 @@ class TestQueroAssistir(TesteCineAI):
         self.assertEqual(usuario.carregar_dados()["quero_assistir"], {})
 
 
+class TestCapaDoDiario(TesteCineAI):
+    """Números da capa do diário (usuario.estatisticas_do_diario)."""
+
+    def test_diario_vazio(self):
+        """Sem nada visto: tudo zerado, sem quebrar."""
+        numeros = usuario.estatisticas_do_diario(filmes.filmes)
+        self.assertEqual(numeros["total"], 0)
+        self.assertIsNone(numeros["nota_media"])
+        self.assertIsNone(numeros["genero"])
+        self.assertIsNone(numeros["melhor"])
+        self.assertEqual(numeros["horas"], 0)
+
+    def test_numeros(self):
+        """Contagens, nota média, diretor que se repete e o mais bem avaliado."""
+        usuario.definir_nota(self.filme("A Origem"), 5)
+        usuario.definir_nota(self.filme("Interestelar"), 4)
+        usuario.definir_nota(self.filme("Titanic"), 3)
+        numeros = usuario.estatisticas_do_diario(filmes.filmes)
+        self.assertEqual(numeros["total"], 3)
+        self.assertEqual(numeros["filmes"], 3)
+        self.assertEqual(numeros["nota_media"], 4.0)
+        self.assertEqual(numeros["pessoa"], ("Christopher Nolan", 2))
+        self.assertEqual(numeros["melhor"]["filme"]["nome"], "A Origem")
+        minutos = sum(self.filme(nome)["duracao_minutos"] for nome in ["A Origem", "Interestelar", "Titanic"])
+        self.assertEqual(numeros["horas"], round(minutos / 60))
+        self.assertFalse(numeros["horas_estimadas"])
+
+    @apenas_modo_rapido  # depende dos episódios da série no catálogo de teste
+    def test_serie_conta_como_estimativa(self):
+        """Série soma episódios × duração e marca as horas como estimativa (≈)."""
+        breaking_bad = self.filme("Breaking Bad")
+        usuario.alternar_assistido(breaking_bad)
+        numeros = usuario.estatisticas_do_diario(filmes.filmes)
+        self.assertEqual(numeros["series"], 1)
+        self.assertTrue(numeros["horas_estimadas"])
+        esperado = breaking_bad["episodios"] * breaking_bad["duracao_minutos"]
+        self.assertEqual(numeros["horas"], round(esperado / 60))
+
+    def test_diretor_so_com_dois(self):
+        """Com um título só de cada diretor, não há 'diretor que mais aparece'."""
+        usuario.alternar_assistido(self.filme("Titanic"))
+        self.assertIsNone(usuario.estatisticas_do_diario(filmes.filmes)["pessoa"])
+
+    def test_nome_do_dono(self):
+        """O nome da capa é salvo (com espaços arrumados) e apagado se vier vazio."""
+        usuario.definir_nome_do_dono("  Eveliny   Gabrielle ")
+        usuario.dados_usuario = usuario.carregar_dados()
+        self.assertEqual(usuario.obter_nome_do_dono(), "Eveliny Gabrielle")
+        usuario.definir_nome_do_dono("")
+        self.assertEqual(usuario.obter_nome_do_dono(), "")
+
+
 # =========================================================
 # 8. ESTRELAS
 # =========================================================

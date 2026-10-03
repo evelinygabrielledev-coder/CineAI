@@ -3759,6 +3759,7 @@ criar_cabecalho_pagina(
     "os filmes que fizeram parte da sua história"
 )
 
+ABA_CAPA = "📖  Capa"
 ABA_DIARIO = "✎  Diário"
 ABA_FAVORITOS = "❤  Favoritos"
 ABA_QUERO_VER = "📌  Quero assistir"
@@ -3789,13 +3790,13 @@ area_abas.grid_columnconfigure(2, weight=1)
 
 seletor_aba = ctk.CTkSegmentedButton(
     area_abas,
-    values=[ABA_DIARIO, ABA_FAVORITOS, ABA_QUERO_VER],
+    values=[ABA_CAPA, ABA_DIARIO, ABA_FAVORITOS, ABA_QUERO_VER],
     height=38,
     font=(FONTE_INTERFACE, 13, "bold"),
     **ESTILO_ABAS,
     command=lambda aba_escolhida: atualizar_meus_filmes()
 )
-seletor_aba.set(ABA_DIARIO)
+seletor_aba.set(ABA_CAPA)
 seletor_aba.grid(row=0, column=0, sticky="w")
 
 # Ordenação: só aparece na aba do diário.
@@ -4279,6 +4280,202 @@ def desenhar_quero_assistir():
         canvas_rolagem.yview_moveto(0)
 
 
+# =========================================================
+# CAPA INTERNA — "este diário pertence a..." + estatísticas
+# =========================================================
+# Os números vêm prontos do usuario.estatisticas_do_diario(); aqui eles viram
+# carimbos de papel (os mesmos das notas na janela do filme) e anotações à mão.
+LARGURA_LINHA_DO_NOME = 380
+
+
+def data_por_extenso(data):
+    """date(2026, 9, 12) -> '12 de setembro de 2026'"""
+    return f"{data.day} de {MESES_EM_PORTUGUES[data.month - 1].lower()} de {data.year}"
+
+
+def plural(quantidade, singular, plural_da_palavra):
+    return f"{quantidade} {singular if quantidade == 1 else plural_da_palavra}"
+
+
+def formatar_numero_br(valor):
+    return f"{valor:,}".replace(",", ".")
+
+
+def selos_da_capa(numeros):
+    """[(título, valor grande, legenda)] dos carimbos da capa."""
+    horas = f"≈{formatar_numero_br(numeros['horas'])}h" if numeros["horas_estimadas"] else f"{formatar_numero_br(numeros['horas'])}h"
+    if numeros["nota_media"] is None:
+        nota, legenda_nota = "–", "ainda sem notas"
+    else:
+        nota = f"{numeros['nota_media']:.1f}".replace(".", ",")
+        legenda_nota = f"de 5 · {plural(numeros['avaliados'], 'nota', 'notas')}"
+    return [
+        ("FILMES", str(numeros["filmes"]), "vistos"),
+        ("SÉRIES", str(numeros["series"]), "vistas"),
+        ("NOTA MÉDIA", nota, legenda_nota),
+        ("HORAS", horas, "na frente da tela"),
+        ("ANOTAÇÕES", str(numeros["anotacoes"]), "escritas"),
+    ]
+
+
+def linhas_anotadas_da_capa(numeros):
+    """[(rótulo em vermelho, texto em azul, filme clicável ou None)] das anotações à mão."""
+    linhas = []
+    if numeros["genero"]:
+        genero, quantidade = numeros["genero"]
+        linhas.append(("gênero que mais aparece:", f"{genero} ({plural(quantidade, 'título', 'títulos')})", None))
+    if numeros["pessoa"]:
+        pessoa, quantidade = numeros["pessoa"]
+        linhas.append(("diretor (ou criador) que mais aparece:", f"{pessoa} ({quantidade})", None))
+    if numeros["mes"]:
+        mes, quantidade = numeros["mes"]
+        nome_mes = f"{MESES_EM_PORTUGUES[mes.month - 1].lower()} de {mes.year}"
+        linhas.append(("mês com mais sessões:", f"{nome_mes} ({plural(quantidade, 'título', 'títulos')})", None))
+    if numeros["melhor"]:
+        melhor = numeros["melhor"]
+        linhas.append((
+            "o mais bem avaliado:",
+            f"{melhor['filme']['nome']}  {usuario.texto_estrelas(melhor['nota'])}",
+            melhor["filme"],
+        ))
+    if numeros["favoritos"]:
+        linhas.append(("favoritos colados:", plural(numeros["favoritos"], "título", "títulos") + " ♥", None))
+    if numeros["quero_assistir"]:
+        linhas.append(("esperando na lista:", plural(numeros["quero_assistir"], "título", "títulos") + " 📌", None))
+    return linhas
+
+
+def criar_linha_do_nome(folha, escala):
+    """O nome escrito à mão. Clicando, vira um campo; Enter (ou sair do campo) salva."""
+    def px(valor):
+        return int(valor * escala)
+
+    area_nome = tk.Frame(folha, bg=COR_PAPEL)
+    area_nome.pack(pady=(px(2), 0))
+
+    def mostrar_nome():
+        for widget in area_nome.winfo_children():
+            widget.destroy()
+        nome = usuario.obter_nome_do_dono()
+        rotulo = tk.Label(
+            area_nome,
+            text=nome or "✎ escreva seu nome aqui",
+            font=(FONTE_MANUSCRITA, -px(38 if nome else 22), "bold" if nome else "normal"),
+            fg=COR_AZUL_CANETA if nome else COR_TEXTO_SUAVE,
+            bg=COR_PAPEL, cursor="hand2"
+        )
+        rotulo.pack()
+        rotulo.bind("<Button-1>", editar_nome)
+
+    def editar_nome(event=None):
+        for widget in area_nome.winfo_children():
+            widget.destroy()
+        campo = tk.Entry(
+            area_nome, font=(FONTE_MANUSCRITA, -px(32), "bold"), fg=COR_AZUL_CANETA,
+            bg=COR_BILHETE, relief="flat", justify="center", width=22,
+            insertbackground=COR_AZUL_CANETA, highlightthickness=1,
+            highlightbackground=COR_BORDA_PAPEL, highlightcolor=COR_VERMELHO
+        )
+        campo.insert(0, usuario.obter_nome_do_dono())
+        campo.pack(ipady=px(2))
+        campo.focus_set()
+        campo.select_range(0, "end")
+
+        def salvar(event=None):
+            if campo.winfo_exists():
+                usuario.definir_nome_do_dono(campo.get())
+            mostrar_nome()
+
+        campo.bind("<Return>", salvar)
+        campo.bind("<FocusOut>", salvar)
+        campo.bind("<Escape>", lambda event: mostrar_nome())
+
+    mostrar_nome()
+    tk.Frame(folha, bg=COR_VERMELHO, height=max(1, px(2)), width=px(LARGURA_LINHA_DO_NOME)).pack(pady=(0, px(4)))
+
+
+def desenhar_capa():
+    limpar_grade(widgets_meus_filmes, imagens_meus_filmes)
+    numeros = usuario.estatisticas_do_diario(filmes.filmes)
+    escala = escala_da_tela(scroll_meus_filmes)
+
+    def px(valor):
+        return int(valor * escala)
+
+    area = tk.Frame(scroll_meus_filmes, bg=COR_FUNDO)
+    area.grid(row=0, column=0, columnspan=COLUNAS_CARDS, sticky="ew")
+    widgets_meus_filmes.append(area)
+
+    folha = tk.Frame(
+        area, bg=COR_PAPEL, highlightbackground=COR_BORDA_PAPEL,
+        highlightcolor=COR_BORDA_PAPEL, highlightthickness=1
+    )
+    folha.pack(fill="x", padx=(px(10), px(60)), pady=(px(16), px(20)))
+
+    # ---------- "este diário pertence a" ----------
+    tk.Label(
+        folha, text="  ✦ MOVIE JOURNAL ✦  ", font=(FONTE_INTERFACE, -px(11), "bold"),
+        fg=COR_TEXTO_CAPA, bg=COR_VERMELHO
+    ).pack(pady=(px(26), px(14)))
+    tk.Label(
+        folha, text="ESTE DIÁRIO PERTENCE A", font=(FONTE_TITULO, -px(17)),
+        fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL
+    ).pack()
+    criar_linha_do_nome(folha, escala)
+
+    if numeros["primeira_data"] is not None:
+        desde = f"primeira página escrita em {data_por_extenso(numeros['primeira_data'])}"
+    else:
+        desde = "a primeira página ainda está esperando o primeiro filme..."
+    tk.Label(
+        folha, text=desde, font=(FONTE_MANUSCRITA, -px(16)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL
+    ).pack(pady=(0, px(18)))
+
+    if numeros["total"] == 0:
+        tk.Label(
+            folha,
+            text="Os números deste diário aparecem aqui quando você marcar\n"
+                 "o primeiro título como visto (ou der estrelas a ele). ✎",
+            font=(FONTE_MANUSCRITA, -px(17)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL, justify="center"
+        ).pack(pady=(px(6), px(34)))
+        return
+
+    # ---------- carimbos com os números ----------
+    linha_selos = tk.Frame(folha, bg=COR_PAPEL)
+    linha_selos.pack(pady=(0, px(14)))
+    for indice, (titulo, valor, legenda) in enumerate(selos_da_capa(numeros)):
+        selo = desenhar_selo_de_nota(titulo, valor, legenda, escala, indice, COR_PAPEL)
+        imagens_meus_filmes.append(selo)
+        tk.Label(linha_selos, image=selo, bg=COR_PAPEL, bd=0).grid(
+            row=0, column=indice, padx=px(4), pady=(px((indice % 2) * 8), 0), sticky="n"
+        )
+
+    # ---------- anotações à mão, em linhas de caderno ----------
+    anotacoes = tk.Frame(folha, bg=COR_PAPEL)
+    anotacoes.pack(fill="x", padx=px(70), pady=(px(4), px(30)))
+    tk.Frame(anotacoes, bg=COR_PAUTA_CADERNO, height=1).pack(fill="x")
+
+    for rotulo, texto, filme_da_linha in linhas_anotadas_da_capa(numeros):
+        linha = tk.Frame(anotacoes, bg=COR_PAPEL)
+        linha.pack(fill="x", pady=(px(7), px(5)))
+        tk.Label(
+            linha, text="✎ " + rotulo, font=(FONTE_MANUSCRITA, -px(17), "bold"),
+            fg=COR_VERMELHO, bg=COR_PAPEL
+        ).pack(side="left")
+        valor = tk.Label(
+            linha, text=texto, font=(FONTE_MANUSCRITA, -px(18)), fg=COR_AZUL_CANETA, bg=COR_PAPEL,
+            cursor="hand2" if filme_da_linha else ""
+        )
+        valor.pack(side="left", padx=(px(8), 0))
+        if filme_da_linha is not None:
+            valor.bind("<Button-1>", lambda event, filme=filme_da_linha: abrir_detalhes(filme))
+        tk.Frame(anotacoes, bg=COR_PAUTA_CADERNO, height=1).pack(fill="x")
+
+    canvas_rolagem = getattr(scroll_meus_filmes, "_parent_canvas", None)
+    if canvas_rolagem is not None:
+        canvas_rolagem.yview_moveto(0)
+
+
 TEXTO_DIARIO_VAZIO = (
     "Este diário ainda está em branco...\n\n"
     "marque um filme como visto (ou dê estrelas a ele)\n"
@@ -4329,6 +4526,10 @@ def atualizar_meus_filmes(voltar_ao_topo=True):
         return
 
     fechar_edicao_do_diario()
+
+    if seletor_aba.get() == ABA_CAPA:
+        desenhar_capa()
+        return
 
     if seletor_aba.get() == ABA_QUERO_VER:
         desenhar_quero_assistir()
