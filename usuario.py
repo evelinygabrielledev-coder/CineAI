@@ -1,5 +1,6 @@
 """
-Dados pessoais do usuário do CineAI: favoritos e filmes já assistidos.
+Dados pessoais do usuário do CineAI: favoritos, assistidos (com nota),
+anotações e a lista "Quero assistir".
 
 Tudo fica salvo em usuario.json, na pasta do projeto. Exemplo do arquivo:
 
@@ -30,7 +31,8 @@ from pathlib import Path
 PASTA_DADOS = Path(os.environ.get("CINEAI_PASTA_USUARIO", Path(__file__).resolve().parent))
 CAMINHO_USUARIO = PASTA_DADOS / "usuario.json"
 
-LISTAS = ("favoritos", "assistidos", "anotacoes")  # anotacoes = "Minhas anotações" de cada filme
+# anotacoes = "Minhas anotações" de cada filme | quero_assistir = guardados "pra depois"
+LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir")
 
 
 # =========================================================
@@ -116,6 +118,10 @@ def foi_assistido(filme):
     return esta_na_lista("assistidos", filme)
 
 
+def quer_assistir(filme):
+    return esta_na_lista("quero_assistir", filme)
+
+
 def filmes_da_lista(nome_lista, catalogo):
     """
     Devolve os filmes do catálogo que estão na lista,
@@ -160,12 +166,37 @@ def alternar(nome_lista, filme):
         }
         ficou_na_lista = True
 
+        # Viu? Então sai do "Quero assistir" (a promessa foi cumprida).
+        if nome_lista == "assistidos":
+            dados_usuario["quero_assistir"].pop(chave, None)
+
     salvar_dados()
     return ficou_na_lista
 
 
 def alternar_favorito(filme):
     return alternar("favoritos", filme)
+
+
+def alternar_quero_assistir(filme):
+    """Guarda (ou tira) o título da lista "Quero assistir". True se ficou na lista."""
+    return alternar("quero_assistir", filme)
+
+
+def guardar_para_depois(filme):
+    """Coloca no "Quero assistir" (sem tirar se já estava). True se entrou agora."""
+    if quer_assistir(filme):
+        return False
+    return alternar("quero_assistir", filme)
+
+
+def data_em_que_guardou(filme):
+    """Quando o título entrou no "Quero assistir" (um date), ou None."""
+    registro = dados_usuario["quero_assistir"].get(chave_filme(filme)) or {}
+    try:
+        return date.fromisoformat(registro.get("adicionado_em") or "")
+    except ValueError:
+        return None
 
 
 def alternar_assistido(filme):
@@ -209,6 +240,7 @@ def definir_nota(filme, nota):
             "ano": filme.get("ano"),
             "adicionado_em": date.today().isoformat()
         }
+        dados_usuario["quero_assistir"].pop(chave, None)  # viu: sai do "Quero assistir"
 
     if nota is None:
         assistidos[chave].pop("nota", None)

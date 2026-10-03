@@ -688,12 +688,22 @@ def abrir_detalhes(filme):
         polaroide_label.imagem = foto
 
     # ---------- botões que parecem coisas de papel ----------
-    # ♡ Favoritar: etiqueta de papel   |   ✓ Assistido: carimbo   |   ▶ Trailer: ingresso
+    # ♡ Favoritar e 📌 Quero ver: etiquetas de papel lado a lado
+    # ✓ Assistido: carimbo   |   ▶ Trailer: ingresso
+    linha_etiquetas_papel = ctk.CTkFrame(pagina_esquerda, fg_color="transparent")
+    linha_etiquetas_papel.pack(pady=(6, 6))
+
     botao_favorito = ctk.CTkButton(
-        pagina_esquerda, width=230, height=36, corner_radius=2, border_width=1,
-        border_color=COR_BORDA_PAPEL, font=(FONTE_MANUSCRITA, 17, "bold")
+        linha_etiquetas_papel, width=113, height=36, corner_radius=2, border_width=1,
+        border_color=COR_BORDA_PAPEL, font=(FONTE_MANUSCRITA, 15, "bold")
     )
-    botao_favorito.pack(pady=(6, 6))
+    botao_favorito.pack(side="left", padx=(0, 4))
+
+    botao_quero_ver = ctk.CTkButton(
+        linha_etiquetas_papel, width=113, height=36, corner_radius=2, border_width=1,
+        border_color=COR_BORDA_PAPEL, font=(FONTE_MANUSCRITA, 15, "bold")
+    )
+    botao_quero_ver.pack(side="left")
 
     botao_assistido = ctk.CTkButton(
         pagina_esquerda, width=230, height=36, corner_radius=6, border_width=2,
@@ -959,12 +969,23 @@ def abrir_detalhes(filme):
     def atualizar_botoes():
         if usuario.eh_favorito(filme):
             botao_favorito.configure(
-                text="♥  nos favoritos", fg_color=COR_BILHETE, hover_color=COR_PAPEL_ESCURO,
+                text="♥ favorito", fg_color=COR_BILHETE, hover_color=COR_PAPEL_ESCURO,
                 text_color=COR_VERMELHO, border_color=COR_VERMELHO
             )
         else:
             botao_favorito.configure(
-                text="♡  favoritar", fg_color=COR_BILHETE, hover_color=COR_PAPEL_ESCURO,
+                text="♡ favoritar", fg_color=COR_BILHETE, hover_color=COR_PAPEL_ESCURO,
+                text_color=COR_VINHO, border_color=COR_BORDA_PAPEL
+            )
+
+        if usuario.quer_assistir(filme):
+            botao_quero_ver.configure(
+                text="📌 na lista", fg_color=COR_BILHETE, hover_color=COR_PAPEL_ESCURO,
+                text_color=COR_AZUL_CANETA, border_color=COR_AZUL_CANETA
+            )
+        else:
+            botao_quero_ver.configure(
+                text="📌 quero ver", fg_color=COR_BILHETE, hover_color=COR_PAPEL_ESCURO,
                 text_color=COR_VINHO, border_color=COR_BORDA_PAPEL
             )
 
@@ -995,6 +1016,11 @@ def abrir_detalhes(filme):
         atualizar_botoes()
         ao_mudar_listas()
 
+    def clicar_quero_ver():
+        usuario.alternar_quero_assistir(filme)
+        atualizar_botoes()
+        ao_mudar_listas()
+
     def clicar_assistido():
         usuario.alternar_assistido(filme)
         atualizar_botoes()
@@ -1002,6 +1028,7 @@ def abrir_detalhes(filme):
         ao_mudar_listas()
 
     botao_favorito.configure(command=clicar_favorito)
+    botao_quero_ver.configure(command=clicar_quero_ver)
     botao_assistido.configure(command=clicar_assistido)
     atualizar_botoes()
     montar_anotacoes()
@@ -3014,6 +3041,8 @@ def anotacao_do_recorte(filme):
         return f"nota {nota}/{usuario.NOTA_MAXIMA}", COR_TINTA_AZUL, favorito
     if favorito:
         return "favorito", COR_TINTA_VERMELHA, True
+    if usuario.quer_assistir(filme):
+        return "pra ver depois", COR_TINTA_AZUL, False
     return "", COR_TINTA_SUAVE, False  # sem nota nem coração: polaroide limpa (o ano já vai embaixo)
 
 
@@ -3131,7 +3160,7 @@ def imagem_do_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo
     chave = (
         usuario.chave_filme(filme), round(escala, 2), cor_fundo_pagina, tamanho_poster, modo,
         usuario.eh_favorito(filme), usuario.obter_nota(filme), usuario.foi_assistido(filme),
-        data_que_assistiu(filme),
+        data_que_assistiu(filme), usuario.quer_assistir(filme),
     )
     if chave not in cache_recortes:
         cache_recortes[chave] = ImageTk.PhotoImage(
@@ -3732,6 +3761,7 @@ criar_cabecalho_pagina(
 
 ABA_DIARIO = "✎  Diário"
 ABA_FAVORITOS = "❤  Favoritos"
+ABA_QUERO_VER = "📌  Quero assistir"
 
 # Abas como marcadores de couro: marrom, e vermelho na aba aberta.
 ESTILO_ABAS = {
@@ -3759,7 +3789,7 @@ area_abas.grid_columnconfigure(2, weight=1)
 
 seletor_aba = ctk.CTkSegmentedButton(
     area_abas,
-    values=[ABA_DIARIO, ABA_FAVORITOS],
+    values=[ABA_DIARIO, ABA_FAVORITOS, ABA_QUERO_VER],
     height=38,
     font=(FONTE_INTERFACE, 13, "bold"),
     **ESTILO_ABAS,
@@ -4124,10 +4154,140 @@ def desenhar_diario(voltar_ao_topo=True):
         canvas_rolagem.yview_moveto(0)
 
 
+# =========================================================
+# QUERO ASSISTIR — checklist presa na página
+# =========================================================
+# Marcar o ☐ conta como "vi": o título sai da lista e vira entrada no diário.
+TAMANHO_POSTER_CHECKLIST = (44, 64)
+COR_FOLHA_CHECKLIST = COR_BILHETE
+ATRASO_RISCAR_MS = 280  # dá tempo de ver o ☑ antes do título sair da lista
+
+
+def criar_item_da_checklist(folha, filme, escala, imagens):
+    def px(valor):
+        return int(valor * escala)
+
+    linha = tk.Frame(folha, bg=COR_FOLHA_CHECKLIST)
+    linha.pack(fill="x", padx=px(22), pady=(px(4), 0))
+
+    caixinha = tk.Label(
+        linha, text="☐", font=(FONTE_SIMBOLOS, -px(24)), fg=COR_VINHO,
+        bg=COR_FOLHA_CHECKLIST, cursor="hand2"
+    )
+    caixinha.pack(side="left", padx=(0, px(8)))
+
+    imagem = imagem_do_recorte(filme, escala, COR_FOLHA_CHECKLIST, TAMANHO_POSTER_CHECKLIST, modo="compacto")
+    imagens.append(imagem)
+    foto = tk.Label(linha, image=imagem, bg=COR_FOLHA_CHECKLIST, bd=0, cursor="hand2")
+    foto.imagem = imagem
+    foto.pack(side="left", padx=(0, px(10)))
+
+    textos = tk.Frame(linha, bg=COR_FOLHA_CHECKLIST)
+    textos.pack(side="left", fill="x", expand=True)
+
+    tipo = "série" if filmes.eh_serie(filme) else "filme"
+    nome = tk.Label(
+        textos, text=f"{filme['nome']}  ({filmes.periodo_de_exibicao(filme)} · {tipo})",
+        font=(FONTE, -px(15), "bold"), fg=COR_TEXTO, bg=COR_FOLHA_CHECKLIST,
+        anchor="w", justify="left", wraplength=px(LARGURA_TEXTO_ENTRADA), cursor="hand2"
+    )
+    nome.pack(fill="x")
+
+    guardado_em = usuario.data_em_que_guardou(filme)
+    detalhe = f"guardado em {guardado_em.strftime('%d/%m/%Y')}" if guardado_em else "guardado pra depois"
+    if usuario.foi_assistido(filme):
+        detalhe += "  ·  pra rever"
+    tk.Label(
+        textos, text=detalhe, font=(FONTE_MANUSCRITA, -px(14)), fg=COR_TEXTO_SUAVE,
+        bg=COR_FOLHA_CHECKLIST, anchor="w"
+    ).pack(fill="x")
+
+    tirar = tk.Label(
+        linha, text="✕ tirar", font=(FONTE_MANUSCRITA, -px(14)), fg=COR_TEXTO_SUAVE,
+        bg=COR_FOLHA_CHECKLIST, cursor="hand2"
+    )
+    tirar.pack(side="right", padx=(px(10), 0))
+
+    tk.Frame(folha, bg=COR_LINHA_DIARIO, height=1).pack(fill="x", padx=px(22), pady=(px(4), 0))
+
+    def marcar_como_visto(event=None):
+        caixinha.configure(text="☑", fg=COR_ASSISTIDO)
+        nome.configure(fg=COR_TEXTO_SUAVE, font=(FONTE, -px(15), "bold overstrike"))
+
+        def concluir():
+            if usuario.foi_assistido(filme):
+                usuario.alternar_quero_assistir(filme)   # já tinha visto: só risca da lista
+            else:
+                usuario.alternar_assistido(filme)        # vira entrada no diário
+            ao_mudar_listas()
+        janela.after(ATRASO_RISCAR_MS, concluir)
+
+    def tirar_da_lista(event=None):
+        usuario.alternar_quero_assistir(filme)
+        ao_mudar_listas()
+
+    def abrir(event=None):
+        abrir_detalhes(filme)
+
+    caixinha.bind("<Button-1>", marcar_como_visto)
+    tirar.bind("<Button-1>", tirar_da_lista)
+    vincular_clique([foto, nome], abrir)
+
+
+def desenhar_quero_assistir():
+    limpar_grade(widgets_meus_filmes, imagens_meus_filmes)
+    guardados = usuario.filmes_da_lista("quero_assistir", filmes.filmes)
+
+    if not guardados:
+        mostrar_mensagem_vazia(scroll_meus_filmes, TEXTO_QUERO_VER_VAZIO, widgets_meus_filmes)
+        return
+
+    escala = escala_da_tela(scroll_meus_filmes)
+
+    def px(valor):
+        return int(valor * escala)
+
+    area = tk.Frame(scroll_meus_filmes, bg=COR_FUNDO)
+    area.grid(row=0, column=0, columnspan=COLUNAS_CARDS, sticky="ew")
+    widgets_meus_filmes.append(area)
+
+    # A folha da checklist, com um pedaço de fita prendendo em cima
+    folha = tk.Frame(
+        area, bg=COR_FOLHA_CHECKLIST, highlightbackground=COR_BORDA_PAPEL,
+        highlightcolor=COR_BORDA_PAPEL, highlightthickness=1
+    )
+    folha.pack(fill="x", padx=(px(10), px(60)), pady=(px(16), px(20)))
+    tk.Frame(folha, bg=COR_FITA, width=px(110), height=px(18)).place(relx=0.5, y=-px(2), anchor="n")
+
+    tk.Label(
+        folha, text="pra assistir ✦", font=(FONTE_MANUSCRITA, -px(26), "bold"),
+        fg=COR_TITULO_MANUSCRITO, bg=COR_FOLHA_CHECKLIST
+    ).pack(anchor="w", padx=px(22), pady=(px(22), 0))
+    tk.Frame(folha, bg=COR_MARCA_TEXTO, height=px(6), width=px(170)).pack(anchor="w", padx=px(26))
+    tk.Label(
+        folha, text="marque ☐ quando assistir: o título vai direto para o seu diário",
+        font=(FONTE_MANUSCRITA, -px(14)), fg=COR_TEXTO_SUAVE, bg=COR_FOLHA_CHECKLIST
+    ).pack(anchor="w", padx=px(22), pady=(px(4), px(8)))
+
+    for filme in guardados[:LIMITE_CARDS_GRADE]:
+        criar_item_da_checklist(folha, filme, escala, imagens_meus_filmes)
+
+    tk.Frame(folha, bg=COR_FOLHA_CHECKLIST, height=px(16)).pack()
+
+    canvas_rolagem = getattr(scroll_meus_filmes, "_parent_canvas", None)
+    if canvas_rolagem is not None:
+        canvas_rolagem.yview_moveto(0)
+
+
 TEXTO_DIARIO_VAZIO = (
     "Este diário ainda está em branco...\n\n"
     "marque um filme como visto (ou dê estrelas a ele)\n"
     "e a primeira entrada aparece aqui, com a data de hoje."
+)
+TEXTO_QUERO_VER_VAZIO = (
+    "Nenhum título preso aqui ainda...\n\n"
+    "abra um filme e toque em  📌 quero ver,\n"
+    "ou diga ao CineAI: \"salva esse pra depois\"."
 )
 TEXTO_FAVORITOS_VAZIO = (
     "Ainda não colei nenhum favorito aqui...\n\n"
@@ -4140,11 +4300,12 @@ def atualizar_contador_meus_filmes():
     quantidade_favoritos = len(usuario.filmes_da_lista("favoritos", filmes.filmes))
     quantidade_assistidos = len(usuario.filmes_da_lista("assistidos", filmes.filmes))
     quantidade_anotacoes = len(usuario.dados_usuario.get("anotacoes", {}))
+    quantidade_quero_ver = len(usuario.filmes_da_lista("quero_assistir", filmes.filmes))
 
     contador_meus_filmes.configure(
         text=(
             f"✎ {quantidade_assistidos} entradas   ❤ {quantidade_favoritos} favoritos   "
-            f"✍ {quantidade_anotacoes} anotações"
+            f"📌 {quantidade_quero_ver} pra ver   ✍ {quantidade_anotacoes} anotações"
         )
     )
 
@@ -4168,6 +4329,10 @@ def atualizar_meus_filmes(voltar_ao_topo=True):
         return
 
     fechar_edicao_do_diario()
+
+    if seletor_aba.get() == ABA_QUERO_VER:
+        desenhar_quero_assistir()
+        return
     preencher_grade(
         scroll_meus_filmes,
         usuario.filmes_da_lista("favoritos", filmes.filmes),

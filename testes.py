@@ -634,6 +634,61 @@ class TestDiario(TesteCineAI):
         self.assertIsNone(usuario.entradas_do_diario(filmes.filmes)[0]["data"])
 
 
+class TestQueroAssistir(TesteCineAI):
+    """Lista "Quero assistir": guardar pra depois, pelo botão ou pelo chat."""
+
+    def test_guardar_o_filme_da_conversa(self):
+        """'Salva esse pra depois' guarda o filme recomendado."""
+        self.recomendado("Quero um filme do Nolan")
+        atual = filmes.filme_atual
+        resultado = self.pedir("salva esse pra depois")
+        self.assertTrue(usuario.quer_assistir(atual))
+        self.assertEqual(resultado["tipo"], "usuario_atualizado")
+        self.assertIn("já está", self.pedir("guarda ele na minha lista")["texto"])
+
+    def test_guardar_pelo_nome_e_tirar(self):
+        """'Salva Interestelar pra depois' e 'tira Interestelar da minha lista'."""
+        interestelar = self.filme("Interestelar")
+        self.pedir("Salva Interestelar pra depois")
+        self.assertTrue(usuario.quer_assistir(interestelar))
+        self.pedir("tira Interestelar da minha lista")
+        self.assertFalse(usuario.quer_assistir(interestelar))
+
+    def test_ver_tira_da_lista(self):
+        """Marcar como visto (ou dar nota) tira o título da lista sozinho."""
+        shrek, titanic = self.filme("Shrek"), self.filme("Titanic")
+        usuario.guardar_para_depois(shrek)
+        usuario.guardar_para_depois(titanic)
+        usuario.alternar_assistido(shrek)
+        usuario.definir_nota(titanic, 4)
+        self.assertFalse(usuario.quer_assistir(shrek))
+        self.assertFalse(usuario.quer_assistir(titanic))
+
+    def test_listar(self):
+        """'O que eu queria assistir?' lista os guardados; vazio explica como guardar."""
+        self.assertIn("vazia", self.pedir("o que eu queria assistir?")["texto"])
+        usuario.guardar_para_depois(self.filme("Titanic"))
+        self.assertIn("Titanic", self.pedir("o que tem na minha lista?")["texto"])
+
+    def test_recomendar_da_lista(self):
+        """O que espera há mais tempo vem primeiro; 'quero outro' traz o próximo da lista."""
+        usuario.guardar_para_depois(self.filme("Titanic"))
+        usuario.guardar_para_depois(self.filme("Shrek"))
+        self.assertEqual(self.recomendado("me recomenda algo da minha lista"), "Titanic")
+        self.assertEqual(self.recomendado("quero outro"), "Shrek")
+
+    def test_frases_de_pedido_nao_viram_lista(self):
+        """'Eu queria ver uma comédia' e 'quero ver um filme, por favor' continuam buscas."""
+        for frase in ["eu queria ver uma comédia", "quero ver um filme de terror, por favor",
+                      "quero assistir algo leve"]:
+            self.assertIsNone(filmes.detectar_pedido_quero_assistir(frase), frase)
+
+    def test_arquivo_antigo_sem_a_lista(self):
+        """usuario.json antigo (sem 'quero_assistir') continua abrindo."""
+        usuario.CAMINHO_USUARIO.write_text('{"favoritos": {}, "assistidos": {}}', encoding="utf-8")
+        self.assertEqual(usuario.carregar_dados()["quero_assistir"], {})
+
+
 # =========================================================
 # 8. ESTRELAS
 # =========================================================

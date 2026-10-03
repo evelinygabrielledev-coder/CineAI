@@ -3572,6 +3572,150 @@ def marcar_atual_como_assistido():
 
 
 # =========================================================
+# LISTA "QUERO ASSISTIR" ("salva esse pra depois")
+# =========================================================
+EXPRESSOES_PARA_DEPOIS = [
+    "pra depois", "para depois", "pra mais tarde", "para mais tarde",
+    "assistir depois", "ver depois", "quero assistir", "quero ver",
+    "minha lista", "na lista", "da lista", "pra ver", "para ver",
+]
+# "por" ficou de fora de propósito: "quero ver um filme, por favor" não é guardar.
+VERBOS_DE_GUARDAR = {
+    "salva", "salvar", "salve", "guarda", "guardar", "guarde", "anota", "anotar",
+    "anote", "adiciona", "adicionar", "adicione", "poe", "ponha",
+}
+VERBOS_DE_TIRAR = {"tira", "tirar", "tire", "remove", "remover", "remova", "apaga", "apagar", "apague"}
+EXPRESSOES_LISTA_QUERO_ASSISTIR = [
+    "minha lista", "lista de quero assistir", "lista quero assistir",
+    "quero assistir depois", "pra assistir depois", "para assistir depois",
+    "pra ver depois", "para ver depois", "salvei", "guardei",
+]
+# "queria ver" sozinho é pedido ("eu queria ver uma comédia"); só vale como pergunta.
+EXPRESSOES_LISTA_SO_EM_PERGUNTA = ["queria assistir", "queria ver"]
+EXPRESSOES_RECOMENDAR_DA_LISTA = ["da minha lista", "da lista", "dos que eu salvei", "dos que salvei"]
+PALAVRAS_DE_ESCOLHER = {
+    "recomenda", "recomende", "escolhe", "escolha", "sorteia", "sorteie",
+    "sugere", "sugira", "indica", "indique", "algo", "alguma", "qual",
+}
+
+
+def detectar_pedido_quero_assistir(cliente):
+    """
+    "Salva esse pra depois"             -> "guardar"
+    "Tira Shrek da minha lista"         -> "tirar"
+    "Me recomenda algo da minha lista"  -> "recomendar"
+    "O que eu queria assistir?"         -> "listar"
+    Outra coisa                         -> None
+    """
+    palavras = set(extrair_palavras(cliente))
+    fala_de_depois = any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_PARA_DEPOIS)
+
+    if palavras & VERBOS_DE_TIRAR and palavras & {"lista", "depois"}:
+        return "tirar"
+    if palavras & VERBOS_DE_GUARDAR and (fala_de_depois or palavras & {"lista", "depois"}):
+        return "guardar"
+
+    eh_pergunta = "?" in cliente or bool(palavras & {"quais", "qual"}) or contem_expressao(cliente, "o que")
+    fala_da_lista = (
+        any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_LISTA_QUERO_ASSISTIR)
+        or (eh_pergunta and any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_LISTA_SO_EM_PERGUNTA))
+    )
+    if not fala_da_lista:
+        return None
+
+    pede_recomendacao = (
+        any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_RECOMENDAR_DA_LISTA)
+        and bool(palavras & PALAVRAS_DE_ESCOLHER)
+        and not palavras & {"quais", "mostra", "mostre", "listar", "tem"}
+    )
+    return "recomendar" if pede_recomendacao else "listar"
+
+
+def texto_lista_quero_assistir():
+    guardados = usuario.filmes_da_lista("quero_assistir", filmes)
+    if not guardados:
+        return criar_resultado(
+            'Sua lista "Quero assistir" está vazia. 📌\n\n'
+            'Quando eu recomendar algo que te interessar, diga "salva esse pra depois", '
+            'ou abra o título e toque em 📌 quero assistir.'
+        )
+    return criar_resultado(montar_lista(
+        f'📌 Sua lista "Quero assistir" ({len(guardados)}):', guardados
+    ) + '\n\n💬 Peça "me recomenda algo da minha lista" quando não souber qual escolher.')
+
+
+def recomendar_da_lista_quero_assistir():
+    """Começa pelo que está esperando há mais tempo; "quero outro" traz o próximo da lista."""
+    global filme_atual, pedido_anterior, candidatos_anteriores, filmes_recomendados
+    global qualidade_pedida, busca_usou_perfil, contexto_relativo, ultima_busca_semantica
+
+    mais_antigos_primeiro = usuario.filmes_da_lista("quero_assistir", filmes)[::-1]
+    pendentes = [filme for filme in mais_antigos_primeiro if not usuario.foi_assistido(filme)]
+    if not pendentes:
+        return texto_lista_quero_assistir()
+
+    escolhido = pendentes[0]
+    filmes_recomendados = []
+    pedido_anterior = "sua lista Quero assistir"
+    candidatos_anteriores = pendentes
+    qualidade_pedida = None
+    busca_usou_perfil = False
+    contexto_relativo = None
+    ultima_busca_semantica = None
+
+    filme_atual = escolhido
+    registrar_recomendacao(escolhido)
+
+    guardado_em = usuario.data_em_que_guardou(escolhido)
+    desde = f" desde {guardado_em.strftime('%d/%m/%Y')}" if guardado_em else ""
+    texto = (
+        f"📌 Da sua lista: este está te esperando{desde}.\n\n" + gerar_resposta(escolhido)
+    )
+    if len(pendentes) > 1:
+        texto += f'\n\n💬 Tem mais {len(pendentes) - 1} na lista: diga "quero outro" para ver o próximo.'
+    return criar_resultado(texto, tipo="recomendacao", filme=escolhido)
+
+
+def responder_quero_assistir(cliente):
+    """Trata a lista "Quero assistir" pelo chat. None se a mensagem não for sobre ela."""
+    pedido = detectar_pedido_quero_assistir(cliente)
+    if pedido is None:
+        return None
+
+    rota(f'lista "Quero assistir" ({pedido})')
+
+    if pedido == "listar":
+        return texto_lista_quero_assistir()
+    if pedido == "recomendar":
+        return recomendar_da_lista_quero_assistir()
+
+    filme_alvo = encontrar_filme_citado(cliente) or filme_atual
+    if filme_alvo is None:
+        return criar_resultado(
+            "Qual título? Diga o nome, por exemplo: "
+            '"Salva Interestelar pra depois", ou peça uma recomendação primeiro.'
+        )
+    nome = descrever_filme_curto(filme_alvo)
+
+    if pedido == "tirar":
+        if not usuario.quer_assistir(filme_alvo):
+            return criar_resultado(f'{nome} não estava na sua lista "Quero assistir".')
+        usuario.alternar_quero_assistir(filme_alvo)
+        return criar_resultado(f'Pronto, tirei {nome} da sua lista "Quero assistir".', tipo="usuario_atualizado")
+
+    if not usuario.guardar_para_depois(filme_alvo):
+        return criar_resultado(f'{nome} já está na sua lista "Quero assistir". 📌')
+
+    total = len(usuario.dados_usuario["quero_assistir"])
+    texto = f'📌 Guardei {nome} na sua lista "Quero assistir" ({total} no total).'
+    if usuario.foi_assistido(filme_alvo):
+        texto += " Você já viu, então fica lá para rever."
+    else:
+        texto += " Quando você marcar como visto, ele sai da lista sozinho."
+    return criar_resultado(texto, tipo="usuario_atualizado")
+
+
+# =========================================================
 # PROCESSAR MENSAGEM
 # =========================================================
 def processar_mensagem(cliente):
@@ -3614,6 +3758,13 @@ def responder_mensagem(cliente):
             "Pode ser um gênero, um ator, um diretor, um ano "
             "ou o assunto da história."
         )
+
+    # ---------------- Lista "Quero assistir": "salva esse pra depois" ----------------
+    # Vem antes do histórico: "me recomenda algo da minha lista" não é
+    # pergunta sobre o que eu já recomendei.
+    resposta_lista = responder_quero_assistir(cliente)
+    if resposta_lista is not None:
+        return resposta_lista
 
     # ---------------- Histórico: "qual foi o primeiro?", "o anterior" ----------------
     tipo_historico = detectar_pedido_de_historico(cliente)
