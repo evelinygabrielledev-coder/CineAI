@@ -7,7 +7,7 @@ por que escolheu cada um e aprende o seu gosto pelas notas que você dá.
 Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
 
 <p align="center">
-  <img src="docs/capa.png" alt="Capa do diário" width="49%">
+  <img src="docs/inicio.png" alt="Tela inicial" width="49%">
   <img src="docs/diario.png" alt="Diário automático" width="49%">
 </p>
 <p align="center">
