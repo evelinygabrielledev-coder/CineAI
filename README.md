@@ -6,6 +6,15 @@ por que escolheu cada um e aprende o seu gosto pelas notas que você dá.
 
 Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
 
+<p align="center">
+  <img src="docs/capa.png" alt="Capa do diário" width="49%">
+  <img src="docs/diario.png" alt="Diário automático" width="49%">
+</p>
+<p align="center">
+  <img src="docs/catalogo.png" alt="Catálogo de filmes e séries" width="49%">
+  <img src="docs/painel_rag.png" alt="Painel do RAG" width="49%">
+</p>
+
 ---
 
 ## ✨ O que ele faz
@@ -23,11 +32,14 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
   usado em "me recomenda algo".
 - **Meu diário**:
   - **Capa** com o seu nome e as estatísticas (filmes, séries, nota média, horas, gênero e diretor que mais aparecem).
-  - **Diário automático**: cada título visto vira uma entrada com data, estrelas e a sua anotação, separada por mês.
+  - **Diário automático**: cada título visto vira uma entrada com data (editável), estrelas e a sua anotação,
+    separada por mês. Viu de novo? **"↻ vi de novo"** cria outra entrada, com outra data e outra anotação.
   - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).
 - **Suas anotações viram recomendação**: o que você escreve no diário entra na busca por embeddings,
   e as estrelas dizem se aquilo é algo que você quer mais ou menos ("me recomenda pelo que eu escrevi").
 - **Trailers**, notas do IMDb / Rotten Tomatoes e títulos semelhantes em cada página.
+- **Detalhes de papel**: polaroides tortas com fita, adesivo de coração nos favoritos, carimbo WATCHED
+  e uma página que vira ao abrir um filme.
 
 ## 🧠 Como funciona
 

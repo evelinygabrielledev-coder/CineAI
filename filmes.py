@@ -19,7 +19,7 @@ import time
 from functools import lru_cache
 import unicodedata
 from urllib.parse import quote_plus
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import numpy as np
@@ -3730,6 +3730,42 @@ def responder_quero_assistir(cliente):
 
 
 # =========================================================
+# "VI DE NOVO" (rever um título)
+# =========================================================
+VERBOS_DE_VER = {"vi", "assisti", "maratonei", "vimos", "assistimos"}
+EXPRESSOES_DE_NOVO = ["de novo", "outra vez", "novamente", "mais uma vez"]
+VERBOS_DE_REVER = {"revi", "reassisti", "revimos", "reassistimos"}
+
+
+def eh_vi_de_novo(cliente):
+    """"Vi de novo", "vi Shrek de novo ontem", "assisti outra vez", "revi"."""
+    palavras = set(extrair_palavras(cliente))
+    if palavras & VERBOS_DE_REVER:
+        return True
+    return bool(palavras & VERBOS_DE_VER) and any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_DE_NOVO)
+
+
+def registrar_vi_de_novo(cliente):
+    filme_alvo = encontrar_filme_citado(cliente) or filme_atual
+    if filme_alvo is None:
+        return criar_resultado('Qual título você viu de novo? Por exemplo: "vi Shrek de novo".')
+
+    nome = descrever_filme_curto(filme_alvo)
+    ontem = "ontem" in extrair_palavras(cliente)
+    data_vista = date.today() - timedelta(days=1) if ontem else date.today()
+    sessao = usuario.registrar_revisita(filme_alvo, data_vista)
+    if sessao is None:
+        return criar_resultado(f"✅ Anotei que você viu {nome}. Ele já está no seu diário.", tipo="usuario_atualizado")
+
+    vez = usuario.quantas_vezes_viu(filme_alvo)
+    return criar_resultado(
+        f"↻ Anotei: você viu {nome} de novo {'ontem' if ontem else 'hoje'} ({vez}ª vez). "
+        "Ganhou uma entrada nova no diário: escreva lá o que achou desta vez. ✎",
+        tipo="usuario_atualizado"
+    )
+
+
+# =========================================================
 # "ME RECOMENDA PELO QUE EU ESCREVI NO DIÁRIO"
 # =========================================================
 EXPRESSOES_PELAS_ANOTACOES = [
@@ -3841,6 +3877,11 @@ def responder_mensagem(cliente):
             "Pode ser um gênero, um ator, um diretor, um ano "
             "ou o assunto da história."
         )
+
+    # ---------------- "Vi de novo": nova sessão no diário ----------------
+    if eh_vi_de_novo(cliente):
+        rota('"vi de novo": nova sessão do título no diário')
+        return registrar_vi_de_novo(cliente)
 
     # ---------------- Lista "Quero assistir": "salva esse pra depois" ----------------
     # Vem antes do histórico: "me recomenda algo da minha lista" não é

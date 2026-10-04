@@ -283,19 +283,32 @@ def texto_estrelas(nota):
 TAMANHO_MAXIMO_ANOTACAO = 2000  # letras
 
 
-def obter_anotacao(filme):
-    """O texto que você escreveu sobre o filme, ou "" se ainda não escreveu nada."""
+def obter_anotacao(filme, sessao=None):
+    """
+    O texto que você escreveu sobre o filme, ou "" se ainda não escreveu nada.
+    sessao=None: a 1ª vez que viu | sessao=0, 1...: cada vez que viu DE NOVO.
+    """
+    if sessao is not None:
+        revisitas = revisitas_do_registro(chave_filme(filme))
+        return revisitas[sessao].get("texto", "") if 0 <= sessao < len(revisitas) else ""
     registro = dados_usuario["anotacoes"].get(chave_filme(filme))
     return registro["texto"] if registro else ""
 
 
-def definir_anotacao(filme, texto):
+def definir_anotacao(filme, texto, sessao=None):
     """
     Guarda (ou apaga, se vier vazio) a sua anotação sobre o filme.
     Salva no arquivo na hora, como os favoritos.
     """
     texto = (texto or "").strip()[:TAMANHO_MAXIMO_ANOTACAO]
     chave = chave_filme(filme)
+
+    if sessao is not None:
+        revisitas = revisitas_do_registro(chave)
+        if 0 <= sessao < len(revisitas) and revisitas[sessao].get("texto", "") != texto:
+            revisitas[sessao]["texto"] = texto
+            salvar_dados()
+        return
     anotacoes = dados_usuario["anotacoes"]
 
     if texto == "":
@@ -324,38 +337,102 @@ def data_do_registro(chave):
         return None
 
 
+# ---------------- Sessões: a 1ª vez + cada "vi de novo" ----------------
+# No usuario.json, quem você viu de novo ganha uma lista dentro do registro:
+#   "808": {"nome": "Shrek", "adicionado_em": "2019-05-02", "nota": 5,
+#           "revisitas": [{"data": "2026-10-03", "texto": "ainda engraçado!"}]}
+# Cada sessão vira uma entrada do diário. sessao=None é a 1ª vez; 0, 1... as revisitas.
+def revisitas_do_registro(chave):
+    """As revisitas de um título (lista vazia se nunca viu de novo). Só lê: não muda o arquivo."""
+    registro = dados_usuario["assistidos"].get(chave)
+    if registro is None:
+        return []
+    return registro.get("revisitas") or []
+
+
+def data_da_sessao(chave, sessao=None):
+    if sessao is None:
+        return data_do_registro(chave)
+    revisitas = revisitas_do_registro(chave)
+    if not 0 <= sessao < len(revisitas):
+        return None
+    try:
+        return date.fromisoformat(revisitas[sessao].get("data") or "")
+    except ValueError:
+        return None
+
+
+def sessoes_em_ordem_cronologica():
+    """
+    Todas as sessões [(chave, sessao)], da mais antiga para a mais nova, pela data.
+    Mesma data: vale a ordem em que foram marcadas. Sem data vai para o fim.
+    """
+    sessoes = []
+    for posicao, chave in enumerate(dados_usuario["assistidos"]):
+        sessoes.append((chave, None, posicao, -1))
+        for indice in range(len(revisitas_do_registro(chave))):
+            sessoes.append((chave, indice, posicao, indice))
+    sessoes.sort(key=lambda item: (data_da_sessao(item[0], item[1]) or date.max, item[2], item[3]))
+    return [(chave, sessao) for chave, sessao, _, _ in sessoes]
+
+
 def chaves_em_ordem_cronologica():
-    """
-    Os títulos vistos do mais antigo para o mais novo, PELA DATA em que você viu
-    (que dá para corrigir no Diário). Mesma data: vale a ordem em que foram marcados.
-    Sem data vai para o fim.
-    """
-    chaves = list(dados_usuario["assistidos"])
-    posicao_de_marcacao = {chave: posicao for posicao, chave in enumerate(chaves)}
-    return sorted(
-        chaves,
-        key=lambda chave: (data_do_registro(chave) or date.max, posicao_de_marcacao[chave])
-    )
+    """Os títulos vistos do mais antigo para o mais novo (pela 1ª vez que você viu)."""
+    return [chave for chave, sessao in sessoes_em_ordem_cronologica() if sessao is None]
 
 
-def numero_da_entrada(filme):
+def numero_da_entrada(filme, sessao=None):
     """
-    "Entrada" do filme no seu diário: o título visto há mais tempo é a entrada 1,
-    o seguinte é a 2... (pela data em que viu). None se não viu.
+    "Entrada" no seu diário: a sessão mais antiga é a entrada 1, a seguinte a 2...
+    (pela data). sessao=None é a 1ª vez que você viu o título. None se não viu.
     """
-    chave = chave_filme(filme)
-    for posicao, chave_vista in enumerate(chaves_em_ordem_cronologica(), start=1):
-        if chave_vista == chave:
+    procurada = (chave_filme(filme), sessao)
+    for posicao, sessao_vista in enumerate(sessoes_em_ordem_cronologica(), start=1):
+        if sessao_vista == procurada:
             return posicao
     return None
+
+
+def quantas_vezes_viu(filme):
+    """0 (não viu), 1 (viu uma vez), 2 (viu de novo)..."""
+    chave = chave_filme(filme)
+    if chave not in dados_usuario["assistidos"]:
+        return 0
+    return 1 + len(revisitas_do_registro(chave))
+
+
+def registrar_revisita(filme, data_vista=None):
+    """
+    "Vi de novo": nova sessão com a data de hoje (ou a informada).
+    Se você ainda não tinha visto, só marca como visto. Devolve o índice da sessão
+    nova (0, 1...) ou None quando foi a 1ª vez. Também sai do "Quero assistir".
+    """
+    chave = chave_filme(filme)
+    if chave not in dados_usuario["assistidos"]:
+        alternar("assistidos", filme)
+        return None
+    data_vista = data_vista or date.today()
+    revisitas = dados_usuario["assistidos"][chave].setdefault("revisitas", [])
+    revisitas.append({"data": data_vista.isoformat(), "texto": ""})
+    dados_usuario["quero_assistir"].pop(chave, None)
+    salvar_dados()
+    return len(revisitas) - 1
+
+
+def apagar_revisita(filme, sessao):
+    revisitas = revisitas_do_registro(chave_filme(filme))
+    if 0 <= sessao < len(revisitas):
+        del revisitas[sessao]
+        salvar_dados()
 
 
 DATA_MAIS_ANTIGA_PERMITIDA = date(1900, 1, 1)
 
 
-def definir_data_assistido(filme, nova_data):
+def definir_data_assistido(filme, nova_data, sessao=None):
     """
     Corrige o dia em que você viu o título (ex.: marcou hoje algo que viu em 2015).
+    sessao=None corrige a 1ª vez; 0, 1... corrigem cada "vi de novo".
     Não aceita data no futuro nem título que você ainda não marcou como visto.
     """
     chave = chave_filme(filme)
@@ -365,7 +442,13 @@ def definir_data_assistido(filme, nova_data):
         raise ValueError("Essa data ainda não chegou. 🙂")
     if nova_data < DATA_MAIS_ANTIGA_PERMITIDA:
         raise ValueError("Essa data é antiga demais.")
-    dados_usuario["assistidos"][chave]["adicionado_em"] = nova_data.isoformat()
+    if sessao is None:
+        dados_usuario["assistidos"][chave]["adicionado_em"] = nova_data.isoformat()
+    else:
+        revisitas = revisitas_do_registro(chave)
+        if not 0 <= sessao < len(revisitas):
+            raise ValueError("Essa sessão não existe mais.")
+        revisitas[sessao]["data"] = nova_data.isoformat()
     salvar_dados()
 
 
@@ -385,26 +468,31 @@ def data_em_que_assistiu(filme):
 
 def entradas_do_diario(catalogo, ordem=ORDEM_DIARIO_RECENTES):
     """
-    Cada título visto vira uma entrada do diário:
-        {"filme", "numero", "data", "nota", "anotacao"}
+    Cada SESSÃO vira uma entrada do diário (a 1ª vez e cada "vi de novo"):
+        {"filme", "numero", "data", "nota", "anotacao", "sessao", "vez"}
+    "vez": 1 = primeira vez, 2 = segunda...
 
-    O número da entrada segue a data em que você viu (o mais antigo = #1)
+    O número da entrada segue a data (a sessão mais antiga = #1)
     e não muda quando você troca a ordem de exibição.
     Ordens: "recentes" (padrão), "antigos" ou "nota" (5★ primeiro; sem nota no fim).
     """
     filmes_por_chave = {chave_filme(filme): filme for filme in catalogo}
 
     entradas = []
-    for numero, chave in enumerate(chaves_em_ordem_cronologica(), start=1):
+    vezes_por_chave = {}
+    for numero, (chave, sessao) in enumerate(sessoes_em_ordem_cronologica(), start=1):
+        vezes_por_chave[chave] = vezes_por_chave.get(chave, 0) + 1
         filme = filmes_por_chave.get(chave)
         if filme is None:
             continue  # saiu do catálogo: o número dele continua reservado
         entradas.append({
             "filme": filme,
             "numero": numero,
-            "data": data_em_que_assistiu(filme),
+            "data": data_da_sessao(chave, sessao),
             "nota": obter_nota(filme),
-            "anotacao": obter_anotacao(filme),
+            "anotacao": obter_anotacao(filme, sessao),
+            "sessao": sessao,
+            "vez": vezes_por_chave[chave],
         })
 
     if ordem == ORDEM_DIARIO_ANTIGOS:
@@ -469,9 +557,12 @@ def estatisticas_do_diario(catalogo):
     Os números da capa do diário, calculados só com o que você marcou:
         total, filmes, series, nota_media, avaliados, horas, horas_estimadas,
         genero (nome, quantidade), pessoa (nome, quantidade), mes (date, quantidade),
-        melhor (entrada), primeira_data, anotacoes, favoritos, quero_assistir
+        melhor (entrada), primeira_data, anotacoes, favoritos, quero_assistir,
+        sessoes (todas as vezes que viu), revistos (títulos vistos mais de uma vez)
+    Títulos contam uma vez só; horas e meses contam cada sessão ("vi de novo" também).
     """
-    entradas = entradas_do_diario(catalogo, ORDEM_DIARIO_ANTIGOS)
+    sessoes = entradas_do_diario(catalogo, ORDEM_DIARIO_ANTIGOS)
+    entradas = [sessao for sessao in sessoes if sessao["sessao"] is None]   # 1ª vez de cada título
 
     contagem_generos = {}
     contagem_pessoas = {}
@@ -479,11 +570,12 @@ def estatisticas_do_diario(catalogo):
     minutos = 0
     tem_estimativa = False
 
-    for entrada in entradas:
+    for entrada in sessoes:
         filme = entrada["filme"]
-        for genero in separar_nomes(filme.get("genero")):
+        primeira_vez = entrada["sessao"] is None   # gêneros e pessoas contam o título uma vez só
+        for genero in separar_nomes(filme.get("genero")) if primeira_vez else []:
             contagem_generos[genero] = contagem_generos.get(genero, 0) + 1
-        for pessoa in separar_nomes(filme.get("diretor")):
+        for pessoa in separar_nomes(filme.get("diretor")) if primeira_vez else []:
             contagem_pessoas[pessoa] = contagem_pessoas.get(pessoa, 0) + 1
         if entrada["data"] is not None:
             mes = entrada["data"].replace(day=1)
@@ -505,7 +597,7 @@ def estatisticas_do_diario(catalogo):
     avaliadas = [entrada for entrada in entradas if entrada["nota"] is not None]
     melhor = max(reversed(avaliadas), key=lambda entrada: entrada["nota"]) if avaliadas else None
 
-    datas = [entrada["data"] for entrada in entradas if entrada["data"] is not None]
+    datas = [sessao["data"] for sessao in sessoes if sessao["data"] is not None]
 
     return {
         "total": len(entradas),
@@ -523,4 +615,6 @@ def estatisticas_do_diario(catalogo):
         "anotacoes": len(dados_usuario["anotacoes"]),
         "favoritos": len(filmes_da_lista("favoritos", catalogo)),
         "quero_assistir": len(filmes_da_lista("quero_assistir", catalogo)),
+        "sessoes": len(sessoes),
+        "revistos": sum(1 for entrada in entradas if quantas_vezes_viu(entrada["filme"]) > 1),
     }

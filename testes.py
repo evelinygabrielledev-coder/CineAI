@@ -650,6 +650,71 @@ class TestDiario(TesteCineAI):
         self.assertIsNone(usuario.entradas_do_diario(filmes.filmes)[0]["data"])
 
 
+class TestRever(TesteCineAI):
+    """'Vi de novo': cada vez que você vê um título vira uma entrada no diário."""
+
+    def test_vi_de_novo_cria_entrada(self):
+        """A revisita ganha entrada própria (2ª vez), com data e anotação separadas."""
+        from datetime import date
+        shrek = self.filme("Shrek")
+        usuario.definir_nota(shrek, 5)
+        usuario.definir_data_assistido(shrek, date(2019, 5, 2))
+        usuario.definir_anotacao(shrek, "Primeira vez: ri muito.")
+        sessao = usuario.registrar_revisita(shrek)
+        usuario.definir_anotacao(shrek, "Revi com a família, ainda engraçado.", sessao=sessao)
+
+        entradas = usuario.entradas_do_diario(filmes.filmes, usuario.ORDEM_DIARIO_ANTIGOS)
+        self.assertEqual([(e["filme"]["nome"], e["vez"]) for e in entradas], [("Shrek", 1), ("Shrek", 2)])
+        self.assertEqual(entradas[0]["anotacao"], "Primeira vez: ri muito.")
+        self.assertEqual(entradas[1]["anotacao"], "Revi com a família, ainda engraçado.")
+        self.assertEqual(entradas[1]["data"], date.today())
+        self.assertEqual(usuario.quantas_vezes_viu(shrek), 2)
+
+        usuario.dados_usuario = usuario.carregar_dados()   # "fecha e abre"
+        self.assertEqual(usuario.obter_anotacao(shrek, sessao=0), "Revi com a família, ainda engraçado.")
+
+    def test_data_e_apagar_revisita(self):
+        """A data da revisita é corrigível; apagar a revisita mantém a 1ª vez."""
+        from datetime import date
+        titanic = self.filme("Titanic")
+        usuario.alternar_assistido(titanic)
+        usuario.definir_data_assistido(titanic, date(2010, 1, 1))
+        sessao = usuario.registrar_revisita(titanic)
+        usuario.definir_data_assistido(titanic, date(2020, 2, 2), sessao=sessao)
+        self.assertEqual(usuario.numero_da_entrada(titanic, sessao), 2)
+        usuario.apagar_revisita(titanic, sessao)
+        self.assertEqual(usuario.quantas_vezes_viu(titanic), 1)
+        self.assertEqual(len(usuario.entradas_do_diario(filmes.filmes)), 1)
+
+    def test_capa_conta_sessoes(self):
+        """Na capa: o título conta 1 vez, mas as horas e as sessões contam a revisita."""
+        a_origem = self.filme("A Origem")
+        usuario.alternar_assistido(a_origem)
+        usuario.registrar_revisita(a_origem)
+        numeros = usuario.estatisticas_do_diario(filmes.filmes)
+        self.assertEqual(numeros["total"], 1)
+        self.assertEqual(numeros["sessoes"], 2)
+        self.assertEqual(numeros["revistos"], 1)
+        self.assertEqual(numeros["horas"], round(2 * a_origem["duracao_minutos"] / 60))
+
+    def test_rever_sem_ter_visto_so_marca(self):
+        """'Vi de novo' em algo que você nunca marcou: vira a 1ª vez, sem revisita."""
+        dunkirk = self.filme("Dunkirk")
+        self.assertIsNone(usuario.registrar_revisita(dunkirk))
+        self.assertEqual(usuario.quantas_vezes_viu(dunkirk), 1)
+
+    def test_rever_pelo_chat(self):
+        """'Vi Shrek de novo' registra a revisita e tira o título do 'Quero assistir'."""
+        shrek = self.filme("Shrek")
+        usuario.alternar_assistido(shrek)
+        usuario.guardar_para_depois(shrek)   # guardado "pra rever"
+        resultado = self.pedir("vi Shrek de novo ontem à noite")
+        self.assertEqual(resultado["tipo"], "usuario_atualizado")
+        self.assertIn("2ª vez", resultado["texto"])
+        self.assertEqual(usuario.quantas_vezes_viu(shrek), 2)
+        self.assertFalse(usuario.quer_assistir(shrek))
+
+
 class TestQueroAssistir(TesteCineAI):
     """Lista "Quero assistir": guardar pra depois, pelo botão ou pelo chat."""
 

@@ -709,7 +709,14 @@ def abrir_detalhes(filme):
         pagina_esquerda, width=230, height=36, corner_radius=6, border_width=2,
         fg_color=COR_PAPEL, hover_color=COR_PAPEL_ESCURO, font=(FONTE_TITULO, 15)
     )
-    botao_assistido.pack(pady=(0, 6))
+    botao_assistido.pack(pady=(0, 2))
+
+    # "↻ vi de novo": aparece depois de assistir (cada clique = nova sessão no diário)
+    link_vi_de_novo = tk.Label(
+        pagina_esquerda, text="", font=(FONTE_MANUSCRITA, -int(15 * escala), "bold"),
+        fg=COR_VINHO, bg=COR_PAPEL, cursor="hand2"
+    )
+    link_vi_de_novo.pack(pady=(0, 4))
 
     texto_trailer = "▶  ASSISTIR TRAILER" if filmes.tem_trailer_salvo(filme) else "▶  PROCURAR TRAILER"
     botao_trailer = ctk.CTkButton(
@@ -1008,14 +1015,25 @@ def abrir_detalhes(filme):
         else:
             legenda_estrelas.configure(text=f"sua nota: {nota_atual} de {usuario.NOTA_MAXIMA}  (clique de novo para apagar)")
 
+        vezes = usuario.quantas_vezes_viu(filme)
+        if vezes == 0:
+            link_vi_de_novo.configure(text="")
+        elif vezes == 1:
+            link_vi_de_novo.configure(text="↻ vi de novo")
+        else:
+            link_vi_de_novo.configure(text=f"↻ vi de novo   ·   visto {vezes}×")
+
         etiqueta.configure(text=texto_da_etiqueta_do_diario(filme))
         desenhar_polaroide_do_diario()
 
-    def animar_carimbo_do_adesivo():
-        """O coração "cai" na polaroide e assenta (5 quadros, ~0,3 s)."""
+    def animar_carimbo_do_adesivo(parametro="escala_adesivo"):
+        """
+        O coração (ou o carimbo WATCHED) "cai" na polaroide e assenta: 5 quadros, ~0,3 s.
+        parametro: "escala_adesivo" ou "escala_carimbo".
+        """
         quadros = [
             ImageTk.PhotoImage(desenhar_recorte(
-                filme, escala, COR_PAPEL, TAMANHO_POSTER_DIARIO, modo="diario", escala_adesivo=tamanho
+                filme, escala, COR_PAPEL, TAMANHO_POSTER_DIARIO, modo="diario", **{parametro: tamanho}
             ))
             for tamanho in QUADROS_CARIMBO_ADESIVO
         ]
@@ -1045,12 +1063,23 @@ def abrir_detalhes(filme):
         ao_mudar_listas()
 
     def clicar_assistido():
-        usuario.alternar_assistido(filme)
+        ficou_assistido = usuario.alternar_assistido(filme)
         atualizar_botoes()
+        if ficou_assistido:
+            animar_carimbo_do_adesivo("escala_carimbo")   # o WATCHED é carimbado
         montar_anotacoes()   # anotações aparecem (ou somem) junto
         ao_mudar_listas()
 
     botao_favorito.configure(command=clicar_favorito)
+
+    def clicar_vi_de_novo(event=None):
+        if not usuario.foi_assistido(filme):
+            return
+        usuario.registrar_revisita(filme)
+        atualizar_botoes()
+        ao_mudar_listas()
+
+    link_vi_de_novo.bind("<Button-1>", clicar_vi_de_novo)
     botao_quero_ver.configure(command=clicar_quero_ver)
     botao_assistido.configure(command=clicar_assistido)
     atualizar_botoes()
@@ -1065,6 +1094,68 @@ def abrir_detalhes(filme):
 
     for posicao, botao_estrela in enumerate(botoes_estrela, start=1):
         botao_estrela.configure(command=lambda nota=posicao: clicar_estrela_e_anotacoes(nota))
+
+    virar_pagina_ao_abrir(detalhes, caderno, pagina_direita, imagens_da_janela)
+
+
+# ---------- animação: a página vira ao abrir um filme ----------
+# Uma folha de papel cobre a página da direita e "vira" em direção à lombada,
+# com uma sombrinha na borda que se mexe. A janela também aparece com um fade.
+QUADROS_VIRAR_PAGINA = 9
+INTERVALO_VIRAR_PAGINA_MS = 24      # ~0,2 s no total
+LARGURA_SOMBRA_VIRANDO = 34
+
+
+def virar_pagina_ao_abrir(janela_detalhes, caderno, pagina_direita, imagens):
+    try:
+        janela_detalhes.attributes("-alpha", 0.0)   # some até a página estar pronta
+    except tk.TclError:
+        pass
+
+    def comecar(tentativa=0):
+        if not janela_detalhes.winfo_exists():
+            return
+        janela_detalhes.update_idletasks()
+        moldura = getattr(pagina_direita, "_parent_frame", pagina_direita)
+        x, y = moldura.winfo_x(), moldura.winfo_y()
+        largura, altura = moldura.winfo_width(), moldura.winfo_height()
+        if largura < 10 or altura < 10:
+            # A janela ainda não ganhou tamanho na tela: tenta de novo daqui a pouco.
+            if tentativa < 20:
+                janela_detalhes.after(25, lambda: comecar(tentativa + 1))
+                return
+            try:
+                janela_detalhes.attributes("-alpha", 1.0)
+            except tk.TclError:
+                pass
+            return
+
+        folha = tk.Frame(caderno, bg=COR_PAPEL, bd=0, highlightthickness=0)
+        sombra_img = ImageTk.PhotoImage(desenhar_sombra_da_dobra(LARGURA_SOMBRA_VIRANDO, altura, "esquerda"))
+        imagens.append(sombra_img)
+        sombra = tk.Label(folha, image=sombra_img, bd=0)
+        sombra.place(relx=1.0, y=0, anchor="ne", relheight=1.0)
+        folha.place(x=x, y=y, width=largura, height=altura)
+        folha.lift()
+
+        def passo(numero):
+            if not folha.winfo_exists():
+                return
+            progresso = numero / QUADROS_VIRAR_PAGINA
+            facilidade = 1 - (1 - progresso) ** 3          # começa rápido e assenta devagar
+            try:
+                janela_detalhes.attributes("-alpha", min(1.0, 0.25 + progresso))
+            except tk.TclError:
+                pass
+            if numero >= QUADROS_VIRAR_PAGINA:
+                folha.destroy()
+                return
+            folha.place_configure(width=max(1, int(largura * (1 - facilidade))))
+            janela_detalhes.after(INTERVALO_VIRAR_PAGINA_MS, lambda: passo(numero + 1))
+
+        passo(0)
+
+    janela_detalhes.after(30, comecar)
 
 
 # =========================================================
@@ -3103,7 +3194,8 @@ def anotacao_do_recorte(filme):
     return "", COR_TINTA_SUAVE, False  # sem nota nem coração: polaroide limpa (o ano já vai embaixo)
 
 
-def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo="cartao", escala_adesivo=1.0):
+def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo="cartao",
+                     escala_adesivo=1.0, escala_carimbo=1.0):
     """
     A polaroide inteira, inclinada, já "colada" na cor da página.
     modo "cartao":   anotação embaixo = nota / favorito (Catálogo, Home...)
@@ -3145,10 +3237,13 @@ def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo=
 
     # ---------- carimbo WATCHED ----------
     if usuario.foi_assistido(filme) and not compacto:
-        carimbo = desenhar_carimbo_watched(px(108), escala, data_que_assistiu(filme))
+        carimbo = desenhar_carimbo_watched(
+            int(px(108) * escala_carimbo), escala * escala_carimbo, data_que_assistiu(filme)
+        )
         papel.alpha_composite(
             carimbo,
-            (borda + largura_poster - carimbo.width + px(6), borda + altura_poster - carimbo.height - px(6))
+            (max(0, borda + largura_poster - carimbo.width + px(6)),
+             max(0, borda + altura_poster - carimbo.height - px(6)))
         )
 
     # ---------- anotação à mão ----------
@@ -3911,7 +4006,7 @@ LARGURA_TEXTO_ENTRADA = 560
 COR_LINHA_DIARIO = COR_PAUTA_CADERNO
 
 estado_diario = {"quantidade": ENTRADAS_POR_VEZ}
-edicao_no_diario = {"filme": None, "caixa": None, "agendamento": None}
+edicao_no_diario = {"filme": None, "sessao": None, "caixa": None, "agendamento": None}
 
 
 def titulo_do_grupo(entrada, ordem):
@@ -3968,15 +4063,15 @@ def salvar_edicao_do_diario():
 
     caixa = edicao_no_diario["caixa"]
     if caixa is not None and caixa.winfo_exists():
-        usuario.definir_anotacao(edicao_no_diario["filme"], caixa.get("1.0", "end"))
+        usuario.definir_anotacao(edicao_no_diario["filme"], caixa.get("1.0", "end"), sessao=edicao_no_diario["sessao"])
 
 
 def fechar_edicao_do_diario():
     salvar_edicao_do_diario()
-    edicao_no_diario.update({"filme": None, "caixa": None, "agendamento": None})
+    edicao_no_diario.update({"filme": None, "sessao": None, "caixa": None, "agendamento": None})
 
 
-def montar_anotacao_da_entrada(area, filme, escala, editando=False):
+def montar_anotacao_da_entrada(area, filme, escala, editando=False, sessao=None):
     """
     A anotação da entrada: o texto à mão (caneta azul) com '✎ editar', ou um
     convite para escrever. Clicando, a própria entrada vira um caderninho.
@@ -3996,7 +4091,7 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
             border_color=COR_BORDA_PAPEL, font=(FONTE_MANUSCRITA, 17)
         )
         caixa.pack(fill="x", pady=(px(4), px(2)))
-        caixa.insert("1.0", usuario.obter_anotacao(filme))
+        caixa.insert("1.0", usuario.obter_anotacao(filme, sessao))
         caixa.focus_set()
 
         rodape = tk.Frame(area, bg=COR_CARD)
@@ -4010,7 +4105,7 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
         def salvar_agora():
             edicao_no_diario["agendamento"] = None
             if caixa.winfo_exists():
-                usuario.definir_anotacao(filme, caixa.get("1.0", "end"))
+                usuario.definir_anotacao(filme, caixa.get("1.0", "end"), sessao=sessao)
                 if aviso.winfo_exists():
                     aviso.configure(text="salvo no seu diário ✓")
                 atualizar_contador_meus_filmes()
@@ -4024,10 +4119,10 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
         def terminar(event=None):
             fechar_edicao_do_diario()
             atualizar_contador_meus_filmes()
-            montar_anotacao_da_entrada(area, filme, escala)
+            montar_anotacao_da_entrada(area, filme, escala, sessao=sessao)
 
         caixa.bind("<KeyRelease>", agendar_salvamento)
-        edicao_no_diario.update({"filme": filme, "caixa": caixa, "agendamento": None})
+        edicao_no_diario.update({"filme": filme, "sessao": sessao, "caixa": caixa, "agendamento": None})
 
         botao_pronto = tk.Label(
             rodape, text="  pronto ✓  ", font=(FONTE_MANUSCRITA, -px(15), "bold"),
@@ -4037,10 +4132,10 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
         botao_pronto.bind("<Button-1>", terminar)
         return
 
-    texto = usuario.obter_anotacao(filme)
+    texto = usuario.obter_anotacao(filme, sessao)
 
     def abrir_edicao(event=None):
-        montar_anotacao_da_entrada(area, filme, escala, editando=True)
+        montar_anotacao_da_entrada(area, filme, escala, editando=True, sessao=sessao)
 
     if texto:
         rotulo = tk.Label(
@@ -4057,7 +4152,7 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
         vincular_clique([rotulo, editar], abrir_edicao)
     else:
         convite = tk.Label(
-            area, text="✎ escrever o que você achou...", font=(FONTE_MANUSCRITA, -px(16)),
+            area, text="✎ o que mudou desta vez?" if sessao is not None else "✎ escrever o que você achou...", font=(FONTE_MANUSCRITA, -px(16)),
             fg=COR_TEXTO_SUAVE, bg=COR_CARD, anchor="w", cursor="hand2"
         )
         convite.pack(anchor="w")
@@ -4067,12 +4162,13 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
 ANO_MAIS_ANTIGO_NO_EDITOR = 1930
 
 
-def abrir_editor_de_data(filme):
+def abrir_editor_de_data(filme, sessao=None):
     """
     Bilhetinho para corrigir quando você assistiu (dia / mês / ano).
     Útil para o que você marcou hoje, mas viu anos atrás.
+    sessao=None corrige a 1ª vez; 0, 1... corrigem cada "vi de novo".
     """
-    data_atual = usuario.data_em_que_assistiu(filme) or date.today()
+    data_atual = usuario.data_da_sessao(usuario.chave_filme(filme), sessao) or date.today()
 
     editor = ctk.CTkToplevel(janela)
     editor.title("Quando você assistiu?")
@@ -4130,7 +4226,7 @@ def abrir_editor_de_data(filme):
             aviso.configure(text="esse dia não existe nesse mês (ou o ano está estranho)")
             return
         try:
-            usuario.definir_data_assistido(filme, nova_data)
+            usuario.definir_data_assistido(filme, nova_data, sessao=sessao)
         except ValueError as erro:
             aviso.configure(text=str(erro))
             return
@@ -4159,6 +4255,8 @@ def criar_entrada_do_diario(container, entrada, imagens):
                                                 “sua anotação...”   ✎ editar
     """
     filme = entrada["filme"]
+    sessao = entrada.get("sessao")          # None = 1ª vez | 0, 1... = "vi de novo"
+    revisita = sessao is not None
     escala = escala_da_tela(container)
 
     def px(valor):
@@ -4200,7 +4298,7 @@ def criar_entrada_do_diario(container, entrada, imagens):
     ))
     for posicao, rotulo in enumerate(rotulos_da_data):
         rotulo.pack(pady=(px(16), 0) if posicao == 0 else (px(2) if rotulo.cget("text") == "✎ data" else 0, 0))
-    vincular_clique(rotulos_da_data + [margem], lambda event: abrir_editor_de_data(filme))
+    vincular_clique(rotulos_da_data + [margem], lambda event: abrir_editor_de_data(filme, sessao))
 
     # ---------- polaroide pequena ----------
     imagem = imagem_do_recorte(filme, escala, COR_CARD, TAMANHO_POSTER_ENTRADA, modo="compacto")
@@ -4221,11 +4319,35 @@ def criar_entrada_do_diario(container, entrada, imagens):
         font=(FONTE_INTERFACE, -px(10), "bold"),
         fg=COR_SERIE if filmes.eh_serie(filme) else COR_TEXTO_SUAVE, bg=COR_CARD
     ).pack(side="left")
+    if entrada.get("vez", 1) > 1:
+        tk.Label(
+            linha_etiqueta, text=f"  ↻ {entrada['vez']}ª VEZ ", font=(FONTE_INTERFACE, -px(10), "bold"),
+            fg=COR_TEXTO_CAPA, bg=COR_DOURADO
+        ).pack(side="left", padx=(px(8), 0))
     if usuario.eh_favorito(filme):
         tk.Label(
             linha_etiqueta, text="  ♥ favorito", font=(FONTE_MANUSCRITA, -px(13), "bold"),
             fg=COR_VERMELHO, bg=COR_CARD
         ).pack(side="left")
+    if revisita:
+        apagar = tk.Label(
+            linha_etiqueta, text="   ✕ apagar esta sessão", font=(FONTE_MANUSCRITA, -px(13)),
+            fg=COR_TEXTO_SUAVE, bg=COR_CARD, cursor="hand2"
+        )
+        apagar.pack(side="left")
+
+        def apagar_sessao(event=None):
+            if messagebox.askyesno(
+                "Apagar sessão",
+                f"Apagar a sessão em que você viu {filme['nome']} de novo?\n"
+                "(A primeira vez continua no diário.)",
+                parent=janela
+            ):
+                fechar_edicao_do_diario()
+                usuario.apagar_revisita(filme, sessao)
+                ao_mudar_listas()
+
+        apagar.bind("<Button-1>", apagar_sessao)
 
     nome = tk.Label(
         textos, text=f"{filme['nome']}  ({filmes.periodo_de_exibicao(filme)})",
@@ -4247,7 +4369,7 @@ def criar_entrada_do_diario(container, entrada, imagens):
             fg=COR_TEXTO_SUAVE, bg=COR_CARD
         ).pack(side="left")
     tk.Label(
-        linha_nota, text=" ✓ WATCHED ", font=(FONTE_TITULO, -px(12)),
+        linha_nota, text=" ↻ WATCHED AGAIN " if revisita else " ✓ WATCHED ", font=(FONTE_TITULO, -px(12)),
         fg=COR_VERMELHO, bg=COR_CARD, highlightbackground=COR_VERMELHO, highlightthickness=1
     ).pack(side="left", padx=(px(12), 0))
 
@@ -4255,7 +4377,7 @@ def criar_entrada_do_diario(container, entrada, imagens):
 
     area_anotacao = tk.Frame(textos, bg=COR_CARD)
     area_anotacao.pack(fill="x")
-    montar_anotacao_da_entrada(area_anotacao, filme, escala)
+    montar_anotacao_da_entrada(area_anotacao, filme, escala, sessao=sessao)
 
     def abrir(event=None):
         abrir_detalhes(filme)
@@ -4381,7 +4503,7 @@ def criar_item_da_checklist(folha, filme, escala, imagens):
 
         def concluir():
             if usuario.foi_assistido(filme):
-                usuario.alternar_quero_assistir(filme)   # já tinha visto: só risca da lista
+                usuario.registrar_revisita(filme)        # era "pra rever": vira uma sessão nova no diário
             else:
                 usuario.alternar_assistido(filme)        # vira entrada no diário
             ao_mudar_listas()
@@ -4501,6 +4623,12 @@ def linhas_anotadas_da_capa(numeros):
             "o mais bem avaliado:",
             f"{melhor['filme']['nome']}  {usuario.texto_estrelas(melhor['nota'])}",
             melhor["filme"],
+        ))
+    if numeros.get("revistos"):
+        linhas.append((
+            "vi de novo:",
+            f"{plural(numeros['revistos'], 'título', 'títulos')} ({numeros['sessoes']} sessões no total) ↻",
+            None,
         ))
     if numeros["favoritos"]:
         linhas.append(("favoritos colados:", plural(numeros["favoritos"], "título", "títulos") + " ♥", None))
