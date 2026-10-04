@@ -49,3 +49,11 @@ dados/backups/
 
 # PDFs exportados do diário (também têm os seus dados)
 dados/exportados/
+
+# Executável (gerado pelo construir_exe.bat; é enorme, cada um gera o seu)
+build/
+dist/
+dados/cineai.log
+dados/testes_antes_do_exe.log
+
+CineAI.spec

@@ -15,7 +15,7 @@ import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageTk
 
 from cineai import conversas, diario_pdf, filmes, perfil, retrato, streamings, usuario
-from cineai.caminhos import PASTA_POSTERS
+from cineai.caminhos import CAMINHO_ICONE, PASTA_POSTERS
 from cineai.rastreio import formatar_ms, rastro
 
 
@@ -353,6 +353,11 @@ def vincular_clique(widgets, funcao):
 # =========================================================
 janela = ctk.CTk()
 janela.title("CineAI — seu diário de cinema")
+if sys.platform.startswith("win") and CAMINHO_ICONE.exists():
+    try:
+        janela.iconbitmap(default=str(CAMINHO_ICONE))   # ícone da janela e da barra de tarefas
+    except tk.TclError:
+        pass
 janela.geometry("1200x760")
 janela.minsize(1050, 680)
 janela.configure(fg_color=COR_FUNDO)

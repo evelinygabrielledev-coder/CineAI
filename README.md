@@ -117,6 +117,22 @@ em `dados/embeddings_cache.pkl`.
 
 ---
 
+## 🖥️ CineAI.exe (abrir sem o Python)
+
+```bash
+python construir_exe.py
+```
+
+Ele instala o PyInstaller, roda os testes e gera `dist/CineAI/CineAI.exe`
+(leva alguns minutos; a pasta fica grande por causa do torch).
+
+- O `.exe` usa a mesma pasta `dados/` do projeto, então o diário é o mesmo do `python main.py`.
+- O **Ollama** continua precisando estar instalado e aberto (ele não vai dentro do `.exe`).
+- Se algo der errado ao abrir, aparece um aviso e os detalhes ficam em `dados/cineai.log`.
+- Mudou o código? Rode o `construir_exe.py` de novo.
+
+---
+
 ## ✅ Testes
 
 ```bash
@@ -133,6 +149,7 @@ Os testes usam uma pasta temporária e **nunca mexem** no seu `usuario.json` nem
 ```
 assistente_filmes/
 ├── main.py            ← abre o CineAI (python main.py)
+├── construir_exe.py   ← gera o CineAI.exe
 ├── cineai/            ← o programa
 │   ├── interface.py   janela (chat, catálogo, diário, painel do RAG)
 │   ├── filmes.py      cérebro: regras, filtros, busca semântica e respostas
