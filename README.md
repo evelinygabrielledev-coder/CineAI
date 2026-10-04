@@ -37,6 +37,8 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
   - **Retrospectiva do ano**: páginas viradas uma a uma com o ano em números, o mês mais cinéfilo,
     o seu gosto, a nota mais alta, uma anotação sua, começo e fim e os títulos revistos
     (botão na Capa ou "como foi meu ano no cinema?" no chat).
+  - **Diário em PDF**: capa, números e todas as entradas por mês (pôster, data, estrelas e anotação),
+    do diário inteiro ou de um ano, prontas para guardar ou imprimir (em `dados/exportados/`).
   - **Diário automático**: cada título visto vira uma entrada com data (editável), estrelas e a sua anotação,
     separada por mês. Viu de novo? **"↻ vi de novo"** cria outra entrada, com outra data e outra anotação.
   - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).
@@ -133,6 +135,7 @@ assistente_filmes/
 │   ├── perfil.py      perfil de gosto (notas, favoritos e anotações)
 │   ├── usuario.py     favoritos, diário, notas e anotações (dados/usuario.json)
 │   ├── conversas.py   conversas salvas (dados/conversas.json)
+│   ├── diario_pdf.py  exporta o diário em PDF (dados/exportados/)
 │   ├── rastreio.py    etapas de cada resposta para o Painel do RAG
 │   └── caminhos.py    onde fica cada arquivo
 ├── importadores/      ← montam o catálogo a partir do TMDB e da OMDb

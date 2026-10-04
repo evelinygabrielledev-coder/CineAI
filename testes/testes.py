@@ -921,6 +921,84 @@ class TestRetrospectiva(TesteCineAI):
         self.assertIn("diário", resultado["texto"])
 
 
+class TestDiarioPdf(TesteCineAI):
+    """Diário em PDF: capa, números e as entradas (gravado só na pasta temporária)."""
+
+    def caminho(self, nome="diario.pdf"):
+        return PASTA_TEMPORARIA / "exportados" / nome
+
+    @staticmethod
+    def contar_paginas(caminho):
+        import re
+        # Cada página nova é acrescentada ao fim do arquivo; o último /Count é o total.
+        return int(re.findall(rb"/Count\s*(\d+)", caminho.read_bytes())[-1])
+
+    def ver(self, nome, data, nota=None, anotacao=None):
+        filme = self.filme(nome)
+        if nota is not None:
+            usuario.definir_nota(filme, nota)
+        else:
+            usuario.alternar_assistido(filme)
+        usuario.definir_data_assistido(filme, data)
+        if anotacao:
+            usuario.definir_anotacao(filme, anotacao)
+
+    def test_diario_vazio(self):
+        """Sem entradas, não cria um PDF vazio: avisa com ValueError."""
+        from cineai import diario_pdf
+        with self.assertRaises(ValueError):
+            diario_pdf.exportar_diario_pdf(filmes.filmes, caminho=self.caminho("vazio.pdf"))
+        self.assertFalse(self.caminho("vazio.pdf").exists())
+
+    def test_exporta_pdf(self):
+        """Gera um PDF de verdade: capa + números + entradas, sem sobrar o .tmp."""
+        from datetime import date
+        from cineai import diario_pdf
+        self.ver("Shrek", date(2025, 5, 2), nota=5, anotacao="Ri do começo ao fim com a família.")
+        self.ver("Titanic", date(2025, 6, 1))
+        paginas_prontas = []
+        caminho = diario_pdf.exportar_diario_pdf(
+            filmes.filmes, caminho=self.caminho(), ao_avancar=paginas_prontas.append
+        )
+        self.assertTrue(caminho.read_bytes().startswith(b"%PDF"))
+        self.assertEqual(self.contar_paginas(caminho), 3)
+        self.assertEqual(paginas_prontas, [1, 2, 3])
+        self.assertFalse(caminho.with_suffix(".tmp").exists())
+
+    def test_muitas_entradas_viram_mais_paginas(self):
+        """Com várias entradas, o diário continua em páginas novas."""
+        from datetime import date
+        from cineai import diario_pdf
+        for dia, filme in enumerate(filmes.filmes[:12], start=1):
+            usuario.alternar_assistido(filme)
+            usuario.definir_data_assistido(filme, date(2025, 1 + dia % 12, dia))
+        caminho = diario_pdf.exportar_diario_pdf(filmes.filmes, caminho=self.caminho("muitas.pdf"))
+        self.assertGreater(self.contar_paginas(caminho), 4)
+
+    def test_so_um_ano(self):
+        """Exportando um ano, só as sessões daquele ano entram."""
+        from datetime import date
+        from cineai import diario_pdf
+        self.ver("Shrek", date(2024, 5, 2))
+        self.ver("Titanic", date(2025, 6, 1))
+        entradas = diario_pdf.entradas_para_exportar(filmes.filmes, 2025)
+        self.assertEqual([entrada["filme"]["nome"] for entrada in entradas], ["Titanic"])
+        with self.assertRaises(ValueError):
+            diario_pdf.exportar_diario_pdf(filmes.filmes, ano=2023, caminho=self.caminho("2023.pdf"))
+
+    def test_anotacao_longa_quebra_linhas(self):
+        """A anotação é quebrada em linhas que cabem na coluna, sem perder palavras."""
+        from cineai import diario_pdf
+        fonte = diario_pdf.fonte(diario_pdf.FONTES_MANUSCRITAS, 34)
+        texto = "Chorei no final, de novo. A trilha sonora é linda demais e a despedida acabou comigo. " * 3
+        linhas = diario_pdf.quebrar_linhas(texto, fonte, 600)
+        self.assertGreater(len(linhas), 2)
+        self.assertEqual(" ".join(linhas).split(), texto.split())
+        from PIL import Image, ImageDraw
+        lapis = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+        self.assertTrue(all(lapis.textlength(linha, font=fonte) <= 600 for linha in linhas))
+
+
 class TestBackup(TesteCineAI):
     """Backup do diário: cópias com data em dados/backups (aqui, na pasta temporária)."""
 

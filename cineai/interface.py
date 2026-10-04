@@ -14,7 +14,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageTk
 
-from cineai import conversas, filmes, perfil, streamings, usuario
+from cineai import conversas, diario_pdf, filmes, perfil, streamings, usuario
 from cineai.caminhos import PASTA_POSTERS
 from cineai.rastreio import formatar_ms, rastro
 
@@ -5480,20 +5480,124 @@ def abrir_retrospectiva(ano=None):
 
 
 def criar_botao_retrospectiva(folha, escala):
-    """Botão dourado na Capa: abre a retrospectiva do ano."""
+    """Botões grandes na Capa: a retrospectiva do ano (dourado) e o diário em PDF."""
     def px(valor):
         return int(valor * escala)
 
     ano = usuario.ano_padrao_da_retrospectiva(filmes.filmes)
     if ano is None:
         return
+    linha = tk.Frame(folha, bg=COR_PAPEL)
+    linha.pack(pady=(0, px(28)))
     botao = tk.Label(
-        folha, text=f"✨  minha retrospectiva de {ano}  ›", font=(FONTE_MANUSCRITA, -px(22), "bold"),
+        linha, text=f"✨  minha retrospectiva de {ano}  ›", font=(FONTE_MANUSCRITA, -px(22), "bold"),
         fg=COR_TEXTO, bg=COR_DOURADO_CLARO, cursor="hand2", padx=px(22), pady=px(9),
         highlightbackground=COR_DOURADO, highlightthickness=max(1, px(2))
     )
-    botao.pack(pady=(0, px(28)))
+    botao.pack(side="left", padx=px(8))
     botao.bind("<Button-1>", lambda event: abrir_retrospectiva(ano))
+
+    botao_pdf = tk.Label(
+        linha, text="📄  diário em PDF", font=(FONTE_MANUSCRITA, -px(22), "bold"),
+        fg=COR_TEXTO_CAPA, bg=COR_VINHO, cursor="hand2", padx=px(22), pady=px(9),
+        highlightbackground=COR_VINHO, highlightthickness=max(1, px(2))
+    )
+    botao_pdf.pack(side="left", padx=px(8))
+    botao_pdf.bind("<Button-1>", abrir_exportar_pdf)
+
+
+# ---------- Diário em PDF ----------
+OPCAO_PDF_TUDO = "o diário inteiro"
+
+
+def abrir_arquivo_no_computador(caminho):
+    """Abre o PDF no leitor padrão (no Windows, o mesmo que dar dois cliques)."""
+    if sys.platform.startswith("win"):
+        os.startfile(caminho)
+    else:
+        webbrowser.open(caminho.as_uri())
+
+
+def abrir_exportar_pdf(event=None):
+    """Janelinha: escolher o diário inteiro ou um ano, e exportar."""
+    anos = usuario.anos_do_diario(filmes.filmes)
+    if not anos:
+        messagebox.showinfo("Diário em PDF", "O diário ainda está em branco. ✎", parent=janela)
+        return
+
+    janela_pdf = ctk.CTkToplevel(janela)
+    janela_pdf.title("Diário em PDF")
+    janela_pdf.resizable(False, False)
+    janela_pdf.configure(fg_color=COR_PAPEL)
+    janela_pdf.transient(janela)
+    janela.update_idletasks()
+    janela_pdf.geometry(f"+{janela.winfo_rootx() + 420}+{janela.winfo_rooty() + 200}")
+    janela_pdf.after(50, janela_pdf.grab_set)
+
+    ctk.CTkLabel(
+        janela_pdf, text="imprimir o diário 📄", font=(FONTE_MANUSCRITA, 24, "bold"),
+        text_color=COR_TITULO_MANUSCRITO
+    ).pack(padx=34, pady=(20, 2))
+    ctk.CTkLabel(
+        janela_pdf, text="capa, números e cada entrada com pôster, estrelas e anotação",
+        font=(FONTE_MANUSCRITA, 15), text_color=COR_TEXTO_SUAVE
+    ).pack(padx=34, pady=(0, 14))
+
+    escolha = ctk.CTkSegmentedButton(
+        janela_pdf, values=[OPCAO_PDF_TUDO] + [str(ano) for ano in anos],
+        font=(FONTE_MANUSCRITA, 16, "bold"), fg_color=COR_VINHO,
+        selected_color=COR_VERMELHO, selected_hover_color=COR_VERMELHO_HOVER,
+        unselected_color=COR_VINHO, unselected_hover_color=COR_VERMELHO_HOVER,
+        text_color=COR_TEXTO_CAPA
+    )
+    escolha.set(OPCAO_PDF_TUDO)
+    escolha.pack(padx=34, pady=(0, 16))
+
+    aviso = ctk.CTkLabel(janela_pdf, text="", font=(FONTE_MANUSCRITA, 15), text_color=COR_AZUL_CANETA)
+    aviso.pack(pady=(0, 4))
+
+    def exportar():
+        ano = None if escolha.get() == OPCAO_PDF_TUDO else int(escolha.get())
+        botao_exportar.configure(state="disabled", text="desenhando as páginas...")
+
+        def ao_avancar(paginas_prontas):
+            aviso.configure(text=f"✎ {plural(paginas_prontas, 'página pronta', 'páginas prontas')}...")
+            janela_pdf.update()
+
+        try:
+            caminho = diario_pdf.exportar_diario_pdf(filmes.filmes, ano=ano, ao_avancar=ao_avancar)
+        except (ValueError, OSError) as erro:
+            botao_exportar.configure(state="normal", text="📄  exportar")
+            aviso.configure(text=str(erro), text_color=COR_VERMELHO)
+            return
+
+        janela_pdf.destroy()
+        abrir_arquivo_no_computador(caminho)
+        messagebox.showinfo(
+            "Diário em PDF",
+            f"Pronto! O PDF foi guardado em:\n{caminho}\n\n"
+            "Ele está na pasta dados/exportados do CineAI.",
+            parent=janela
+        )
+
+    botao_exportar = ctk.CTkButton(
+        janela_pdf, text="📄  exportar", height=38, corner_radius=4, fg_color=COR_VERMELHO,
+        hover_color=COR_VERMELHO_HOVER, text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 18, "bold"),
+        command=exportar
+    )
+    botao_exportar.pack(padx=34, pady=(4, 8), fill="x")
+
+    link_pasta = ctk.CTkLabel(
+        janela_pdf, text="📂 abrir a pasta dos PDFs", font=(FONTE_MANUSCRITA, 15),
+        text_color=COR_VINHO, cursor="hand2"
+    )
+    link_pasta.pack(pady=(0, 18))
+
+    def abrir_pasta(event=None):
+        diario_pdf.PASTA_EXPORTADOS.mkdir(parents=True, exist_ok=True)
+        abrir_arquivo_no_computador(diario_pdf.PASTA_EXPORTADOS)
+
+    link_pasta.bind("<Button-1>", abrir_pasta)
 
 
 TEXTO_DIARIO_VAZIO = (

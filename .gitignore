@@ -46,3 +46,6 @@ Thumbs.db
 
 # Backups do diário (têm os seus dados pessoais)
 dados/backups/
+
+# PDFs exportados do diário (também têm os seus dados)
+dados/exportados/
