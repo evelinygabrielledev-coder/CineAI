@@ -48,6 +48,7 @@ LIMITE_SIMILARIDADE = 0.25
 PESO_BONUS_PALAVRAS = 0.20
 
 modelo = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+perfil.codificar_texto = modelo.encode  # as anotações do diário usam o mesmo modelo das sinopses
 
 with open(CAMINHO_JSON, "r", encoding="utf-8") as arquivo:
     filmes = json.load(arquivo)
@@ -1601,28 +1602,41 @@ def sortear_entre_os_melhores(ordenados):
     return [escolhido] + [filme for filme in ordenados if filme is not escolhido]
 
 
-def registrar_ranking_do_perfil(ordenados, perfil_atual, titulo="Ranking pelo seu perfil"):
-    """Mostra no Painel do RAG as partes da pontuação dos 5 primeiros."""
+def registrar_ranking_do_perfil(ordenados, perfil_atual, titulo="Ranking pelo seu perfil", so_anotacoes=False):
+    """
+    Mostra no Painel do RAG as partes da pontuação dos 5 primeiros.
+    so_anotacoes=True: a coluna "total" mostra a nota usada NESSA ordem (80% anotações),
+    senão o 1º lugar aparecia com um total menor que o 2º.
+    """
     linhas = []
     for filme in ordenados[:5]:
         pontuacao, partes = perfil.pontuar_filme(filme, perfil_atual)
+        if so_anotacoes:
+            pontuacao = perfil.pontuar_pelas_anotacoes(filme, perfil_atual)
         linhas.append((
             filme["nome"],
-            [f"{partes['generos']:+.2f}", f"{partes['gosto']:+.2f}", f"{pontuacao:.3f}"],
+            [f"{partes['generos']:+.2f}", f"{partes['gosto']:+.2f}",
+             f"{partes['anotacoes']:+.2f}", f"{pontuacao:.3f}"],
             max(pontuacao, 0)
         ))
 
     maior = max((linha[2] for linha in linhas), default=1) or 1
     linhas = [(nome, valores, barra / maior) for nome, valores, barra in linhas]
 
-    rastro.tabela(
-        "👤", titulo, ["gêneros", "sinopse", "total"], linhas,
-        detalhe=(
-            f"{len(ordenados)} candidatos • total = {perfil.PESO_GENEROS}×gêneros "
-            f"+ {perfil.PESO_GOSTO}×sinopses que você curtiu + diretores, atores, "
-            "popularidade e notas"
+    quantidade_anotacoes = len(perfil_atual.get("anotacoes") or [])
+    if so_anotacoes:
+        detalhe = (
+            f"{len(ordenados)} candidatos • total = {perfil.PESO_SO_ANOTACOES}×anotações "
+            f"+ {1 - perfil.PESO_SO_ANOTACOES:.1f}×perfil completo ({quantidade_anotacoes} anotações com sinal)"
         )
-    )
+    else:
+        detalhe = (
+            f"{len(ordenados)} candidatos • total = {perfil.PESO_GENEROS}×gêneros "
+            f"+ {perfil.PESO_GOSTO}×sinopses que você curtiu "
+            f"+ {perfil.PESO_ANOTACOES}×suas anotações ({quantidade_anotacoes} com sinal) "
+            "+ diretores, atores, popularidade e notas"
+        )
+    rastro.tabela("👤", titulo, ["gêneros", "sinopse", "anotações", "total"], linhas, detalhe=detalhe)
 
 
 def ordenar_sem_perfil(candidatos):
@@ -3716,6 +3730,75 @@ def responder_quero_assistir(cliente):
 
 
 # =========================================================
+# "ME RECOMENDA PELO QUE EU ESCREVI NO DIÁRIO"
+# =========================================================
+EXPRESSOES_PELAS_ANOTACOES = [
+    "pelo que eu escrevi", "pelo que escrevi", "com base no que eu escrevi",
+    "com base no que escrevi", "pelas minhas anotacoes", "pelas anotacoes",
+    "com base nas minhas anotacoes", "com base nas anotacoes", "pelo meu diario",
+    "pelo diario", "com base no meu diario", "com base no diario",
+]
+
+
+def pede_pelas_anotacoes(cliente):
+    return any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_PELAS_ANOTACOES)
+
+
+def recomendar_pelas_anotacoes(cliente):
+    """Ordena os títulos não vistos pelo que você escreveu (e pelas estrelas que deu)."""
+    global filme_atual, pedido_anterior, candidatos_anteriores, filmes_recomendados
+    global qualidade_pedida, busca_usou_perfil, contexto_relativo, ultima_busca_semantica
+
+    perfil_atual = perfil.calcular_perfil(filmes)
+    anotacoes = perfil_atual["anotacoes"]
+    rastro.etapa(
+        "📝", "Suas anotações",
+        f"{len(anotacoes)} anotação(ões) com sinal: "
+        + (", ".join(f'{a["filme"]["nome"]} ({"+" if a["sinal"] > 0 else "−"})' for a in anotacoes[:6]) or "nenhuma")
+    )
+
+    if not anotacoes:
+        return criar_resultado(
+            "Ainda não tenho anotações suas para usar. ✎\n\n"
+            "No Meu diário, escreva o que você achou de um título (pelo menos "
+            f"{perfil.MINIMO_PALAVRAS_ANOTACAO} palavras, contando do que gostou) e dê estrelas a ele: "
+            "as estrelas me dizem se aquilo é algo que você quer mais (4–5★) ou menos (1–2★)."
+        )
+
+    base = filtrar_por_tipo(filmes, detectar_tipo(cliente))
+    base, _ = remover_assistidos(base, "")
+    if not base:
+        return criar_resultado("Você já viu todos os títulos desse tipo do catálogo! 🎬")
+
+    # Painel do RAG: o que cada anotação "encontrou" sozinha no catálogo
+    linhas_vizinhos = []
+    for anotacao in anotacoes:
+        vizinhos = perfil.vizinhos_da_anotacao(anotacao, base)
+        nomes = ", ".join(f'{filme["nome"]} (z {z:.1f})' for z, filme in vizinhos) or "nenhum"
+        sinal = "+" if anotacao["sinal"] > 0 else "−"
+        linhas_vizinhos.append(f'{anotacao["filme"]["nome"]} ({sinal}) “{perfil.trecho(anotacao["texto"], 40)}” → {nomes}')
+    rastro.etapa("🧭", "Vizinhos de cada anotação", "\n".join(linhas_vizinhos))
+
+    ordenados = sorted(base, key=lambda filme: perfil.pontuar_pelas_anotacoes(filme, perfil_atual), reverse=True)
+    registrar_ranking_do_perfil(ordenados, perfil_atual, titulo="Ranking pelas suas anotações", so_anotacoes=True)
+
+    escolhido = ordenados[0]
+    filmes_recomendados = []
+    pedido_anterior = "suas anotações do diário"
+    candidatos_anteriores = ordenados
+    qualidade_pedida = None
+    busca_usou_perfil = True
+    contexto_relativo = None
+    ultima_busca_semantica = None
+
+    filme_atual = escolhido
+    registrar_recomendacao(escolhido)
+
+    texto = "📝 Escolhi pelo que você escreveu no seu diário:\n\n" + texto_da_recomendacao(escolhido, True)
+    return criar_resultado(texto, tipo="recomendacao", filme=escolhido)
+
+
+# =========================================================
 # PROCESSAR MENSAGEM
 # =========================================================
 def processar_mensagem(cliente):
@@ -3765,6 +3848,11 @@ def responder_mensagem(cliente):
     resposta_lista = responder_quero_assistir(cliente)
     if resposta_lista is not None:
         return resposta_lista
+
+    # ---------------- "Me recomenda pelo que eu escrevi no diário" ----------------
+    if pede_pelas_anotacoes(cliente):
+        rota("recomendação pelas suas anotações do diário")
+        return recomendar_pelas_anotacoes(cliente)
 
     # ---------------- Histórico: "qual foi o primeiro?", "o anterior" ----------------
     tipo_historico = detectar_pedido_de_historico(cliente)

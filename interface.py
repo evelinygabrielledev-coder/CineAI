@@ -4871,7 +4871,7 @@ def criar_tabela_da_etapa(container, tabela):
             height=10,
             corner_radius=2,
             fg_color=COR_PAPEL_ESCURO,
-            progress_color=COR_ROSA_MARCA_TEXTO if eh_primeiro else COR_DOURADO
+            progress_color=COR_VERMELHO if eh_primeiro else COR_DOURADO
         )
         barra_pontuacao.set(max(0.0, min(1.0, barra)))
         barra_pontuacao.grid(row=linha, column=2 + len(valores), sticky="w", padx=(8, 12), pady=2)

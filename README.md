@@ -21,7 +21,12 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
 - **Comparar títulos**: "Breaking Bad ou Interestelar?".
 - **Perfil de gosto**: as estrelas que você dá (1 a 5) formam um perfil por gênero, diretor e ator,
   usado em "me recomenda algo".
-- **Meu diário**: favoritos, assistidos (com data e número da entrada), notas e anotações pessoais.
+- **Meu diário**:
+  - **Capa** com o seu nome e as estatísticas (filmes, séries, nota média, horas, gênero e diretor que mais aparecem).
+  - **Diário automático**: cada título visto vira uma entrada com data, estrelas e a sua anotação, separada por mês.
+  - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).
+- **Suas anotações viram recomendação**: o que você escreve no diário entra na busca por embeddings,
+  e as estrelas dizem se aquilo é algo que você quer mais ou menos ("me recomenda pelo que eu escrevi").
 - **Trailers**, notas do IMDb / Rotten Tomatoes e títulos semelhantes em cada página.
 
 ## 🧠 Como funciona
@@ -32,7 +37,8 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
 3. **IA local (Ollama, qwen3:1.7b)**: quando é preciso, extrai o *assunto* do pedido.
 4. **Busca semântica**: o assunto é comparado com as sinopses (sentence-transformers,
    similaridade de cosseno + bônus por palavras em comum).
-5. **Ranking**: o resultado é ordenado pela qualidade e pelo seu perfil.
+5. **Ranking**: o resultado é ordenado pela qualidade e pelo seu perfil (gêneros, diretores,
+   sinopses que você curtiu e as suas anotações do diário, comparadas com o catálogo em desvios-padrão).
 
 ## 🛠️ Tecnologias
 

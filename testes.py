@@ -741,6 +741,81 @@ class TestCapaDoDiario(TesteCineAI):
         self.assertEqual(usuario.obter_nome_do_dono(), "")
 
 
+@apenas_modo_rapido  # usa as sinopses do catálogo de teste e os embeddings simulados
+class TestAnotacoesNaRecomendacao(TesteCineAI):
+    """Etapa 4: o que você escreve no diário entra na recomendação (RAG com as suas palavras)."""
+    TEXTO_DINOSSAUROS = "Adorei os dinossauros clonados escapando do parque!"
+
+    def anotar(self, nome, nota, texto):
+        filme = self.filme(nome)
+        usuario.definir_nota(filme, nota)
+        usuario.definir_anotacao(filme, texto)
+        return filme
+
+    def test_anotacao_positiva_puxa(self):
+        """Nota 5★ com texto sobre dinossauros: Jurassic Park ganha a maior parte de anotações."""
+        self.anotar("Titanic", 5, self.TEXTO_DINOSSAUROS)
+        perfil_atual = perfil.calcular_perfil(filmes.filmes)
+        jurassic = self.filme("Jurassic Park: O Parque dos Dinossauros")
+        partes = {f["nome"]: perfil.parte_das_anotacoes(f, perfil_atual) for f in filmes.filmes}
+        self.assertGreater(partes[jurassic["nome"]], 0.3)
+        self.assertEqual(max(partes, key=partes.get), jurassic["nome"])
+        self.assertIn("Titanic", perfil.frase_da_anotacao(jurassic, perfil_atual))
+
+    def test_anotacao_negativa_afasta(self):
+        """O mesmo texto num título com 1★ empurra Jurassic Park para baixo."""
+        self.anotar("Titanic", 1, self.TEXTO_DINOSSAUROS)
+        perfil_atual = perfil.calcular_perfil(filmes.filmes)
+        jurassic = self.filme("Jurassic Park: O Parque dos Dinossauros")
+        self.assertLess(perfil.parte_das_anotacoes(jurassic, perfil_atual), 0)
+        self.assertIsNone(perfil.frase_da_anotacao(jurassic, perfil_atual))
+
+    def test_anotacao_sentimental_usa_a_ancora(self):
+        """'Marcou minha infância' em Shrek não fala do filme: a âncora (sinopse do Shrek) traz Shrek 2."""
+        shrek = self.anotar("Shrek", 5, "Marcou muito minha infância")
+        perfil_atual = perfil.calcular_perfil(filmes.filmes)
+        anotacao = perfil_atual["anotacoes"][0]
+        vizinhos = perfil.vizinhos_da_anotacao(anotacao, filmes.filmes)
+        self.assertEqual(vizinhos[0][1]["nome"], "Shrek 2")
+        self.assertNotIn(shrek["nome"], [filme["nome"] for _, filme in vizinhos])
+
+    def test_anotacao_curta_nao_conta(self):
+        """'Amei!' não diz sobre o quê: fica de fora da busca pelas anotações."""
+        self.anotar("Titanic", 5, "Amei!")
+        self.assertEqual(perfil.calcular_perfil(filmes.filmes)["anotacoes"], [])
+
+    def test_partes_nao_empatam_no_teto(self):
+        """Bug do catálogo real: todos davam +1,00. Agora a curva suave nunca chega a 1."""
+        self.anotar("Titanic", 5, self.TEXTO_DINOSSAUROS)
+        perfil_atual = perfil.calcular_perfil(filmes.filmes)
+        partes = [perfil.parte_das_anotacoes(filme, perfil_atual) for filme in filmes.filmes]
+        self.assertLess(max(partes), 1.0)
+
+    def test_tres_estrelas_nao_conta(self):
+        """Anotação de título com 3★ (neutro) não entra no perfil."""
+        self.anotar("Titanic", 3, self.TEXTO_DINOSSAUROS)
+        self.assertEqual(perfil.calcular_perfil(filmes.filmes)["anotacoes"], [])
+
+    def test_explicacao_cita_a_anotacao(self):
+        """Com perfil completo, a explicação ganha a linha 📝 com o trecho do que você escreveu."""
+        self.anotar("Titanic", 5, self.TEXTO_DINOSSAUROS)
+        usuario.definir_nota(self.filme("Shrek"), 5)
+        usuario.definir_nota(self.filme("Dunkirk"), 4)
+        perfil_atual = perfil.calcular_perfil(filmes.filmes)
+        explicacao = perfil.explicar_recomendacao(self.filme("Jurassic Park: O Parque dos Dinossauros"), perfil_atual)
+        self.assertIn("📝 Lembra o que você escreveu sobre Titanic", explicacao)
+
+    def test_pedido_pelo_chat(self):
+        """'Me recomenda algo pelo que eu escrevi no diário' usa as anotações (e avisa se não houver)."""
+        self.assertIn("Ainda não tenho anotações", self.pedir("me recomenda algo pelo que eu escrevi no diário")["texto"])
+        self.anotar("Titanic", 5, self.TEXTO_DINOSSAUROS)
+        resultado = self.pedir("me recomenda algo pelo que eu escrevi no diário")
+        self.assertEqual(resultado["filme"]["nome"], "Jurassic Park: O Parque dos Dinossauros")
+        self.assertIn("📝", resultado["texto"])
+        titulos = [etapa["titulo"] for etapa in resultado["rastro"]["etapas"]]
+        self.assertIn("Ranking pelas suas anotações", titulos)
+
+
 # =========================================================
 # 8. ESTRELAS
 # =========================================================

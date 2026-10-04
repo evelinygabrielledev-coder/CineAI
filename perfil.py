@@ -12,7 +12,11 @@ Passo a passo:
   2. O sinal é repassado para os gêneros, diretores e atores do filme.
   3. Cada característica ganha uma AFINIDADE = soma dos sinais / √(quantidade + SUAVIZACAO).
   4. As sinopses dos filmes marcados viram um VETOR DE GOSTO (média ponderada).
-  5. Cada filme não assistido recebe uma pontuação combinando tudo isso.
+  5. As suas ANOTAÇÕES do diário viram vetores também: um filme cuja sinopse
+     lembra o que você escreveu sobre um título que AMOU sobe; se lembra o que
+     você escreveu sobre um que DETESTOU, desce. (As estrelas dão o sinal: o
+     embedding sozinho não sabe a diferença entre "amei" e "odiei".)
+  6. Cada filme não assistido recebe uma pontuação combinando tudo isso.
 
 Este módulo não sabe nada de interface nem de chat.
 """
@@ -56,16 +60,37 @@ PESO_ATORES = 0.10
 PESO_GOSTO = 0.30          # parecido com as histórias que você curtiu
 PESO_POPULARIDADE = 0.10   # pequeno empurrão para filmes conhecidos
 PESO_QUALIDADE = 0.15      # empurrão para filmes bem avaliados
+PESO_ANOTACOES = 0.25      # parecido com o que você ESCREVEU no diário
 
 # 5) Escalas para deixar cada parte entre -1 e 1
 ESCALA_AFINIDADE = 3.0
 ESCALA_GOSTO = 2.0
+# As anotações usam uma curva suave (tanh) em vez de um teto: com 1.900 títulos,
+# muitos passavam de "2,5 desvios" e TODOS empatavam em +1,00 (a anotação parava
+# de diferenciar). Com a curva, 2 desvios ≈ 0,46 | 4 ≈ 0,76 | 6 ≈ 0,91: nunca empata.
+ESCALA_ANOTACOES = 4.0
 
 # 6) Mínimo de filmes com sinal para o perfil valer
 MINIMO_FILMES_PARA_PERFIL = 3
 
 # 7) Nas buscas normais ("uma comédia"), quanto o gosto pesa no desempate
 PESO_DESEMPATE = 0.5
+
+# 8) Anotações: a partir de quantos desvios a explicação cita o que você escreveu
+LIMITE_ANOTACAO_NA_EXPLICACAO = 1.5
+TAMANHO_TRECHO_ANOTACAO = 70
+PESO_SO_ANOTACOES = 0.8    # "me recomenda pelo que eu escrevi": anotações valem 80%
+MINIMO_PALAVRAS_ANOTACAO = 3  # "amei" sozinho não diz SOBRE O QUÊ: fica de fora da busca
+VIZINHOS_POR_ANOTACAO = 3     # quantos títulos parecidos com cada anotação o Painel do RAG mostra
+# A anotação é misturada com a sinopse do próprio título anotado ("âncora").
+# Só o texto: "marcou minha infância" acha filmes SOBRE infância. Com a âncora,
+# a busca fica "infância + o que esse filme é" (minions, vilão que vira pai...).
+# 1,0 = só o que você escreveu | 0,0 = só a sinopse do filme anotado.
+PESO_TEXTO_DA_ANOTACAO = 0.6
+
+# O filmes.py liga isto ao modelo de embeddings (perfil.codificar_texto = modelo.encode).
+# Sem ele (ex.: funções chamadas soltas), as anotações simplesmente não entram.
+codificar_texto = None
 
 
 # =========================================================
@@ -176,6 +201,154 @@ def calcular_vetor_gosto(filmes_com_sinal):
 
 
 # =========================================================
+# 5) ANOTAÇÕES (o que você escreveu no diário)
+# =========================================================
+# Por que "desvios" (z) e não a similaridade direta? Um texto curto em português
+# já fica um pouco parecido com QUALQUER sinopse (0,2 ~ 0,3 no modelo real).
+# Então comparamos cada filme com a média do catálogo para a mesma anotação:
+#     z = (similaridade - média) / desvio padrão
+# z = 0 é "normal"; z = 2 é bem mais parecido que o resto do catálogo.
+cache_vetores_texto = {}
+cache_matriz_sinopses = {"chave": None, "matriz": None}
+
+
+def vetor_do_texto(texto):
+    """Embedding (tamanho 1) de um texto, guardado em memória para não recalcular."""
+    if codificar_texto is None or not texto:
+        return None
+    if texto not in cache_vetores_texto:
+        vetor = np.asarray(codificar_texto(texto), dtype=np.float32)
+        tamanho = np.linalg.norm(vetor)
+        cache_vetores_texto[texto] = vetor / tamanho if tamanho else None
+    return cache_vetores_texto[texto]
+
+
+def matriz_das_sinopses(catalogo):
+    """Todas as sinopses empilhadas numa matriz (uma linha por filme), com cache."""
+    chave = (id(catalogo), len(catalogo))
+    if cache_matriz_sinopses["chave"] != chave:
+        vetores = [filme["vetor_sinopse"] for filme in catalogo if "vetor_sinopse" in filme]
+        cache_matriz_sinopses["chave"] = chave
+        cache_matriz_sinopses["matriz"] = np.vstack(vetores).astype(np.float32) if vetores else None
+    return cache_matriz_sinopses["matriz"]
+
+
+def calcular_anotacoes(catalogo):
+    """
+    Cada anotação de um título com sinal (gostou ou não gostou) vira:
+        {"filme", "texto", "sinal", "vetor", "media", "desvio"}
+    Anotação de filme com 3★ (sinal 0) não diz nada do seu gosto e fica de fora.
+    """
+    filmes_por_chave = {usuario.chave_filme(filme): filme for filme in catalogo}
+    matriz = matriz_das_sinopses(catalogo)
+    anotacoes = []
+
+    for chave, registro in usuario.dados_usuario.get("anotacoes", {}).items():
+        filme = filmes_por_chave.get(chave)
+        if filme is None:
+            continue
+        sinal = sinal_do_filme(filme)
+        texto = registro.get("texto", "")
+        if sinal == 0 or len(texto.split()) < MINIMO_PALAVRAS_ANOTACAO:
+            continue
+        vetor = vetor_do_texto(texto)
+        if vetor is None:
+            continue
+        vetor_ancora = filme.get("vetor_sinopse")
+        if vetor_ancora is not None and len(vetor_ancora) == len(vetor):
+            mistura = PESO_TEXTO_DA_ANOTACAO * vetor + (1 - PESO_TEXTO_DA_ANOTACAO) * np.asarray(vetor_ancora, dtype=np.float32)
+            tamanho = np.linalg.norm(mistura)
+            if tamanho:
+                vetor = mistura / tamanho
+
+        media, desvio = 0.0, 1.0
+        if matriz is not None and len(matriz) > 1 and matriz.shape[1] == len(vetor):
+            similaridades = matriz @ vetor
+            media = float(similaridades.mean())
+            desvio = float(similaridades.std()) or 1.0
+
+        anotacoes.append({
+            "filme": filme, "texto": registro["texto"], "sinal": sinal,
+            "vetor": vetor, "media": media, "desvio": desvio,
+        })
+
+    return anotacoes
+
+
+def ecos_das_anotacoes(filme, perfil):
+    """
+    O quanto a sinopse do filme "ecoa" cada anotação: [(contribuição, z, anotação)].
+    contribuição = peso da anotação (-1 a 1, pelas estrelas) × z (só a parte acima do normal).
+    """
+    anotacoes = perfil.get("anotacoes") or []
+    if not anotacoes or "vetor_sinopse" not in filme:
+        return []
+
+    chave = usuario.chave_filme(filme)
+    ecos = []
+    for anotacao in anotacoes:
+        if usuario.chave_filme(anotacao["filme"]) == chave:
+            continue  # a anotação do próprio filme não conta para ele
+        if len(anotacao["vetor"]) != len(filme["vetor_sinopse"]):
+            continue
+        similaridade = float(np.dot(anotacao["vetor"], filme["vetor_sinopse"]))
+        z = (similaridade - anotacao["media"]) / anotacao["desvio"]
+        peso = limitar(anotacao["sinal"] / 2.0)
+        ecos.append((peso * max(z, 0.0), z, anotacao))
+    return ecos
+
+
+def parte_das_anotacoes(filme, perfil):
+    """
+    -1 a 1: o eco da anotação que MAIS combina (de um título que você curtiu)
+    menos o eco da que mais lembra um título que você não curtiu.
+    """
+    ecos = ecos_das_anotacoes(filme, perfil)
+    if not ecos:
+        return 0.0
+    melhor_positivo = max((contribuicao for contribuicao, _, _ in ecos if contribuicao > 0), default=0.0)
+    pior_negativo = min((contribuicao for contribuicao, _, _ in ecos if contribuicao < 0), default=0.0)
+    return math.tanh((melhor_positivo + pior_negativo) / ESCALA_ANOTACOES)
+
+
+def vizinhos_da_anotacao(anotacao, candidatos, quantidade=VIZINHOS_POR_ANOTACAO):
+    """Os títulos cuja sinopse mais lembra uma anotação: [(z, filme)] (para o Painel do RAG)."""
+    pontuados = []
+    for filme in candidatos:
+        if "vetor_sinopse" not in filme or len(filme["vetor_sinopse"]) != len(anotacao["vetor"]):
+            continue
+        if usuario.chave_filme(filme) == usuario.chave_filme(anotacao["filme"]):
+            continue
+        similaridade = float(np.dot(anotacao["vetor"], filme["vetor_sinopse"]))
+        pontuados.append(((similaridade - anotacao["media"]) / anotacao["desvio"], filme))
+    pontuados.sort(key=lambda par: par[0], reverse=True)
+    return pontuados[:quantidade]
+
+
+def anotacao_que_lembra(filme, perfil):
+    """(anotação, z) da anotação positiva que mais combina com o filme, ou (None, 0)."""
+    positivos = [(contribuicao, z, anotacao) for contribuicao, z, anotacao in ecos_das_anotacoes(filme, perfil)
+                 if contribuicao > 0]
+    if not positivos:
+        return None, 0.0
+    _, z, anotacao = max(positivos, key=lambda eco: eco[0])
+    return anotacao, z
+
+
+def trecho(texto, tamanho=TAMANHO_TRECHO_ANOTACAO):
+    texto = " ".join(texto.split())
+    return texto if len(texto) <= tamanho else texto[: tamanho - 1].rstrip() + "…"
+
+
+def frase_da_anotacao(filme, perfil):
+    """'📝 Lembra o que você escreveu sobre Titanic: “chorei no final…”' ou None."""
+    anotacao, z = anotacao_que_lembra(filme, perfil)
+    if anotacao is None or z < LIMITE_ANOTACAO_NA_EXPLICACAO:
+        return None
+    return f'📝 Lembra o que você escreveu sobre {anotacao["filme"]["nome"]}: “{trecho(anotacao["texto"])}”'
+
+
+# =========================================================
 # PERFIL COMPLETO
 # =========================================================
 def calcular_perfil(catalogo):
@@ -216,6 +389,7 @@ def calcular_perfil(catalogo):
         "diretores": diretores,
         "atores": atores,
         "vetor_gosto": calcular_vetor_gosto(filmes_com_sinal),
+        "anotacoes": calcular_anotacoes(catalogo),
     }
 
 
@@ -304,6 +478,7 @@ def pontuar_filme(filme, perfil):
         "gosto": limitar(similaridade_gosto * ESCALA_GOSTO),
         "popularidade": popularidade_normalizada(filme),
         "qualidade": qualidade_normalizada(filme),
+        "anotacoes": parte_das_anotacoes(filme, perfil),
     }
 
     pontuacao = (
@@ -313,9 +488,16 @@ def pontuar_filme(filme, perfil):
         + PESO_GOSTO * partes["gosto"]
         + PESO_POPULARIDADE * partes["popularidade"]
         + PESO_QUALIDADE * partes["qualidade"]
+        + PESO_ANOTACOES * partes["anotacoes"]
     )
 
     return pontuacao, partes
+
+
+def pontuar_pelas_anotacoes(filme, perfil):
+    """'Me recomenda pelo que eu escrevi': as anotações mandam, o resto desempata."""
+    pontuacao, partes = pontuar_filme(filme, perfil)
+    return PESO_SO_ANOTACOES * partes["anotacoes"] + (1 - PESO_SO_ANOTACOES) * pontuacao
 
 
 def ordenar_por_afinidade(candidatos, perfil):
@@ -374,7 +556,9 @@ def explicar_recomendacao(filme, perfil, generos_ignorados=()):
     """
     generos_ignorados = {normalizar_chave(genero) for genero in generos_ignorados}
     if not perfil["suficiente"]:
-        return None
+        return frase_da_anotacao(filme, perfil)
+
+    frase_anotacao = frase_da_anotacao(filme, perfil)
 
     motivos = []
     chaves_ja_citadas = set()  # para não citar o mesmo filme duas vezes
@@ -409,14 +593,18 @@ def explicar_recomendacao(filme, perfil, generos_ignorados=()):
             # Gênero primeiro: "é Animação, como Toy Story (5★) e Shrek (5★)"
             motivos.insert(0, f"é {melhor_genero['nome']}, como {nomes}")
 
+    explicacao = None
     if motivos:
-        return "💡 Combina com você: " + "; e ".join(motivos) + "."
+        explicacao = "💡 Combina com você: " + "; e ".join(motivos) + "."
+    elif frase_anotacao is None:
+        _, partes = pontuar_filme(filme, perfil)
+        if partes["gosto"] > 0.5:
+            explicacao = "💡 Tem o tipo de história que você costuma curtir."
 
-    _, partes = pontuar_filme(filme, perfil)
-    if partes["gosto"] > 0.5:
-        return "💡 Tem o tipo de história que você costuma curtir."
+    if frase_anotacao is not None:
+        explicacao = f"{explicacao}\n{frase_anotacao}" if explicacao else frase_anotacao
 
-    return None
+    return explicacao
 
 
 # =========================================================
