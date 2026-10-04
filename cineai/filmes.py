@@ -26,7 +26,7 @@ import numpy as np
 import ollama
 from sentence_transformers import SentenceTransformer
 
-from cineai import perfil, usuario
+from cineai import perfil, streamings, usuario
 from cineai.caminhos import CAMINHO_CACHE_EMBEDDINGS, CAMINHO_CATALOGO, PASTA_PROJETO
 from cineai.rastreio import rastro
 
@@ -867,10 +867,11 @@ def filtrar_filmes(cliente):
     genero = detectar_genero(cliente)
     qualidade = detectar_qualidade(cliente)
     tipo = detectar_tipo(cliente)
+    streaming = streamings.detectar_streaming(cliente)   # "na Netflix", "que eu tenho"
 
     if (
         diretor is None and ator is None and ano is None and decada is None
-        and genero is None and qualidade is None
+        and genero is None and qualidade is None and streaming is None
     ):
         texto_tipo = f" • só {'séries' if tipo == TIPO_SERIE else 'filmes'}" if tipo else ""
         rastro.etapa(
@@ -880,6 +881,7 @@ def filtrar_filmes(cliente):
         return None
 
     candidatos = filtrar_por_tipo(filmes, tipo)
+    candidatos = streamings.filtrar_por_streaming(candidatos, streaming)
 
     if diretor is not None:
         candidatos = [
@@ -923,6 +925,8 @@ def filtrar_filmes(cliente):
             f"ano = {ano}" if ano else None,
             f"anos {decada[0]}–{decada[1]}" if decada else None,
             f"qualidade = {qualidade}" if qualidade else None,
+            (f"streaming = {'os que você assina' if streaming == streamings.MEUS_STREAMINGS else streaming}"
+             if streaming else None),
         ] if texto
     ]
     rastro.etapa(
@@ -1130,6 +1134,10 @@ def gerar_resposta(melhor_filme, qualidade=None):
     nota = escolher_nota_para_exibir(melhor_filme, qualidade)
     if nota:
         texto += f"\n\n{nota}"
+
+    onde = streamings.texto_onde_assistir(melhor_filme)
+    if onde:
+        texto += f"\n{onde}" if nota else f"\n\n{onde}"
 
     return texto
 
@@ -3043,7 +3051,7 @@ def chave_de_ordem(ordem, perfil_atual=None):
 
 
 def filtrar_catalogo(texto="", genero=TODOS, decada=TODOS, nota_minima=None,
-                     ordem="Mais populares", esconder_assistidos=False, tipo=None):
+                     ordem="Mais populares", esconder_assistidos=False, tipo=None, streaming=None):
     """
     Busca avançada do Catálogo: aplica todos os filtros juntos e ordena.
 
@@ -3052,8 +3060,10 @@ def filtrar_catalogo(texto="", genero=TODOS, decada=TODOS, nota_minima=None,
     genero      -> "Comédia" (ou "Todos")
     decada      -> "Anos 2010", "Antes de 1980" (ou "Todos")
     nota_minima -> 90 = Rotten (crítica) 90%+ (ou None)
+    streaming   -> "Netflix", streamings.MEUS_STREAMINGS ("os que eu tenho") ou None
     """
     resultado = filtrar_por_tipo(filmes, tipo)
+    resultado = streamings.filtrar_por_streaming(resultado, streaming)
 
     if texto.strip():
         resultado = [f for f in resultado if filme_combina_com_texto(f, texto)]
@@ -3728,6 +3738,72 @@ def responder_quero_assistir(cliente):
 
 
 # =========================================================
+# "ONDE ASSISTIR?" sobre o título da conversa
+# =========================================================
+EXPRESSOES_ONDE_ASSISTIR = [
+    "onde assistir", "onde assisto", "onde eu assisto", "onde posso assistir", "onde ver",
+    "onde vejo", "onde eu vejo", "onde posso ver", "onde passa", "onde ta passando",
+    "onde esta passando", "qual streaming", "em qual streaming", "que streaming",
+    "em que streaming", "tem em streaming", "ta em algum streaming", "esta em algum streaming",
+]
+PALAVRAS_DE_PEDIDO_DE_BUSCA = {"quero", "queria", "recomenda", "recomende", "indica", "sugere", "um", "uma", "algum", "alguma", "algo"}
+
+
+def eh_pergunta_onde_assistir(cliente):
+    """
+    "Onde assistir?", "Onde eu vejo esse?", "Tá na Netflix?" -> True.
+    "Quero uma comédia na Netflix" -> False (isso é busca).
+    """
+    palavras = extrair_palavras(cliente)
+    if any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_ONDE_ASSISTIR):
+        # "onde assistir UM filme de terror?" é pedido de busca, não pergunta sobre o título
+        return not set(palavras) & {"um", "uma", "algum", "alguma", "algo"}
+    streaming = streamings.detectar_streaming(cliente)
+    return (
+        streaming not in (None, streamings.MEUS_STREAMINGS)
+        and "?" in cliente
+        and bool(palavras[:1]) and palavras[0] in {"ta", "esta", "tem", "passa", "da", "e"}
+        and not set(palavras) & PALAVRAS_DE_PEDIDO_DE_BUSCA
+    )
+
+
+def responder_onde_assistir(cliente):
+    filme_alvo = encontrar_filme_citado(cliente) or filme_atual
+    if filme_alvo is None:
+        return criar_resultado('De qual título? Por exemplo: "onde assistir Interestelar?"')
+
+    nome = descrever_filme_curto(filme_alvo)
+    lista = streamings.onde_assistir(filme_alvo)
+    if lista is None:
+        return criar_resultado(
+            f"Ainda não sei onde {nome} está passando. 📺\n\n"
+            "Rode o importadores/importar_onde_assistir.py para eu buscar os streamings do catálogo."
+        )
+
+    perguntado = streamings.detectar_streaming(cliente)
+    if perguntado not in (None, streamings.MEUS_STREAMINGS):
+        if perguntado in lista:
+            return criar_resultado(f"Sim! ✅ {nome} está no {perguntado}.")
+        resposta = f"Não, {nome} não está no {perguntado}."
+        return criar_resultado(resposta + (f" Está em: {', '.join(lista)}." if lista else
+                                           " E não está em nenhum streaming por assinatura agora."))
+
+    if not lista:
+        return criar_resultado(
+            f"{nome} não está em nenhum streaming por assinatura no Brasil agora. "
+            "Dá para alugar ou comprar nas lojas digitais."
+        )
+    meus = set(usuario.obter_meus_streamings())
+    tenho = [nome_streaming for nome_streaming in lista if nome_streaming in meus]
+    texto = f"📺 {nome} está em: {', '.join(lista)}."
+    if tenho:
+        texto += f"\n✅ Você assina: {', '.join(tenho)}."
+    elif meus:
+        texto += "\nNenhum desses é dos streamings que você marcou como seus."
+    return criar_resultado(texto)
+
+
+# =========================================================
 # "VI DE NOVO" (rever um título)
 # =========================================================
 VERBOS_DE_VER = {"vi", "assisti", "maratonei", "vimos", "assistimos"}
@@ -3875,6 +3951,11 @@ def responder_mensagem(cliente):
             "Pode ser um gênero, um ator, um diretor, um ano "
             "ou o assunto da história."
         )
+
+    # ---------------- "Onde assistir?" / "Tá na Netflix?" ----------------
+    if eh_pergunta_onde_assistir(cliente):
+        rota("pergunta: onde assistir (streamings do Brasil)")
+        return responder_onde_assistir(cliente)
 
     # ---------------- "Vi de novo": nova sessão no diário ----------------
     if eh_vi_de_novo(cliente):

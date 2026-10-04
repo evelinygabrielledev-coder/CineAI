@@ -239,6 +239,20 @@ def ollama_simulado(model, messages, think=None):
     return resposta("Resposta pela sinopse.")
 
 
+# Onde assistir (como o importadores/importar_onde_assistir.py deixaria no filmes.json)
+STREAMINGS_DE_TESTE = {
+    "Shrek": ["Netflix", "Prime Video"],
+    "Interestelar": ["Max", "Prime Video"],
+    "Toy Story: Um Mundo de Aventuras": ["Disney+"],
+    "Titanic": [],          # consultado, mas fora dos streamings por assinatura
+}
+for filme_teste in CATALOGO_DE_TESTE:
+    if filme_teste["nome"] in STREAMINGS_DE_TESTE:
+        filme_teste["onde_assistir"] = {
+            "assinatura": STREAMINGS_DE_TESTE[filme_teste["nome"]], "consultado_em": "2026-10-04"
+        }
+
+
 if not MODO_COMPLETO:
     caminho_catalogo = PASTA_TEMPORARIA / "filmes_teste.json"
     caminho_catalogo.write_text(json.dumps(CATALOGO_DE_TESTE, ensure_ascii=False), encoding="utf-8")
@@ -251,7 +265,7 @@ if not MODO_COMPLETO:
 
 # Só agora importamos o CineAI (depois de configurar caminhos e simulações)
 print("Carregando o CineAI" + (" com o catálogo real..." if MODO_COMPLETO else " (modo rápido)..."))
-from cineai import conversas, filmes, perfil, rastreio, usuario  # noqa: E402
+from cineai import conversas, filmes, perfil, rastreio, streamings, usuario  # noqa: E402
 
 
 apenas_modo_rapido = unittest.skipIf(MODO_COMPLETO, "depende do catálogo de teste")
@@ -713,6 +727,63 @@ class TestRever(TesteCineAI):
         self.assertIn("2ª vez", resultado["texto"])
         self.assertEqual(usuario.quantas_vezes_viu(shrek), 2)
         self.assertFalse(usuario.quer_assistir(shrek))
+
+
+@apenas_modo_rapido  # usa os streamings do catálogo de teste
+class TestOndeAssistir(TesteCineAI):
+    """Onde assistir: streamings por assinatura do Brasil (dados da JustWatch, via TMDB)."""
+
+    def test_nomes_do_tmdb_viram_nomes_curtos(self):
+        """'Amazon Prime Video with Ads' -> Prime Video; 'Cinemax' não vira Max."""
+        self.assertEqual(streamings.nome_padrao("Amazon Prime Video with Ads"), "Prime Video")
+        self.assertEqual(streamings.nome_padrao("HBO Max"), "Max")
+        self.assertEqual(streamings.nome_padrao("Paramount Plus Apple TV Channel"), "Paramount+")
+        self.assertEqual(streamings.nome_padrao("Cinemax"), "Cinemax")
+        self.assertEqual(streamings.padronizar_lista(["Netflix basic with Ads", "Netflix", "Max"]), ["Netflix", "Max"])
+
+    def test_detectar_no_chat(self):
+        """'na Netflix', 'no prime', 'que eu tenho'; 'um filme com o Max' não é streaming."""
+        self.assertEqual(streamings.detectar_streaming("uma comédia na Netflix"), "Netflix")
+        self.assertEqual(streamings.detectar_streaming("quero uma animação no prime"), "Prime Video")
+        self.assertEqual(streamings.detectar_streaming("algo que eu tenho"), streamings.MEUS_STREAMINGS)
+        self.assertIsNone(streamings.detectar_streaming("um filme com o Max"))
+
+    def test_busca_com_streaming(self):
+        """'Uma animação na Netflix' -> Shrek, e a resposta diz onde assistir."""
+        resultado = self.pedir("Quero uma animação na Netflix")
+        self.assertEqual(resultado["filme"]["nome"], "Shrek")
+        self.assertIn("📺 Onde assistir: Netflix, Prime Video", resultado["texto"])
+
+    def test_meus_streamings(self):
+        """Com 'Max' marcado como seu, 'um filme que eu tenho' só traz o que está no Max."""
+        usuario.definir_meus_streamings(["Max"])
+        self.assertEqual(self.recomendado("Quero um filme que eu tenho"), "Interestelar")
+        self.assertIn("Max ✓", streamings.texto_onde_assistir(self.filme("Interestelar")))
+
+    def test_perguntas_sobre_o_titulo(self):
+        """Depois de Shrek: 'tá na netflix?' (sim), 'tá no max?' (não) e 'onde eu vejo esse?'."""
+        self.recomendado("Quero uma animação na Netflix")
+        self.assertIn("Sim!", self.pedir("tá na netflix?")["texto"])
+        resposta_max = self.pedir("tá no max?")["texto"]
+        self.assertIn("não está no Max", resposta_max)
+        self.assertIn("Netflix, Prime Video", self.pedir("onde eu vejo esse?")["texto"])
+
+    def test_fora_dos_streamings_e_nao_consultado(self):
+        """Titanic: consultado e fora de assinatura. Dunkirk: ainda não consultado."""
+        self.assertIn("nenhum streaming", self.pedir("onde assistir Titanic?")["texto"])
+        self.assertIn("Ainda não sei", self.pedir("onde assistir Dunkirk?")["texto"])
+
+    def test_busca_nao_vira_pergunta(self):
+        """'Quero uma comédia na Netflix' e 'onde assistir um filme de terror?' são buscas."""
+        self.assertFalse(filmes.eh_pergunta_onde_assistir("Quero uma comédia na Netflix"))
+        self.assertFalse(filmes.eh_pergunta_onde_assistir("onde assistir um filme de terror?"))
+
+    def test_catalogo_filtra_streaming(self):
+        """Catálogo: só Netflix -> Shrek; 'os que eu tenho' com Disney+ -> Toy Story."""
+        self.assertEqual([f["nome"] for f in filmes.filtrar_catalogo(streaming="Netflix")], ["Shrek"])
+        usuario.definir_meus_streamings(["Disney+"])
+        nomes = [f["nome"] for f in filmes.filtrar_catalogo(streaming=streamings.MEUS_STREAMINGS)]
+        self.assertEqual(nomes, ["Toy Story: Um Mundo de Aventuras"])
 
 
 class TestQueroAssistir(TesteCineAI):

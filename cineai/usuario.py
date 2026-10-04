@@ -545,6 +545,20 @@ def definir_nome_do_dono(nome):
     salvar_dados()
 
 
+# ---------------- Meus streamings (os que você assina) ----------------
+def obter_meus_streamings():
+    return list(dados_usuario["configuracoes"].get("meus_streamings", []))
+
+
+def definir_meus_streamings(nomes):
+    nomes_limpos = []
+    for nome in nomes:
+        if nome and nome not in nomes_limpos:
+            nomes_limpos.append(nome)
+    dados_usuario["configuracoes"]["meus_streamings"] = nomes_limpos
+    salvar_dados()
+
+
 def separar_nomes(texto):
     """'Ação, Aventura' -> ['Ação', 'Aventura']"""
     return [parte.strip() for parte in (texto or "").split(",") if parte.strip()]

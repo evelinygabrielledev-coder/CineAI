@@ -28,6 +28,8 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
 - **Catálogo com filmes e séries**: filtros de gênero, década, nota da crítica, ordem e
   "esconder os que já vi".
 - **Comparar títulos**: "Breaking Bad ou Interestelar?".
+- **Onde assistir**: selinhos dos streamings do Brasil (Netflix, Prime Video, Max, Disney+…) em cada título,
+  filtro "que eu assino" no Catálogo e no chat ("uma comédia na Netflix", "tá no Max?").
 - **Perfil de gosto**: as estrelas que você dá (1 a 5) formam um perfil por gênero, diretor e ator,
   usado em "me recomenda algo".
 - **Meu diário**:
@@ -92,6 +94,7 @@ python importadores/importar_tmdb.py          # filmes + pôsteres
 python importadores/importar_series.py        # séries + pôsteres
 python importadores/importar_avaliacoes.py    # IMDb / Rotten Tomatoes (limite de 1.000 por dia no plano grátis)
 python importadores/importar_trailers.py      # trailers que faltarem
+python importadores/importar_onde_assistir.py # em quais streamings do Brasil cada título está
 ```
 
 ### 5. Abrir o CineAI
@@ -141,4 +144,4 @@ assistente_filmes/
 
 Este produto usa a API do TMDB, mas não é endossado nem certificado pelo
 [TMDB](https://www.themoviedb.org). Notas do IMDb, Rotten Tomatoes e Metacritic via
-[OMDb API](https://www.omdbapi.com).
+[OMDb API](https://www.omdbapi.com). Dados de streaming: [JustWatch](https://www.justwatch.com) (via TMDB).

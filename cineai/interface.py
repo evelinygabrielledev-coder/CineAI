@@ -12,7 +12,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageTk
 
-from cineai import conversas, filmes, perfil, usuario
+from cineai import conversas, filmes, perfil, streamings, usuario
 from cineai.caminhos import PASTA_POSTERS
 from cineai.rastreio import formatar_ms, rastro
 
@@ -435,6 +435,51 @@ def adicionar_titulo_secao(container, texto, cor=COR_VERMELHO):
         anchor="w"
     )
     titulo.pack(fill="x", padx=34, pady=(18, 6))
+
+
+# ---------------- Onde assistir: selinhos coloridos dos streamings ----------------
+def criar_selinhos_de_streaming(container, filme):
+    """Um selinho na cor de cada streaming ('✓' nos que você assina) + a fonte dos dados."""
+    escala = escala_da_tela(container)
+
+    def px(valor):
+        return int(valor * escala)
+
+    area = tk.Frame(container, bg=COR_PAPEL)
+    area.pack(fill="x", padx=(px(34), px(26)))
+
+    lista = streamings.onde_assistir(filme)
+    if lista is None:
+        tk.Label(
+            area, text="ainda não consultado — rode  python importadores/importar_onde_assistir.py",
+            font=(FONTE_MANUSCRITA, -px(14)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL, anchor="w"
+        ).pack(anchor="w")
+        return
+    if not lista:
+        tk.Label(
+            area, text="fora dos streamings por assinatura no Brasil (só aluguel ou compra)",
+            font=(FONTE_MANUSCRITA, -px(15)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL, anchor="w"
+        ).pack(anchor="w")
+    else:
+        meus = set(usuario.obter_meus_streamings())
+        linha = tk.Frame(area, bg=COR_PAPEL)
+        linha.pack(anchor="w")
+        for nome in lista:
+            tk.Label(
+                linha, text=f" {nome}{'  ✓' if nome in meus else ''} ",
+                font=(FONTE_INTERFACE, -px(12), "bold"), fg="#FFFFFF",
+                bg=streamings.cor_do_streaming(nome), padx=px(6), pady=px(3)
+            ).pack(side="left", padx=(0, px(6)))
+        if meus & set(lista):
+            tk.Label(
+                area, text="✓ = você assina", font=(FONTE_MANUSCRITA, -px(13)),
+                fg=COR_ASSISTIDO, bg=COR_PAPEL
+            ).pack(anchor="w", pady=(px(4), 0))
+    consultado = (filme.get("onde_assistir") or {}).get("consultado_em", "")
+    tk.Label(
+        area, text=f"dados de streaming: JustWatch (via TMDB) · consultado em {consultado}",
+        font=(FONTE_INTERFACE, -px(9)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL
+    ).pack(anchor="w", pady=(px(4), 0))
 
 
 # ---------------- Peças do diário aberto (tela de detalhes) ----------------
@@ -873,6 +918,10 @@ def abrir_detalhes(filme):
     if notas_para_selos(filme):
         adicionar_titulo_secao(pagina_direita, "AVALIAÇÕES")
         criar_selos_de_nota(pagina_direita, filme, imagens_da_janela)
+
+    # ---------- Onde assistir (streamings do Brasil) ----------
+    adicionar_titulo_secao(pagina_direita, "ONDE ASSISTIR 📺")
+    criar_selinhos_de_streaming(pagina_direita, filme)
 
     # ---------- Minhas anotações (só depois de assistir) ----------
     adicionar_titulo_secao(pagina_direita, "MINHAS ANOTAÇÕES ✎")
@@ -2967,6 +3016,73 @@ filtro_decada = criar_filtro(1, "DÉCADA", [filmes.TODOS] + filmes.decadas_do_ca
 filtro_nota = criar_filtro(2, "NOTA", list(filmes.NOTAS_MINIMAS_DO_CATALOGO))
 filtro_ordem = criar_filtro(3, "ORDEM", filmes.ORDENS_DO_CATALOGO)
 
+STREAMING_TODOS = filmes.TODOS
+STREAMING_MEUS = "✓ Que eu assino"
+filtro_streaming = criar_filtro(4, "STREAMING", [STREAMING_TODOS, STREAMING_MEUS] + streamings.NOMES_DOS_STREAMINGS)
+
+
+def streaming_escolhido_no_catalogo():
+    escolha = filtro_streaming.get()
+    if escolha == STREAMING_TODOS:
+        return None
+    if escolha == STREAMING_MEUS:
+        return streamings.MEUS_STREAMINGS
+    return escolha
+
+
+def abrir_meus_streamings(event=None):
+    """Bilhetinho com caixinhas: quais streamings você assina."""
+    editor = ctk.CTkToplevel(janela)
+    editor.title("Meus streamings")
+    editor.resizable(False, False)
+    editor.configure(fg_color=COR_PAPEL)
+    editor.transient(janela)
+    janela.update_idletasks()
+    editor.geometry(f"+{janela.winfo_rootx() + 420}+{janela.winfo_rooty() + 180}")
+    editor.after(50, editor.grab_set)
+
+    ctk.CTkLabel(
+        editor, text="quais streamings você assina?", font=(FONTE_MANUSCRITA, 22, "bold"),
+        text_color=COR_TITULO_MANUSCRITO
+    ).pack(padx=24, pady=(18, 2))
+    ctk.CTkLabel(
+        editor, text='eles ganham ✓ nos selinhos e valem no filtro "os que eu assino"',
+        font=(FONTE_MANUSCRITA, 14), text_color=COR_TEXTO_SUAVE
+    ).pack(padx=24, pady=(0, 10))
+
+    grade = ctk.CTkFrame(editor, fg_color="transparent")
+    grade.pack(padx=24)
+    meus = set(usuario.obter_meus_streamings())
+    caixas = {}
+    for posicao, nome in enumerate(streamings.NOMES_DOS_STREAMINGS):
+        variavel = ctk.BooleanVar(value=nome in meus)
+        ctk.CTkCheckBox(
+            grade, text=nome, variable=variavel, font=(FONTE_INTERFACE, 13, "bold"),
+            text_color=COR_TEXTO, fg_color=streamings.cor_do_streaming(nome),
+            hover_color=COR_VERMELHO_HOVER, border_color=COR_VINHO, corner_radius=3
+        ).grid(row=posicao // 2, column=posicao % 2, sticky="w", padx=10, pady=5)
+        caixas[nome] = variavel
+
+    def salvar():
+        usuario.definir_meus_streamings([nome for nome, variavel in caixas.items() if variavel.get()])
+        editor.destroy()
+        atualizar_catalogo(manter_pagina=True)
+
+    ctk.CTkButton(
+        editor, text="salvar ✓", width=130, height=34, corner_radius=4, fg_color=COR_VERMELHO,
+        hover_color=COR_VERMELHO_HOVER, text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 16, "bold"),
+        command=salvar
+    ).pack(pady=(14, 18))
+
+
+# Link "✎ quais eu assino" colado no título do filtro STREAMING
+link_meus_streamings = ctk.CTkLabel(
+    filtro_streaming.master, text="✎ quais eu assino", font=(FONTE_MANUSCRITA, 13),
+    text_color=COR_AZUL_CANETA, height=18, cursor="hand2"
+)
+link_meus_streamings.place(relx=1.0, y=0, anchor="ne")
+link_meus_streamings.bind("<Button-1>", abrir_meus_streamings)
+
 esconder_assistidos_var = ctk.BooleanVar(value=False)
 caixa_esconder = ctk.CTkCheckBox(
     barra_filtros,
@@ -2981,7 +3097,7 @@ caixa_esconder = ctk.CTkCheckBox(
     corner_radius=3,
     command=lambda: atualizar_catalogo()
 )
-caixa_esconder.grid(row=0, column=4, padx=(10, 6), pady=(26, 10), sticky="w")
+caixa_esconder.grid(row=0, column=5, padx=(10, 6), pady=(26, 10), sticky="w")
 
 
 def limpar_filtros():
@@ -2990,6 +3106,7 @@ def limpar_filtros():
     filtro_decada.set(filmes.TODOS)
     filtro_nota.set(list(filmes.NOTAS_MINIMAS_DO_CATALOGO)[0])
     filtro_ordem.set(filmes.ORDENS_DO_CATALOGO[0])
+    filtro_streaming.set(STREAMING_TODOS)
     esconder_assistidos_var.set(False)
     seletor_tipo_catalogo.set(filmes.TODOS)
     pintar_seletor_tipo()
@@ -3008,7 +3125,7 @@ botao_limpar_filtros = ctk.CTkButton(
     corner_radius=4,
     command=limpar_filtros
 )
-botao_limpar_filtros.grid(row=0, column=5, padx=(6, 14), pady=(26, 10), sticky="e")
+botao_limpar_filtros.grid(row=0, column=6, padx=(6, 14), pady=(26, 10), sticky="e")
 
 
 # =========================================================
@@ -3617,7 +3734,8 @@ def atualizar_catalogo(event=None, manter_pagina=False):
         nota_minima=filmes.NOTAS_MINIMAS_DO_CATALOGO.get(filtro_nota.get()),
         ordem=filtro_ordem.get(),
         esconder_assistidos=esconder_assistidos_var.get(),
-        tipo=filmes.TIPOS_DO_CATALOGO.get(seletor_tipo_catalogo.get())
+        tipo=filmes.TIPOS_DO_CATALOGO.get(seletor_tipo_catalogo.get()),
+        streaming=streaming_escolhido_no_catalogo()
     )
 
     if not manter_pagina or estado_catalogo["inicio"] >= len(estado_catalogo["filmes"]):
