@@ -655,6 +655,135 @@ def estatisticas_do_diario(catalogo):
 
 
 # =========================================================
+# RETROSPECTIVA DO ANO (o "Wrapped" do diário)
+# =========================================================
+# Só entram as sessões com data naquele ano: a 1ª vez de um título e também
+# cada "vi de novo". Assim, rever Shrek em 2026 conta no ano de 2026.
+QUANTIDADE_GENEROS_RETROSPECTIVA = 3
+MINIMO_DIA_CHEIO = 2          # "dia mais cinéfilo" só aparece com 2 sessões ou mais
+
+
+def anos_do_diario(catalogo):
+    """Os anos que têm alguma sessão no diário, do mais novo para o mais antigo."""
+    anos = {entrada["data"].year for entrada in entradas_do_diario(catalogo) if entrada["data"] is not None}
+    return sorted(anos, reverse=True)
+
+
+def ano_padrao_da_retrospectiva(catalogo, hoje=None):
+    """O ano de hoje, se já tiver algo nele; senão, o ano mais recente do diário (ou None)."""
+    hoje = hoje or date.today()
+    anos = anos_do_diario(catalogo)
+    if not anos:
+        return None
+    return hoje.year if hoje.year in anos else anos[0]
+
+
+def contagem_ordenada(contagem):
+    """{'Drama': 2, 'Ação': 3} -> [('Ação', 3), ('Drama', 2)] (empate: quem apareceu primeiro)."""
+    ordem = {nome: posicao for posicao, nome in enumerate(contagem)}
+    return sorted(contagem.items(), key=lambda par: (-par[1], ordem[par[0]]))
+
+
+def anotacao_em_destaque(sessoes):
+    """
+    A anotação que abre a página "nas suas palavras": a do título com a maior nota;
+    no empate, a mais longa. None se você não escreveu nada naquele ano.
+    """
+    anotadas = [sessao for sessao in sessoes if (sessao["anotacao"] or "").strip()]
+    if not anotadas:
+        return None
+    return max(anotadas, key=lambda sessao: (sessao["nota"] or 0, len(sessao["anotacao"].split())))
+
+
+def retrospectiva_do_ano(catalogo, ano):
+    """
+    Os números de UM ano do diário:
+        ano, sessoes, titulos, novos, filmes, series, horas, horas_estimadas,
+        meses (12 contagens, jan..dez), mes (nº do mês, quantidade) ou None,
+        generos [(nome, quantidade)] (até 3), pessoa (nome, quantidade) ou None,
+        melhor (entrada), nota_media, anotacao (entrada) ou None,
+        primeira e ultima (entradas), dia (date, quantidade) ou None,
+        revistos [entradas de "vi de novo" no ano], anotacoes (quantas sessões anotadas)
+    Devolve None se o ano não tem nenhuma sessão.
+    """
+    sessoes = [
+        entrada for entrada in entradas_do_diario(catalogo, ORDEM_DIARIO_ANTIGOS)
+        if entrada["data"] is not None and entrada["data"].year == ano
+    ]
+    if not sessoes:
+        return None
+
+    # Cada título conta uma vez (a sessão mais antiga dele no ano).
+    titulos = {}
+    for sessao in sessoes:
+        titulos.setdefault(chave_filme(sessao["filme"]), sessao)
+    entradas_dos_titulos = list(titulos.values())
+
+    contagem_meses = [0] * 12
+    contagem_dias = {}
+    contagem_generos = {}
+    contagem_pessoas = {}
+    minutos = 0
+    tem_estimativa = False
+
+    for sessao in sessoes:
+        contagem_meses[sessao["data"].month - 1] += 1
+        contagem_dias[sessao["data"]] = contagem_dias.get(sessao["data"], 0) + 1
+        minutos_vistos = minutos_do_titulo(sessao["filme"])
+        if minutos_vistos:
+            minutos += minutos_vistos
+            tem_estimativa = tem_estimativa or sessao["filme"].get("tipo") == "serie"
+
+    for entrada in entradas_dos_titulos:
+        for genero in separar_nomes(entrada["filme"].get("genero")):
+            contagem_generos[genero] = contagem_generos.get(genero, 0) + 1
+        for pessoa in separar_nomes(entrada["filme"].get("diretor")):
+            contagem_pessoas[pessoa] = contagem_pessoas.get(pessoa, 0) + 1
+
+    mes = None
+    if max(contagem_meses) > 0:
+        numero_mes = contagem_meses.index(max(contagem_meses)) + 1   # empate: o mês mais cedo
+        mes = (numero_mes, max(contagem_meses))
+
+    pessoa = mais_frequente(contagem_pessoas)
+    if pessoa is not None and pessoa[1] < MINIMO_PARA_DESTAQUE:
+        pessoa = None
+
+    dia = mais_frequente(contagem_dias)
+    if dia is not None and dia[1] < MINIMO_DIA_CHEIO:
+        dia = None
+
+    avaliadas = [entrada for entrada in entradas_dos_titulos if entrada["nota"] is not None]
+    melhor = max(reversed(avaliadas), key=lambda entrada: entrada["nota"]) if avaliadas else None
+    notas = [entrada["nota"] for entrada in avaliadas]
+
+    series = sum(1 for entrada in entradas_dos_titulos if entrada["filme"].get("tipo") == "serie")
+
+    return {
+        "ano": ano,
+        "sessoes": len(sessoes),
+        "titulos": len(entradas_dos_titulos),
+        "novos": sum(1 for sessao in sessoes if sessao["sessao"] is None),
+        "filmes": len(entradas_dos_titulos) - series,
+        "series": series,
+        "horas": round(minutos / 60),
+        "horas_estimadas": tem_estimativa,
+        "meses": contagem_meses,
+        "mes": mes,
+        "generos": contagem_ordenada(contagem_generos)[:QUANTIDADE_GENEROS_RETROSPECTIVA],
+        "pessoa": pessoa,
+        "melhor": melhor,
+        "nota_media": round(sum(notas) / len(notas), 1) if notas else None,
+        "anotacao": anotacao_em_destaque(sessoes),
+        "anotacoes": sum(1 for sessao in sessoes if (sessao["anotacao"] or "").strip()),
+        "primeira": sessoes[0],
+        "ultima": sessoes[-1],
+        "dia": dia,
+        "revistos": [sessao for sessao in sessoes if sessao["sessao"] is not None],
+    }
+
+
+# =========================================================
 # BACKUP DO DIÁRIO (cópias com data, em dados/backups/)
 # =========================================================
 # Cada backup é UM arquivo com tudo: favoritos, diário, notas, anotações,

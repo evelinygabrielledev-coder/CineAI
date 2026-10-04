@@ -34,6 +34,9 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
   usado em "me recomenda algo".
 - **Meu diário**:
   - **Capa** com o seu nome e as estatísticas (filmes, séries, nota média, horas, gênero e diretor que mais aparecem).
+  - **Retrospectiva do ano**: páginas viradas uma a uma com o ano em números, o mês mais cinéfilo,
+    o seu gosto, a nota mais alta, uma anotação sua, começo e fim e os títulos revistos
+    (botão na Capa ou "como foi meu ano no cinema?" no chat).
   - **Diário automático**: cada título visto vira uma entrada com data (editável), estrelas e a sua anotação,
     separada por mês. Viu de novo? **"↻ vi de novo"** cria outra entrada, com outra data e outra anotação.
   - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).

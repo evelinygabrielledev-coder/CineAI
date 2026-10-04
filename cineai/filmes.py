@@ -3833,6 +3833,80 @@ def recomendar_sugestao_da_noite():
 
 
 # =========================================================
+# RETROSPECTIVA DO ANO: "como foi meu ano no cinema?"
+# =========================================================
+EXPRESSOES_RETROSPECTIVA = [
+    "retrospectiva", "meu ano no cinema", "como foi meu ano", "como foi o meu ano",
+    "resumo do meu ano", "resumo do ano", "meu wrapped", "wrapped",
+]
+NOMES_DOS_MESES = [
+    "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+    "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+]
+
+
+def eh_pedido_retrospectiva(cliente):
+    return any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_RETROSPECTIVA)
+
+
+def ano_citado(cliente):
+    """'minha retrospectiva de 2025' -> 2025 (ou None)."""
+    for palavra in extrair_palavras(cliente):
+        if len(palavra) == 4 and palavra.isdigit() and 1900 <= int(palavra) <= date.today().year:
+            return int(palavra)
+    return None
+
+
+def texto_da_retrospectiva(numeros):
+    """Resumo da retrospectiva em poucas linhas, para o chat."""
+    def plural(quantidade, singular, plural_da_palavra):
+        return f"{quantidade} {singular if quantidade == 1 else plural_da_palavra}"
+
+    horas = ("≈" if numeros["horas_estimadas"] else "") + f"{numeros['horas']}h"
+    linhas = [
+        f"🎞 Sua retrospectiva de {numeros['ano']}:",
+        "",
+        f"• {plural(numeros['titulos'], 'título', 'títulos')} "
+        f"({plural(numeros['filmes'], 'filme', 'filmes')}, {plural(numeros['series'], 'série', 'séries')}), "
+        f"{horas} na frente da tela",
+    ]
+    if numeros["mes"]:
+        numero_mes, quantidade = numeros["mes"]
+        linhas.append(f"• mês mais cinéfilo: {NOMES_DOS_MESES[numero_mes - 1]} ({plural(quantidade, 'sessão', 'sessões')})")
+    if numeros["generos"]:
+        linhas.append("• gêneros do ano: " + ", ".join(nome for nome, _ in numeros["generos"]))
+    if numeros["pessoa"]:
+        linhas.append(f"• diretor do ano: {numeros['pessoa'][0]}")
+    if numeros["melhor"]:
+        melhor = numeros["melhor"]
+        linhas.append(f"• o melhor: {melhor['filme']['nome']} {usuario.texto_estrelas(melhor['nota'])}")
+    if numeros["revistos"]:
+        linhas.append(f"• vi de novo: {plural(len(numeros['revistos']), 'vez', 'vezes')} ↻")
+    if numeros["anotacao"]:
+        anotacao = numeros["anotacao"]
+        linhas.append(f'• nas suas palavras: "{anotacao["anotacao"].strip()}" ({anotacao["filme"]["nome"]})')
+    linhas += ["", "📖 Abri as páginas da retrospectiva para você."]
+    return "\n".join(linhas)
+
+
+def responder_retrospectiva(cliente):
+    anos = usuario.anos_do_diario(filmes)
+    if not anos:
+        return criar_resultado(
+            "Seu diário ainda não tem nenhuma sessão com data. 📖\n"
+            "Marque alguns títulos como vistos e a retrospectiva aparece."
+        )
+    ano = ano_citado(cliente) or usuario.ano_padrao_da_retrospectiva(filmes)
+    numeros = usuario.retrospectiva_do_ano(filmes, ano)
+    if numeros is None:
+        anos_texto = ", ".join(str(ano_do_diario) for ano_do_diario in anos)
+        return criar_resultado(f"Não tenho nada no diário em {ano}. Anos com sessões: {anos_texto}.")
+    resultado = criar_resultado(texto_da_retrospectiva(numeros), tipo="retrospectiva")
+    resultado["ano"] = ano
+    return resultado
+
+
+# =========================================================
 # "ONDE ASSISTIR?" sobre o título da conversa
 # =========================================================
 EXPRESSOES_ONDE_ASSISTIR = [
@@ -4051,6 +4125,11 @@ def responder_mensagem(cliente):
     if eh_pedido_sugestao_da_noite(cliente):
         rota("sugestão da noite (lista Quero assistir > seu gosto > populares)")
         return recomendar_sugestao_da_noite()
+
+    # ---------------- Retrospectiva: "como foi meu ano no cinema?" ----------------
+    if eh_pedido_retrospectiva(cliente):
+        rota("retrospectiva do ano (números do diário naquele ano)")
+        return responder_retrospectiva(cliente)
 
     # ---------------- "Onde assistir?" / "Tá na Netflix?" ----------------
     if eh_pergunta_onde_assistir(cliente):

@@ -821,6 +821,106 @@ class TestSugestaoDaNoite(TesteCineAI):
         self.assertNotEqual(self.recomendado("quero outro"), resultado["filme"]["nome"])
 
 
+class TestRetrospectiva(TesteCineAI):
+    """Retrospectiva do ano: só as sessões com data naquele ano entram."""
+
+    def ver(self, nome, data, nota=None, anotacao=None):
+        filme = self.filme(nome)
+        if nota is not None:
+            usuario.definir_nota(filme, nota)
+        else:
+            usuario.alternar_assistido(filme)
+        usuario.definir_data_assistido(filme, data)
+        if anotacao:
+            usuario.definir_anotacao(filme, anotacao)
+        return filme
+
+    def test_diario_vazio(self):
+        """Sem sessões: nenhum ano, e a retrospectiva de qualquer ano é None."""
+        from datetime import date
+        self.assertEqual(usuario.anos_do_diario(filmes.filmes), [])
+        self.assertIsNone(usuario.ano_padrao_da_retrospectiva(filmes.filmes))
+        self.assertIsNone(usuario.retrospectiva_do_ano(filmes.filmes, date.today().year))
+
+    def test_separa_por_ano(self):
+        """Cada ano conta só o que foi visto nele; anos em ordem do mais novo."""
+        from datetime import date
+        self.ver("Titanic", date(2024, 3, 10), nota=3)
+        self.ver("A Origem", date(2025, 7, 1), nota=5)
+        self.ver("Interestelar", date(2025, 7, 20), nota=4)
+        self.assertEqual(usuario.anos_do_diario(filmes.filmes), [2025, 2024])
+
+        numeros = usuario.retrospectiva_do_ano(filmes.filmes, 2025)
+        self.assertEqual(numeros["titulos"], 2)
+        self.assertEqual(numeros["sessoes"], 2)
+        self.assertEqual(numeros["mes"], (7, 2))
+        self.assertEqual(numeros["meses"][6], 2)
+        self.assertEqual(sum(numeros["meses"]), 2)
+        self.assertEqual(numeros["pessoa"], ("Christopher Nolan", 2))
+        self.assertEqual(numeros["melhor"]["filme"]["nome"], "A Origem")
+        self.assertEqual(numeros["nota_media"], 4.5)
+        self.assertEqual(numeros["primeira"]["filme"]["nome"], "A Origem")
+        self.assertEqual(numeros["ultima"]["filme"]["nome"], "Interestelar")
+        self.assertEqual(usuario.retrospectiva_do_ano(filmes.filmes, 2024)["titulos"], 1)
+        self.assertIsNone(usuario.retrospectiva_do_ano(filmes.filmes, 2023))
+
+    def test_ano_padrao(self):
+        """Sem nada no ano de hoje, a retrospectiva abre no ano mais recente do diário."""
+        from datetime import date
+        self.ver("Titanic", date(2024, 3, 10))
+        self.assertEqual(usuario.ano_padrao_da_retrospectiva(filmes.filmes, hoje=date(2026, 1, 5)), 2024)
+        self.ver("Shrek", date(2026, 1, 2))
+        self.assertEqual(usuario.ano_padrao_da_retrospectiva(filmes.filmes, hoje=date(2026, 1, 5)), 2026)
+
+    def test_revisita_conta_no_ano_em_que_reviu(self):
+        """Ver Shrek em 2019 e rever em 2025: em 2025 ele é reencontro, não novidade."""
+        from datetime import date
+        shrek = self.ver("Shrek", date(2019, 5, 2), nota=5)
+        usuario.registrar_revisita(shrek, date(2025, 2, 14))
+        numeros = usuario.retrospectiva_do_ano(filmes.filmes, 2025)
+        self.assertEqual(numeros["titulos"], 1)
+        self.assertEqual(numeros["novos"], 0)
+        self.assertEqual(len(numeros["revistos"]), 1)
+        self.assertEqual(numeros["revistos"][0]["vez"], 2)
+        self.assertEqual(usuario.retrospectiva_do_ano(filmes.filmes, 2019)["revistos"], [])
+
+    def test_anotacao_em_destaque(self):
+        """A anotação escolhida é a do título com maior nota (e só se houver alguma)."""
+        from datetime import date
+        self.ver("Titanic", date(2025, 1, 5), nota=3, anotacao="Chorei demais no final do navio.")
+        self.ver("A Origem", date(2025, 2, 5), nota=5, anotacao="Fiquei pensando no pião girando.")
+        numeros = usuario.retrospectiva_do_ano(filmes.filmes, 2025)
+        self.assertEqual(numeros["anotacao"]["filme"]["nome"], "A Origem")
+        self.assertEqual(numeros["anotacoes"], 2)
+        self.ver("Shrek", date(2024, 1, 1), nota=4)
+        self.assertIsNone(usuario.retrospectiva_do_ano(filmes.filmes, 2024)["anotacao"])
+
+    def test_dia_mais_cheio(self):
+        """Dois títulos no mesmo dia viram o 'dia mais cheio'; um só não."""
+        from datetime import date
+        self.ver("Titanic", date(2025, 4, 12))
+        numeros = usuario.retrospectiva_do_ano(filmes.filmes, 2025)
+        self.assertIsNone(numeros["dia"])
+        self.ver("Shrek", date(2025, 4, 12))
+        self.assertEqual(usuario.retrospectiva_do_ano(filmes.filmes, 2025)["dia"], (date(2025, 4, 12), 2))
+
+    def test_pelo_chat(self):
+        """'Como foi meu ano de 2025 no cinema?' responde com o resumo e pede para abrir a janela."""
+        from datetime import date
+        self.ver("A Origem", date(2025, 7, 1), nota=5)
+        resultado = self.pedir("minha retrospectiva de 2025")
+        self.assertEqual(resultado["tipo"], "retrospectiva")
+        self.assertEqual(resultado["ano"], 2025)
+        self.assertIn("A Origem", resultado["texto"])
+        self.assertIn("julho", resultado["texto"])
+
+    def test_pelo_chat_sem_diario(self):
+        """Sem nada no diário, o chat explica em vez de abrir uma janela vazia."""
+        resultado = self.pedir("como foi meu ano no cinema?")
+        self.assertEqual(resultado["tipo"], "mensagem")
+        self.assertIn("diário", resultado["texto"])
+
+
 class TestBackup(TesteCineAI):
     """Backup do diário: cópias com data em dados/backups (aqui, na pasta temporária)."""
 
