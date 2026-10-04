@@ -61,6 +61,9 @@ PASTA_USUARIO = Path(os.environ.get("CINEAI_PASTA_USUARIO", PASTA_DADOS))
 
 CAMINHO_ENV = PASTA_PROJETO / ".env"
 
+# Cópia do modelo de embeddings (só existe na pasta "CineAI portátil", feita pelo montar_portatil.py)
+CAMINHO_MODELO_LOCAL = PASTA_DADOS / "modelo_embeddings"
+
 # Arquivos que vão DENTRO do .exe (o ícone). Pelo python, ficam na pasta do projeto.
 PASTA_RECURSOS = Path(getattr(sys, "_MEIPASS", PASTA_PROJETO))
 CAMINHO_ICONE = PASTA_RECURSOS / "cineai.ico"

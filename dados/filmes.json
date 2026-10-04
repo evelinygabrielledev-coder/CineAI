@@ -58826,7 +58826,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1399-game-of-thrones/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      7,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -58867,7 +58877,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/66732-stranger-things/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      9,
+      8,
+      9,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -58908,7 +58925,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71446-la-casa-de-papel/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      15,
+      16,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -58953,7 +58975,14 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1396-breaking-bad/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      13,
+      13,
+      13,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -58996,7 +59025,20 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1402-the-walking-dead/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      13,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      22,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -59037,7 +59079,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/93405/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      7,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -59078,7 +59125,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/63174-lucifer/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      18,
+      26,
+      10,
+      16,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -59119,7 +59174,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/69050-riverdale/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      22,
+      22,
+      19,
+      19,
+      22,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -59160,7 +59224,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/76479-the-boys/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -59203,7 +59274,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71712-the-good-doctor/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      18,
+      20,
+      20,
+      18,
+      22,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -59244,7 +59324,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/85271-wandavision/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -59285,7 +59368,21 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1418-the-big-bang-theory/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      17,
+      23,
+      23,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -59326,7 +59423,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/84958-loki/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -59367,7 +59468,18 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/60735-the-flash/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      23,
+      23,
+      23,
+      22,
+      19,
+      18,
+      20,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -59409,7 +59521,19 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/60625-rick-and-morty/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      11,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -59450,7 +59574,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/60574-peaky-blinders/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -59491,7 +59623,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/82856-the-mandalorian/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -59533,7 +59670,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/85552-euphoria/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -59574,7 +59716,32 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1416-grey-s-anatomy/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      27,
+      24,
+      16,
+      24,
+      22,
+      22,
+      23,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      25,
+      21,
+      17,
+      20,
+      20,
+      10,
+      18,
+      18,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -59615,7 +59782,47 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/456-the-simpsons/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      22,
+      24,
+      22,
+      22,
+      25,
+      25,
+      25,
+      25,
+      23,
+      22,
+      21,
+      22,
+      22,
+      22,
+      21,
+      22,
+      22,
+      20,
+      21,
+      23,
+      22,
+      22,
+      22,
+      22,
+      22,
+      22,
+      22,
+      21,
+      23,
+      22,
+      22,
+      22,
+      22,
+      18,
+      18,
+      15,
+      5
+    ]
   },
   {
     "tipo": "serie",
@@ -59656,7 +59863,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/119051-wednesday/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -59697,7 +59909,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/75006-the-umbrella-academy/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -59740,7 +59958,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/18165-the-vampire-diaries/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      23,
+      22,
+      22,
+      22,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -59782,7 +60010,19 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1668-friends/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      25,
+      23,
+      23,
+      23,
+      23,
+      23,
+      23,
+      17
+    ]
   },
   {
     "tipo": "serie",
@@ -59823,7 +60063,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/76669-elite/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -59864,7 +60114,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/88396-the-falcon-and-the-winter-soldier/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -59905,7 +60158,16 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/48866-the-100/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      16,
+      16,
+      13,
+      13,
+      13,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -59947,7 +60209,24 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1622-supernatural/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      16,
+      22,
+      22,
+      22,
+      23,
+      23,
+      23,
+      23,
+      23,
+      23,
+      23,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -59988,7 +60267,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/87108-chernobyl/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      5
+    ]
   },
   {
     "tipo": "serie",
@@ -60029,7 +60311,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/81356-sex-education/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -60070,7 +60358,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/44217-vikings/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      10,
+      10,
+      20,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -60115,7 +60411,17 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1408-house/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      24,
+      24,
+      16,
+      24,
+      21,
+      23,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -60156,7 +60462,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/70523-dark/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -60197,7 +60508,11 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/100088-the-last-of-us/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -60239,7 +60554,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/94997-house-of-the-dragon/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -60280,7 +60600,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/77169-cobra-kai/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      15
+    ]
   },
   {
     "tipo": "serie",
@@ -60321,7 +60649,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71912-the-witcher/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -60362,7 +60696,15 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/60059-better-call-saul/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -60403,7 +60745,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/19885-sherlock/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      3,
+      3,
+      3,
+      3
+    ]
   },
   {
     "tipo": "serie",
@@ -60444,7 +60792,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/42009-black-mirror/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      3,
+      4,
+      6,
+      6,
+      3,
+      5,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -60486,7 +60843,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1412-arrow/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      23,
+      23,
+      23,
+      23,
+      23,
+      22,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -60525,7 +60892,13 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/63247-westworld/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -60566,7 +60939,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/94605-arcane/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -60607,7 +60984,22 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1413-american-horror-story/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      13,
+      13,
+      13,
+      12,
+      10,
+      11,
+      10,
+      9,
+      10,
+      10,
+      9,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -60648,7 +61040,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2288-prison-break/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      13,
+      22,
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -60689,7 +61088,18 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1100-how-i-met-your-mother/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      20,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -60732,7 +61142,18 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/37680-suits/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -60773,7 +61194,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1405-dexter/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -60814,7 +61245,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/87739-the-queen-s-gambit/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -60853,7 +61287,13 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      12,
+      10,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -60897,7 +61337,18 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/2316-the-office/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      22,
+      23,
+      14,
+      26,
+      24,
+      24,
+      24,
+      23
+    ]
   },
   {
     "tipo": "serie",
@@ -60938,7 +61389,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61889-marvel-s-daredevil/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -60984,7 +61440,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4607-lost/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      23,
+      13,
+      17,
+      17
+    ]
   },
   {
     "tipo": "serie",
@@ -61023,7 +61487,17 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      15,
+      16,
+      16,
+      16,
+      16,
+      16,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -61065,7 +61539,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/12637-rebelde/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      215,
+      120,
+      105
+    ]
   },
   {
     "tipo": "serie",
@@ -61104,7 +61583,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -61145,7 +61627,38 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2190-south-park/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      18,
+      17,
+      17,
+      14,
+      17,
+      15,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      2,
+      6,
+      6,
+      5,
+      5,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -61189,7 +61702,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/246-avatar-the-last-airbender/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      20,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -61230,7 +61748,33 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1434-family-guy/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      21,
+      22,
+      30,
+      18,
+      12,
+      16,
+      20,
+      18,
+      23,
+      22,
+      21,
+      18,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      15,
+      18,
+      15
+    ]
   },
   {
     "tipo": "serie",
@@ -61271,7 +61815,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/70785-anne-with-an-e/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -61312,7 +61861,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2004-malcolm-in-the-middle/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16,
+      25,
+      22,
+      22,
+      22,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -61355,7 +61913,15 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/34524-teen-wolf/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      24,
+      12,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -61398,7 +61964,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/5920-the-mentalist/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      23,
+      24,
+      24,
+      22,
+      22,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -61440,7 +62015,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/65334-miraculous-les-aventures-de-ladybug-et-chat-noir/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      26,
+      25,
+      26,
+      26,
+      26,
+      26
+    ]
   },
   {
     "tipo": "serie",
@@ -61481,7 +62064,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/66788-13-reasons-why/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -61524,7 +62113,19 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4604-smallville/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      21,
+      23,
+      22,
+      22,
+      22,
+      22,
+      20,
+      22,
+      21,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -61565,7 +62166,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/99966/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -61604,7 +62209,15 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      22,
+      23,
+      22,
+      19,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -61645,7 +62258,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/46648-true-detective/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -61689,7 +62308,37 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/2734-law-order-special-victims-unit/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      21,
+      23,
+      25,
+      25,
+      23,
+      22,
+      22,
+      19,
+      22,
+      24,
+      24,
+      23,
+      24,
+      24,
+      23,
+      23,
+      21,
+      24,
+      24,
+      20,
+      16,
+      22,
+      22,
+      13,
+      22,
+      21,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -61730,7 +62379,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/124364-from/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -61771,7 +62426,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/105214-oscuro-deseo/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      15
+    ]
   },
   {
     "tipo": "serie",
@@ -61814,7 +62473,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90462-chucky/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -61855,7 +62519,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/86831-love-death-robots/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      8,
+      9,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -61896,7 +62566,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/60797-scorpion/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      24,
+      25,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -61939,7 +62615,28 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4057-criminal-minds/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      23,
+      20,
+      26,
+      23,
+      24,
+      24,
+      24,
+      24,
+      23,
+      22,
+      22,
+      22,
+      15,
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -61980,7 +62677,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/48891-brooklyn-nine-nine/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      23,
+      23,
+      22,
+      22,
+      18,
+      13,
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -62021,7 +62728,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/78191-you/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -62062,7 +62776,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/46331-under-the-dome/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -62103,7 +62822,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/84773-the-lord-of-the-rings-the-rings-of-power/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -62144,7 +62868,20 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/615-futurama/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      20,
+      15,
+      12,
+      16,
+      26,
+      26,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -62185,7 +62922,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1403-marvel-s-agents-of-s-h-i-e-l-d/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      22,
+      22,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -62226,7 +62972,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/88329-hawkeye/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -62267,7 +63016,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79242-chilling-adventures-of-sabrina/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -62308,7 +63061,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/60708-gotham/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      22,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -62350,7 +63110,21 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2691-two-and-a-half-men/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      24,
+      19,
+      24,
+      22,
+      16,
+      24,
+      23,
+      22,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -62391,7 +63165,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/43348-pablo-escobar-el-patron-del-mal/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      113
+    ]
   },
   {
     "tipo": "serie",
@@ -62434,7 +63211,20 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4087-the-x-files/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      25,
+      24,
+      24,
+      20,
+      22,
+      22,
+      21,
+      20,
+      6,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -62475,7 +63265,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/92749-moon-knight/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -62516,7 +63309,19 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/46952-the-blacklist/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      23,
+      22,
+      22,
+      22,
+      19,
+      22,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -62557,7 +63362,15 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1398-the-sopranos/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -62598,7 +63411,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/74577-the-end-of-the-f-ing-world/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -62637,7 +63454,19 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      74,
+      84,
+      104,
+      80,
+      95,
+      99,
+      75,
+      88,
+      94,
+      68
+    ]
   },
   {
     "tipo": "serie",
@@ -62679,7 +63508,15 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/39351-grimm/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      22,
+      21,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -62720,7 +63557,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/40075-gravity-falls/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -62761,7 +63602,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/16286-yo-soy-betty-la-fea/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      335
+    ]
   },
   {
     "tipo": "serie",
@@ -62803,7 +63647,21 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1911-bones/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      21,
+      15,
+      26,
+      22,
+      23,
+      13,
+      24,
+      24,
+      22,
+      22,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -62844,7 +63702,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/110492-peacemaker/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -62891,7 +63753,18 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79744-the-rookie/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      20,
+      14,
+      22,
+      22,
+      10,
+      18,
+      18,
+      1
+    ]
   },
   {
     "tipo": "serie",
@@ -62932,7 +63805,20 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1421-modern-family/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      22,
+      22,
+      22,
+      22,
+      18
+    ]
   },
   {
     "tipo": "serie",
@@ -62975,7 +63861,20 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/34307-shameless/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      14,
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -63016,7 +63915,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/63351-narcos/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -63055,7 +63959,22 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      12,
+      12,
+      12,
+      10,
+      10,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -63102,7 +64021,15 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/69478-the-handmaid-s-tale/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      13,
+      13,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -63146,7 +64073,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/60622-fargo/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      11,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -63187,7 +64121,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/108978-reacher/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -63226,7 +64166,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      16,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -63267,7 +64212,11 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/80213-the-purge/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -63308,7 +64257,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/91239-bridgerton/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -63349,7 +64305,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1409-sons-of-anarchy/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      14,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -63392,7 +64357,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      2
+    ]
   },
   {
     "tipo": "serie",
@@ -63433,7 +64401,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67178-marvel-s-the-punisher/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -63475,7 +64447,14 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/73586-yellowstone/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      10,
+      10,
+      10,
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -63516,7 +64495,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1425-house-of-cards/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -63557,7 +64544,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/52814-halo/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -63602,7 +64593,28 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/387-spongebob-squarepants/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      41,
+      36,
+      40,
+      40,
+      36,
+      47,
+      52,
+      52,
+      47,
+      20,
+      51,
+      35,
+      64,
+      23,
+      24,
+      22,
+      26,
+      23,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -63644,7 +64656,19 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/15260-adventure-time/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      26,
+      26,
+      26,
+      26,
+      52,
+      43,
+      26,
+      27,
+      14,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -63685,7 +64709,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/104877-sen-cal-kapimi/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      39,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -63726,7 +64754,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/106379-fallout/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -63765,7 +64797,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -63806,7 +64841,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67744-mindhunter/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -63847,7 +64886,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/115036-the-book-of-boba-fett/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -63889,7 +64931,16 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/71728-young-sheldon/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      21,
+      18,
+      22,
+      22,
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -63932,7 +64983,12 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/40008-hannibal/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -63976,7 +65032,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/46296-spartacus/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64018,7 +65079,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79460-legacies/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16,
+      16,
+      16,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -64059,7 +65126,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/95396-severance/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      10,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -64101,7 +65173,17 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/56570-outlander/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16,
+      13,
+      13,
+      13,
+      12,
+      8,
+      16,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64142,7 +65224,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61222-bojack-horseman/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      12,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -64181,7 +65271,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      19,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -64221,7 +65318,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/113988-dahmer-monster-the-jeffrey-dahmer-story/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64262,7 +65362,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/80752-see/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -64303,7 +65408,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/63639-the-expanse/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      13,
+      13,
+      10,
+      10,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -64344,7 +65457,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/69740-ozark/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -64385,7 +65504,14 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1705-fringe/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      23,
+      22,
+      22,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -64426,7 +65552,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67335-sin-senos-si-hay-paraiso/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      90,
+      87,
+      63
+    ]
   },
   {
     "tipo": "serie",
@@ -64467,7 +65598,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1424-orange-is-the-new-black/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -64512,7 +65652,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/75450-titans/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      11,
+      13,
+      13,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -64553,7 +65699,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/72844-the-haunting-of-hill-house/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64594,7 +65743,19 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/75219-9-1-1/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      18,
+      18,
+      14,
+      18,
+      18,
+      10,
+      18,
+      18,
+      3
+    ]
   },
   {
     "tipo": "serie",
@@ -64636,7 +65797,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/31917-pretty-little-liars/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      25,
+      24,
+      24,
+      26,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -64677,7 +65847,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1438-the-wire/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      12,
+      12,
+      13,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64718,7 +65895,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/153312-tulsa-king/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64759,7 +65942,13 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/95057-superman-lois/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      15,
+      15,
+      13,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64800,7 +65989,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62127-marvel-s-iron-fist/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -64841,7 +66034,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90802-the-sandman/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      11,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -64882,7 +66079,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/125988-silo/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      1
+    ]
   },
   {
     "tipo": "serie",
@@ -64923,7 +66126,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/38472-marvel-s-jessica-jones/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -64965,7 +66173,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1920-twin-peaks/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      22,
+      18
+    ]
   },
   {
     "tipo": "serie",
@@ -65007,7 +66220,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1407-homeland/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -65046,7 +66269,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/97546-ted-lasso/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      12,
+      12,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -65086,7 +66315,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1639-heroes/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      11,
+      25,
+      19
+    ]
   },
   {
     "tipo": "serie",
@@ -65125,7 +66360,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/96677-lupin/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      7,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -65168,7 +66408,23 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/58841-chicago-p-d/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      15,
+      23,
+      23,
+      23,
+      22,
+      22,
+      20,
+      16,
+      22,
+      22,
+      13,
+      22,
+      21,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -65207,7 +66463,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/92783-she-hulk-attorney-at-law/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -65247,7 +66506,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/16997-the-pacific/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -65284,7 +66546,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      22,
+      22,
+      22,
+      11
+    ]
   },
   {
     "tipo": "serie",
@@ -65324,7 +66593,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1981-charmed/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      22,
+      23,
+      23,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -65365,7 +66644,33 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4614-ncis/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      23,
+      24,
+      24,
+      19,
+      25,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      20,
+      16,
+      21,
+      22,
+      10,
+      20,
+      20,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -65405,7 +66710,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/39272-once-upon-a-time/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      23,
+      23,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -65444,7 +66758,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62455-vis-a-vis/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      11,
+      13,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -65485,7 +66805,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1892-the-fresh-prince-of-bel-air/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      24,
+      24,
+      26,
+      25,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -65522,7 +66850,16 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16,
+      17,
+      18,
+      16,
+      15,
+      15,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -65559,7 +66896,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      11
+    ]
   },
   {
     "tipo": "serie",
@@ -65598,7 +66938,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71914-the-wheel-of-time/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -65637,7 +66982,18 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1400-seinfeld/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      5,
+      12,
+      23,
+      24,
+      22,
+      24,
+      24,
+      22,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -65676,7 +67032,31 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1433-american-dad/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      16,
+      19,
+      16,
+      20,
+      18,
+      19,
+      18,
+      19,
+      20,
+      3,
+      15,
+      22,
+      22,
+      22,
+      20,
+      24,
+      22,
+      22,
+      22,
+      22,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -65719,7 +67099,24 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/44006-chicago-fire/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      22,
+      23,
+      23,
+      22,
+      23,
+      22,
+      20,
+      16,
+      22,
+      22,
+      13,
+      22,
+      21,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -65758,7 +67155,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71915-good-omens/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6,
+      1
+    ]
   },
   {
     "tipo": "serie",
@@ -65797,7 +67199,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/33880-the-legend-of-korra/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      14,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -65836,7 +67244,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/65494-the-crown/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -65875,7 +67291,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4194-star-wars-the-clone-wars/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      22,
+      20,
+      13,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -65914,7 +67339,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/68421-altered-carbon/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -65953,7 +67382,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/102903-control-z/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -65994,7 +67428,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1395-gossip-girl/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      25,
+      22,
+      22,
+      24,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66034,7 +67476,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/31132-regular-show/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      28,
+      39,
+      37,
+      37,
+      28,
+      36,
+      28
+    ]
   },
   {
     "tipo": "serie",
@@ -66073,7 +67525,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/107113-only-murders-in-the-building/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      1
+    ]
   },
   {
     "tipo": "serie",
@@ -66112,7 +67572,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/83867-andor/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -66152,7 +67616,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/105-sex-and-the-city/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      18,
+      18,
+      18,
+      8,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -66193,7 +67665,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/18347-community/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      24,
+      22,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -66232,7 +67712,14 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1411-person-of-interest/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      22,
+      23,
+      22,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -66271,7 +67758,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1419-castle/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      24,
+      24,
+      23,
+      24,
+      23,
+      23,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -66311,7 +67808,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/10545-true-blood/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      12,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66350,7 +67856,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/693-desperate-housewives/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      23,
+      23,
+      17,
+      24,
+      23,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -66389,7 +67905,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/11250-pasion-de-gavilanes/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      188,
+      82
+    ]
   },
   {
     "tipo": "serie",
@@ -66428,7 +67948,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67198-star-trek-discovery/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      15,
+      14,
+      13,
+      13,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66467,7 +67994,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62126-marvel-s-luke-cage/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -66504,7 +68035,13 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      12,
+      12,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -66547,7 +68084,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/47-el-chavo-del-ocho/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      45,
+      45,
+      40,
+      47,
+      45,
+      41,
+      51
+    ]
   },
   {
     "tipo": "serie",
@@ -66586,7 +68132,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/95-buffy-the-vampire-slayer/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      22,
+      22,
+      22,
+      22,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -66626,7 +68181,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/47640-the-strain/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66665,7 +68226,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61550-marvel-s-agent-carter/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66704,7 +68269,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/63333-the-last-kingdom/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66743,7 +68315,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/89641/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -66782,7 +68358,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/60573-silicon-valley/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10,
+      10,
+      10,
+      8,
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -66821,7 +68405,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90239-el-juego-de-las-llaves/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -66858,7 +68447,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -66897,7 +68489,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90260-i-am-not-okay-with-this/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -66936,7 +68531,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/105248-cyberpunk-edgerunners/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -66975,7 +68574,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2038-drake-josh/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      14,
+      17,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -67014,7 +68619,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/31586-la-reina-del-sur/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      63,
+      60,
+      60
+    ]
   },
   {
     "tipo": "serie",
@@ -67053,7 +68663,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/68507-his-dark-materials/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      7,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -67092,7 +68707,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67070-fleabag/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -67132,7 +68751,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/85949-star-trek-picard/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -67171,7 +68795,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/136315-the-bear/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10,
+      10,
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -67210,7 +68841,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/111110-one-piece/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      1
+    ]
   },
   {
     "tipo": "serie",
@@ -67249,7 +68885,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/100883-never-have-i-ever/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -67288,7 +68930,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61664-sense8/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -67327,7 +68973,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/75758-lost-in-space/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -67367,7 +69018,16 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/8592-parks-and-recreation/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      24,
+      16,
+      22,
+      22,
+      20,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -67406,7 +69066,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/93741-jurassic-world-camp-cretaceous/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      10,
+      11,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -67445,7 +69112,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1606-ghost-whisperer/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      18,
+      23,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -67484,7 +69158,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/126308-shogun/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -67524,7 +69201,19 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/32798-hawaii-five-0/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      23,
+      24,
+      22,
+      25,
+      25,
+      25,
+      25,
+      25,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -67566,7 +69255,19 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/4629-stargate-sg-1/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      22,
+      22,
+      22,
+      22,
+      22,
+      20,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -67607,7 +69308,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2098-batman-the-animated-series/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      60,
+      10,
+      10,
+      5
+    ]
   },
   {
     "tipo": "serie",
@@ -67646,7 +69353,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/73375-tom-clancy-s-jack-ryan/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -67686,7 +69399,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1415-elementary/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      24,
+      24,
+      21,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -67723,7 +69445,18 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -67763,7 +69496,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/63401-we-bare-bears/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      23,
+      47,
+      43
+    ]
   },
   {
     "tipo": "serie",
@@ -67802,7 +69541,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79696-manifest/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16,
+      13,
+      13,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -67839,7 +69584,13 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1972-battlestar-galactica/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      20,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -67876,7 +69627,16 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      22,
+      26,
+      26,
+      26,
+      26,
+      25
+    ]
   },
   {
     "tipo": "serie",
@@ -67913,7 +69673,11 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -67952,7 +69716,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/16420/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25
+    ]
   },
   {
     "tipo": "serie",
@@ -67991,7 +69758,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/92685-the-owl-house/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      19,
+      21,
+      3
+    ]
   },
   {
     "tipo": "serie",
@@ -68028,7 +69800,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68069,7 +69846,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4686-ben-10/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -68108,7 +69891,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/93740-foundation/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68147,7 +69935,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/117581-ginny-georgia/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -68184,7 +69978,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68223,7 +70024,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62046-scream-queens/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68260,7 +70065,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      151
+    ]
   },
   {
     "tipo": "serie",
@@ -68300,7 +70108,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61617-over-the-garden-wall/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68339,7 +70150,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61056-how-to-get-away-with-murder/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      15,
+      15,
+      15,
+      15,
+      15,
+      15
+    ]
   },
   {
     "tipo": "serie",
@@ -68378,7 +70197,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62264-ash-vs-evil-dead/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68417,7 +70241,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/249042-adolescence/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -68458,7 +70285,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/37606-the-amazing-world-of-gumball/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      36,
+      40,
+      40,
+      40,
+      40,
+      44
+    ]
   },
   {
     "tipo": "serie",
@@ -68498,7 +70333,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/39340-2-broke-girls/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      22,
+      22,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -68537,7 +70380,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/76331-succession/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      9,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68576,7 +70425,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/124834-heartstopper/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -68615,7 +70469,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/77606-the-boss-baby-back-in-business/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      11,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -68654,7 +70514,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/115004-mare-of-easttown/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -68693,7 +70556,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4589-arrested-development/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      18,
+      13,
+      15,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -68733,7 +70603,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/84661-the-outsider/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -68773,7 +70646,19 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1620-csi-miami/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      25,
+      24,
+      21,
+      25,
+      24,
+      22,
+      19
+    ]
   },
   {
     "tipo": "serie",
@@ -68812,7 +70697,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/66292-big-little-lies/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -68852,7 +70741,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/31251-victorious/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      19,
+      13,
+      12,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -68889,7 +70784,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      22,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -68926,7 +70826,11 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -68965,7 +70869,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1420-new-girl/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      25,
+      23,
+      22,
+      22,
+      22,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69004,7 +70917,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62285-marvel-s-the-defenders/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69044,7 +70960,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/131927-dexter-new-blood/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -69081,7 +71000,14 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/64432-the-magicians/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -69121,7 +71047,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/86430-your-honor/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -69160,7 +71090,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/80743-insatiable/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -69199,7 +71133,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79788-watchmen/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -69236,7 +71173,13 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6,
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -69275,7 +71218,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/42035-el-barco/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      14,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -69315,7 +71263,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/31356-big-time-rush/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      27,
+      12,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -69354,7 +71308,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/108545-3-body-problem/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69393,7 +71350,11 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/200875-it-welcome-to-derry/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -69434,7 +71395,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71789-seal-team/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      19,
+      15,
+      14,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -69473,7 +71443,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71411-el-chapo/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      12,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -69513,7 +71488,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2085-courage-the-cowardly-dog/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      26,
+      25,
+      26,
+      25
+    ]
   },
   {
     "tipo": "serie",
@@ -69553,7 +71534,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67136-this-is-us/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      18,
+      18,
+      18,
+      15,
+      18
+    ]
   },
   {
     "tipo": "serie",
@@ -69590,7 +71579,17 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      26,
+      25,
+      27,
+      25,
+      25,
+      25,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -69629,7 +71628,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/97186-love-victor/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69666,7 +71670,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -69705,7 +71712,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/103768-sweet-tooth/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69745,7 +71757,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/113962-lioness/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69784,7 +71801,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/94954-hazbin-hotel/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      0,
+      0,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -69821,7 +71845,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -69860,7 +71887,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/205715-gen-v/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69897,7 +71928,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      14,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -69936,7 +71972,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/85720-shadow-and-bone/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -69975,7 +72015,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/87784-defending-jacob/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -70014,7 +72057,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/89456-primal/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -70053,7 +72102,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71024-castlevania/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      4,
+      8,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70092,7 +72147,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/69629-the-gifted/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -70131,7 +72190,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/21510-white-collar/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      14,
+      16,
+      16,
+      16,
+      13,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -70168,7 +72235,12 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/89247-batwoman/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      18,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -70207,7 +72279,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67195-legion/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      11,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -70249,7 +72326,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71790-s-w-a-t/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      23,
+      21,
+      18,
+      22,
+      22,
+      13,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -70289,7 +72376,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1104-mad-men/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13,
+      13,
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -70328,7 +72424,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90669-1899/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -70367,7 +72466,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/82596-emily-in-paris/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70406,7 +72513,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/97180-selena-the-series/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18
+    ]
   },
   {
     "tipo": "serie",
@@ -70446,7 +72556,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1891-rome/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70485,7 +72599,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/80240-la-reina-del-flow/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      82,
+      90,
+      65
+    ]
   },
   {
     "tipo": "serie",
@@ -70526,7 +72645,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/5371-icarly/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      25,
+      20,
+      13,
+      11,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -70565,7 +72692,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/97175-fate-the-winx-saga/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -70605,7 +72736,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/54671-penny-dreadful/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10,
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -70644,7 +72780,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/253-star-trek/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      29,
+      26,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -70684,7 +72825,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/62017-the-man-in-the-high-castle/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70723,7 +72870,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/72750-killing-eve/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -70762,7 +72915,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/76773-station-19/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      17,
+      16,
+      16,
+      18,
+      18,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70802,7 +72964,12 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/111803-the-white-lotus/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      7,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -70841,7 +73008,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/80968-narcos-mexico/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70880,7 +73052,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/65708-taboo/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -70919,7 +73094,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79525-the-last-dance/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -70958,7 +73136,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/72637-o11ce/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      80,
+      80,
+      60
+    ]
   },
   {
     "tipo": "serie",
@@ -70997,7 +73180,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/92782-ms-marvel/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -71036,7 +73222,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61923-star-vs-the-forces-of-evil/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      41,
+      38,
+      37
+    ]
   },
   {
     "tipo": "serie",
@@ -71075,7 +73267,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/47665-black-sails/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71114,7 +73312,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/96462/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -71153,7 +73354,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/86423-locke-key/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -71192,7 +73398,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/194764-the-penguin/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -71231,7 +73440,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/86248-upload/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      7,
+      8,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -71268,7 +73483,13 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      15,
+      9,
+      10,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -71305,7 +73526,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71344,7 +73572,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/79680-snowpiercer/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71383,7 +73617,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/109958-the-haunting-of-bly-manor/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -71422,7 +73659,23 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/10283-archer/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      13,
+      10,
+      13,
+      13,
+      13,
+      10,
+      8,
+      8,
+      9,
+      8,
+      8,
+      8,
+      9
+    ]
   },
   {
     "tipo": "serie",
@@ -71461,7 +73714,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/114472-secret-invasion/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -71500,7 +73756,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71738-the-orville/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      14,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71539,7 +73800,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2384-knight-rider/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      21,
+      21,
+      21,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -71578,7 +73845,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/69061-the-oa/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -71617,7 +73888,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/41727-banshee/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -71656,7 +73933,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90027-carnival-row/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71693,7 +73974,15 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      22,
+      22,
+      22,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -71733,7 +74022,24 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1431-csi-crime-scene-investigation/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      23,
+      23,
+      23,
+      23,
+      25,
+      24,
+      24,
+      17,
+      24,
+      23,
+      22,
+      22,
+      22,
+      22,
+      18
+    ]
   },
   {
     "tipo": "serie",
@@ -71770,7 +74076,16 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      10,
+      10,
+      8,
+      8,
+      10,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -71809,7 +74124,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/100834-veneno/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -71848,7 +74166,27 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2710-it-s-always-sunny-in-philadelphia/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      10,
+      15,
+      13,
+      12,
+      13,
+      13,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      8,
+      8,
+      8,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71887,7 +74225,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/90461-monsters-at-work/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -71927,7 +74269,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/66276-the-night-of/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -71966,7 +74311,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4574-x-men/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      19,
+      17,
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -72005,7 +74357,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/202411-monarch-legacy-of-monsters/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -72044,7 +74400,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/126280-sex-life/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -72083,7 +74443,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/95403-the-peripheral/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -72123,7 +74486,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61859-the-night-manager/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -72163,7 +74530,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61175-steven-universe/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      49,
+      29,
+      24,
+      24,
+      28
+    ]
   },
   {
     "tipo": "serie",
@@ -72202,7 +74576,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/34967-falling-skies/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      12,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -72239,7 +74620,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      169
+    ]
   },
   {
     "tipo": "serie",
@@ -72281,7 +74665,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1215-californication/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      12,
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -72318,7 +74711,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      197
+    ]
   },
   {
     "tipo": "serie",
@@ -72357,7 +74753,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/82452-avatar-the-last-airbender/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -72396,7 +74796,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/76719-the-rain/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -72435,7 +74840,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/73021-disenchantment/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      20,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -72474,7 +74884,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/64230-preacher/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      13,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -72513,7 +74929,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/222766-the-day-of-the-jackal/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -72552,7 +74971,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/83100/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -72592,7 +75014,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/74016-the-resident/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      14,
+      23,
+      20,
+      14,
+      23,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -72634,7 +75064,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2352-the-nanny/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      26,
+      26,
+      26,
+      23,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -72673,7 +75111,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/87689-warrior-nun/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -72712,7 +75154,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1621-boardwalk-empire/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      12,
+      12,
+      12,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -72751,7 +75200,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/97400-midnight-mass/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -72790,7 +75242,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/114461-ahsoka/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -72829,7 +75285,17 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/1695-monk/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      12,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ]
   },
   {
     "tipo": "serie",
@@ -72868,7 +75334,15 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/54650-power/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10,
+      10,
+      10,
+      10,
+      15
+    ]
   },
   {
     "tipo": "serie",
@@ -72909,7 +75383,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4586-gilmore-girls/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      21,
+      22,
+      22,
+      22,
+      22,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -72948,7 +75431,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/39852-the-sinner/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -72987,7 +75476,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/54344-the-leftovers/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -73026,7 +75520,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/100757-outer-banks/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -73065,7 +75566,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/81354-ratched/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -73104,7 +75608,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/71578-atypical/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -73146,7 +75656,21 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/62650-chicago-med/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      18,
+      23,
+      20,
+      22,
+      20,
+      16,
+      22,
+      22,
+      13,
+      22,
+      21,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -73185,7 +75709,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/70593/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -73225,7 +75753,20 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4239-married-with-children/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      22,
+      21,
+      23,
+      25,
+      26,
+      26,
+      26,
+      26,
+      26,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -73264,7 +75805,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/129552-the-night-agent/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -73303,7 +75850,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/241259-baby-reindeer/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -73342,7 +75892,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4658-alf/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      26,
+      25,
+      26,
+      24
+    ]
   },
   {
     "tipo": "serie",
@@ -73381,7 +75937,23 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/17610-ncis-los-angeles/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      22,
+      18,
+      22,
+      21
+    ]
   },
   {
     "tipo": "serie",
@@ -73420,7 +75992,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/115857-madre-solo-hay-dos/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      9,
+      8,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -73460,7 +76037,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1426-luther/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      4,
+      4,
+      2,
+      4
+    ]
   },
   {
     "tipo": "serie",
@@ -73497,7 +76081,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      22,
+      19,
+      24,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -73536,7 +76127,17 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/74204-big-mouth/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      11,
+      10,
+      10,
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -73573,7 +76174,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      20,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -73613,7 +76219,15 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/33907-downton-abbey/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      7,
+      8,
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -73650,7 +76264,13 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      26,
+      20,
+      26,
+      26
+    ]
   },
   {
     "tipo": "serie",
@@ -73689,7 +76309,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/605-sabrina-the-teenage-witch/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      26,
+      25,
+      22,
+      22,
+      22,
+      22
+    ]
   },
   {
     "tipo": "serie",
@@ -73728,7 +76357,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/89393-9-1-1-lone-star/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      14,
+      18,
+      18,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -73765,7 +76401,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      20,
+      20,
+      20,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -73804,7 +76447,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/127235-invasion/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -73843,7 +76491,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/125910-young-royals/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6,
+      6,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -73882,7 +76535,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/120168-quien-mato-a-sara/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      8,
+      7
+    ]
   },
   {
     "tipo": "serie",
@@ -73921,7 +76579,11 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/120911-the-terminal-list/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -73960,7 +76622,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/80307-bodyguard/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -73997,7 +76662,13 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      10,
+      11
+    ]
   },
   {
     "tipo": "serie",
@@ -74036,7 +76707,11 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/94305-the-walking-dead-world-beyond/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -74075,7 +76750,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/73107-barry/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      8,
+      8,
+      8,
+      8
+    ]
   },
   {
     "tipo": "serie",
@@ -74112,7 +76793,11 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      177,
+      0
+    ]
   },
   {
     "tipo": "serie",
@@ -74151,7 +76836,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/3498-wizards-of-waverly-place/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      21,
+      30,
+      28,
+      27
+    ]
   },
   {
     "tipo": "serie",
@@ -74190,7 +76881,10 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/224372-a-knight-of-the-seven-kingdoms/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -74229,7 +76923,12 @@
       "aluguel_ou_compra": true,
       "link": "https://www.themoviedb.org/tv/93812-the-great/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -74266,7 +76965,14 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -74305,7 +77011,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/105971-star-wars-the-bad-batch/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      16,
+      16,
+      15
+    ]
   },
   {
     "tipo": "serie",
@@ -74342,7 +77053,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13
+    ]
   },
   {
     "tipo": "serie",
@@ -74382,7 +77098,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/6040-ben-10-alien-force/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      20
+    ]
   },
   {
     "tipo": "serie",
@@ -74421,7 +77142,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/67026-designated-survivor/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      21,
+      22,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -74458,7 +77184,10 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      69
+    ]
   },
   {
     "tipo": "serie",
@@ -74497,7 +77226,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/74440-harley-quinn/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      11,
+      10,
+      10
+    ]
   },
   {
     "tipo": "serie",
@@ -74534,7 +77270,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      14
+    ]
   },
   {
     "tipo": "serie",
@@ -74571,7 +77312,12 @@
       "aluguel_ou_compra": false,
       "link": null,
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      10,
+      13,
+      6
+    ]
   },
   {
     "tipo": "serie",
@@ -74610,7 +77356,13 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2317-my-name-is-earl/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      24,
+      23,
+      18,
+      27
+    ]
   },
   {
     "tipo": "serie",
@@ -74650,7 +77402,12 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/2309-danny-phantom/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      20,
+      17,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -74690,7 +77447,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/1274-six-feet-under/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      13,
+      13,
+      13,
+      12,
+      12
+    ]
   },
   {
     "tipo": "serie",
@@ -74731,7 +77495,14 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/61852-henry-danger/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      25,
+      18,
+      19,
+      20,
+      39
+    ]
   },
   {
     "tipo": "serie",
@@ -74770,6 +77541,16 @@
       "aluguel_ou_compra": false,
       "link": "https://www.themoviedb.org/tv/4313-full-house/watch?locale=BR",
       "consultado_em": "2026-10-04"
-    }
+    },
+    "episodios_por_temporada": [
+      22,
+      22,
+      24,
+      26,
+      26,
+      24,
+      24,
+      24
+    ]
   }
 ]

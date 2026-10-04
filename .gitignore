@@ -57,3 +57,6 @@ dados/cineai.log
 dados/testes_antes_do_exe.log
 
 CineAI.spec
+# Pasta para outro computador (gerada pelo montar_portatil.py)
+CineAI portátil/
+CineAI portátil.zip

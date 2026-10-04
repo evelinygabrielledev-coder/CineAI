@@ -1124,6 +1124,78 @@ class TestRetrato(TesteCineAI):
         self.assertIn("Ainda é cedo", resultado["texto"])
 
 
+class TestSeriesPorEpisodio(TesteCineAI):
+    """'Parei no S02E05': até onde você viu cada série."""
+    TEMPORADAS_BREAKING_BAD = [7, 13, 13, 13, 16]
+
+    def setUp(self):
+        super().setUp()
+        self.bb = self.filme("Breaking Bad")
+        self.bb["episodios_por_temporada"] = list(self.TEMPORADAS_BREAKING_BAD)
+
+    def tearDown(self):
+        self.bb.pop("episodios_por_temporada", None)
+        super().tearDown()
+
+    def test_marcar_e_avancar(self):
+        """Depois do último episódio da temporada vem o E01 da próxima."""
+        usuario.definir_progresso(self.bb, 1, 6)
+        self.assertEqual(usuario.avancar_episodio(self.bb), (1, 7, False))
+        self.assertEqual(usuario.avancar_episodio(self.bb), (2, 1, False))
+        self.assertEqual(usuario.porcentagem_da_serie(self.bb), round(100 * 8 / 62))
+        usuario.dados_usuario = usuario.carregar_dados()   # "fecha e abre"
+        self.assertEqual(usuario.obter_progresso(self.bb), (2, 1))
+
+    def test_terminar_a_serie_vai_pro_diario(self):
+        usuario.guardar_para_depois(self.bb)
+        usuario.definir_progresso(self.bb, 5, 15)
+        self.assertFalse(usuario.quer_assistir(self.bb))       # começou a ver: saiu da lista
+        self.assertEqual(usuario.avancar_episodio(self.bb)[2], True)
+        self.assertTrue(usuario.foi_assistido(self.bb))
+        self.assertIsNone(usuario.obter_progresso(self.bb))
+        self.assertEqual(usuario.series_em_andamento(filmes.filmes), [])
+
+    def test_valida_temporada_e_episodio(self):
+        with self.assertRaises(ValueError):
+            usuario.definir_progresso(self.bb, 6, 1)     # só tem 5 temporadas
+        with self.assertRaises(ValueError):
+            usuario.definir_progresso(self.bb, 1, 8)     # a 1ª tem 7 episódios
+        with self.assertRaises(ValueError):
+            usuario.definir_progresso(self.bb, 0, 1)
+
+    def test_sem_saber_os_episodios(self):
+        """Sem episodios_por_temporada: só segue contando, e confere o total de temporadas."""
+        dark = self.filme("Dark")
+        usuario.definir_progresso(dark, 1, 10)
+        self.assertEqual(usuario.avancar_episodio(dark), (1, 11, False))
+        self.assertIsNone(usuario.porcentagem_da_serie(dark))
+        with self.assertRaises(ValueError):
+            usuario.definir_progresso(dark, 4, 1)
+
+    def test_em_andamento_mais_recente_primeiro(self):
+        dark = self.filme("Dark")
+        usuario.definir_progresso(self.bb, 1, 1)
+        usuario.definir_progresso(dark, 1, 1)
+        usuario.definir_progresso(self.bb, 1, 2)
+        self.assertEqual([serie["nome"] for serie, _, _ in usuario.series_em_andamento(filmes.filmes)],
+                         ["Breaking Bad", "Dark"])
+
+    def test_ler_episodio(self):
+        self.assertEqual(filmes.ler_episodio("parei no S02E05"), (2, 5))
+        self.assertEqual(filmes.ler_episodio("vi o episódio 3 da temporada 4"), (4, 3))
+        self.assertEqual(filmes.ler_episodio("temporada 2, episódio 10"), (2, 10))
+        self.assertIsNone(filmes.ler_episodio("um filme de 2005"))
+
+    def test_pelo_chat(self):
+        resultado = self.pedir("parei no S02E05 de Breaking Bad")
+        self.assertEqual(resultado["tipo"], "usuario_atualizado")
+        self.assertEqual(usuario.obter_progresso(self.bb), (2, 5))
+        self.pedir("vi mais um episódio de Breaking Bad")
+        self.assertEqual(usuario.obter_progresso(self.bb), (2, 6))
+        self.assertIn("S02E06", self.pedir("onde eu parei?")["texto"])
+        self.assertIn("De qual série", self.pedir("vi o próximo episódio")["texto"])
+
+
 class TestListasTematicas(TesteCineAI):
     """Listas com nome ('pra chorar', 'com a família'...) que você mesma cria."""
 

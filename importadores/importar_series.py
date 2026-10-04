@@ -122,6 +122,7 @@ def converter_serie(detalhes):
         "duracao_minutos": duracao_do_episodio(detalhes),  # duração de UM episódio
         "temporadas": detalhes.get("number_of_seasons"),
         "episodios": detalhes.get("number_of_episodes"),
+        "episodios_por_temporada": episodios_por_temporada(detalhes),
         "status": status,
         "nota_tmdb": round(detalhes.get("vote_average", 0), 1),
         "votos_tmdb": detalhes.get("vote_count", 0),
@@ -133,6 +134,15 @@ def converter_serie(detalhes):
         "premios": [],
         "indicacoes": []
     }
+
+
+def episodios_por_temporada(detalhes):
+    """[7, 13, 13, 13, 16]: quantos episódios tem cada temporada (sem os "especiais", temporada 0)."""
+    temporadas = sorted(
+        (temporada for temporada in detalhes.get("seasons", []) if (temporada.get("season_number") or 0) >= 1),
+        key=lambda temporada: temporada["season_number"]
+    )
+    return [temporada.get("episode_count") or 0 for temporada in temporadas]
 
 
 def buscar_e_converter_serie(id_serie):

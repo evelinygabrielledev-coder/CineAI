@@ -54,7 +54,7 @@ trazer_arquivo_do_lugar_antigo("usuario.json")
 
 # anotacoes = "Minhas anotações" de cada filme | quero_assistir = guardados "pra depois"
 # configuracoes = coisas suas que não são filmes (ex.: o nome na capa do diário)
-LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir", "configuracoes", "listas")
+LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir", "configuracoes", "listas", "progresso_series")
 
 
 # =========================================================
@@ -752,6 +752,118 @@ def listas_do_filme(filme):
     """Em quais listas o título está."""
     chave = chave_filme(filme)
     return [nome for nome, lista in dados_usuario["listas"].items() if chave in lista["titulos"]]
+
+
+# =========================================================
+# SÉRIES POR EPISÓDIO ("parei no S02E05")
+# =========================================================
+# No usuario.json:
+#   "progresso_series": {"serie:1396": {"nome": "Breaking Bad", "temporada": 2, "episodio": 5,
+#                                        "atualizado_em": "2026-10-04"}}
+# É o ÚLTIMO episódio que você viu. Ao ver o último episódio da última temporada,
+# a série vai para o diário (como "vista") e sai de "assistindo agora".
+def episodios_por_temporada(serie):
+    """[7, 13, 13, 13, 16] (do importador de episódios), ou [] se ainda não sabemos."""
+    lista = serie.get("episodios_por_temporada")
+    return [int(quantidade) for quantidade in lista if quantidade] if isinstance(lista, list) else []
+
+
+def obter_progresso(serie):
+    """(temporada, episódio) do último que você viu, ou None."""
+    registro = dados_usuario["progresso_series"].get(chave_filme(serie))
+    if not registro:
+        return None
+    return registro["temporada"], registro["episodio"]
+
+
+def texto_do_episodio(temporada, episodio):
+    return f"S{temporada:02d}E{episodio:02d}"
+
+
+def e_o_ultimo_episodio(serie, temporada, episodio):
+    por_temporada = episodios_por_temporada(serie)
+    if por_temporada:
+        return temporada == len(por_temporada) and episodio >= por_temporada[-1]
+    return False
+
+
+def definir_progresso(serie, temporada, episodio, hoje=None):
+    """
+    Guarda até onde você viu. Confere com o número de temporadas/episódios, quando sabemos.
+    Devolve {"terminou": True} se foi o último episódio da série (aí ela entra no diário).
+    """
+    temporada, episodio = int(temporada), int(episodio)
+    if temporada < 1 or episodio < 1:
+        raise ValueError("Temporada e episódio começam no 1.")
+    por_temporada = episodios_por_temporada(serie)
+    total_temporadas = len(por_temporada) or serie.get("temporadas")
+    if total_temporadas and temporada > total_temporadas:
+        raise ValueError(f"{serie['nome']} tem {total_temporadas} temporada{'s' if total_temporadas > 1 else ''}.")
+    if por_temporada and episodio > por_temporada[temporada - 1]:
+        raise ValueError(f"A temporada {temporada} tem {por_temporada[temporada - 1]} episódios.")
+
+    chave = chave_filme(serie)
+    hoje = hoje or date.today()
+    if e_o_ultimo_episodio(serie, temporada, episodio):
+        dados_usuario["progresso_series"].pop(chave, None)
+        if chave not in dados_usuario["assistidos"]:
+            dados_usuario["assistidos"][chave] = {"nome": serie["nome"], "ano": serie.get("ano"), "adicionado_em": hoje.isoformat()}
+        dados_usuario["quero_assistir"].pop(chave, None)
+        salvar_dados()
+        return {"terminou": True}
+
+    dados_usuario["progresso_series"].pop(chave, None)   # sai e entra de novo: fica por último (= mais recente)
+    dados_usuario["progresso_series"][chave] = {
+        "nome": serie["nome"], "temporada": temporada, "episodio": episodio, "atualizado_em": hoje.isoformat()
+    }
+    dados_usuario["quero_assistir"].pop(chave, None)   # começou a ver: sai do "Quero assistir"
+    salvar_dados()
+    return {"terminou": False}
+
+
+def proximo_episodio(serie):
+    """O episódio depois do último que você viu (ou S01E01 se ainda não começou)."""
+    atual = obter_progresso(serie)
+    if atual is None:
+        return 1, 1
+    temporada, episodio = atual
+    por_temporada = episodios_por_temporada(serie)
+    if por_temporada and episodio >= por_temporada[temporada - 1] and temporada < len(por_temporada):
+        return temporada + 1, 1
+    return temporada, episodio + 1
+
+
+def avancar_episodio(serie, hoje=None):
+    """"Vi mais um": marca o próximo episódio. Devolve (temporada, episódio, terminou)."""
+    temporada, episodio = proximo_episodio(serie)
+    resultado = definir_progresso(serie, temporada, episodio, hoje)
+    return temporada, episodio, resultado["terminou"]
+
+
+def apagar_progresso(serie):
+    if dados_usuario["progresso_series"].pop(chave_filme(serie), None) is not None:
+        salvar_dados()
+
+
+def porcentagem_da_serie(serie):
+    """Quanto da série você já viu (0 a 100), ou None se não sabemos os episódios."""
+    atual = obter_progresso(serie)
+    por_temporada = episodios_por_temporada(serie)
+    if atual is None or not por_temporada:
+        return None
+    temporada, episodio = atual
+    vistos = sum(por_temporada[:temporada - 1]) + episodio
+    return min(100, round(100 * vistos / sum(por_temporada)))
+
+
+def series_em_andamento(catalogo):
+    """[(serie, temporada, episódio)] das séries que você está vendo, a mexida por último primeiro."""
+    por_chave = {chave_filme(filme): filme for filme in catalogo}
+    registros = list(dados_usuario["progresso_series"].items())[::-1]   # o último mexido fica no fim do dicionário
+    return [
+        (por_chave[chave], registro["temporada"], registro["episodio"])
+        for chave, registro in registros if chave in por_chave
+    ]
 
 
 # =========================================================

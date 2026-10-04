@@ -315,8 +315,124 @@ def texto_da_etiqueta_do_diario(filme):
     tipo = "SERIES" if filmes.eh_serie(filme) else "MOVIE"
     entrada = usuario.numero_da_entrada(filme)
     if entrada is None:
+        progresso = usuario.obter_progresso(filme) if filmes.eh_serie(filme) else None
+        if progresso is not None:
+            return f"  ✦ {tipo} JOURNAL  •  WATCHING {usuario.texto_do_episodio(*progresso)}  "
         return f"  ✦ {tipo} JOURNAL  •  TO WATCH  "
     return f"  ✦ {tipo} JOURNAL  •  ENTRY #{entrada:03d}  "
+
+
+# ---------- Séries: "onde eu parei" (S02E05) ----------
+MAXIMO_OPCOES_SEM_DADOS = 30   # sem saber os episódios, oferece até 30 em cada menu
+
+
+def texto_onde_parei(serie):
+    atual = usuario.obter_progresso(serie)
+    if atual is None:
+        return "já terminei ✓" if usuario.foi_assistido(serie) else "ainda não comecei"
+    texto = "parei no " + usuario.texto_do_episodio(*atual)
+    porcentagem = usuario.porcentagem_da_serie(serie)
+    if porcentagem is not None:
+        texto += f"  ·  {porcentagem}% da série"
+    return texto
+
+
+def criar_area_onde_parei(container, serie, ao_mudar=None):
+    """Temporada + episódio em menus, e o botão "vi o próximo"."""
+    area = tk.Frame(container, bg=COR_PAPEL)
+    area.pack(fill="x", padx=34, pady=(0, 4))
+    escala = escala_da_tela(container)
+
+    status = tk.Label(area, text="", font=(FONTE_MANUSCRITA, -int(19 * escala), "bold"), fg=COR_AZUL_CANETA, bg=COR_PAPEL)
+    status.pack(anchor="w")
+    aviso = tk.Label(area, text="", font=(FONTE_MANUSCRITA, -int(14 * escala)), fg=COR_VERMELHO, bg=COR_PAPEL)
+
+    por_temporada = usuario.episodios_por_temporada(serie)
+    total_temporadas = len(por_temporada) or serie.get("temporadas") or MAXIMO_OPCOES_SEM_DADOS
+
+    def episodios_da(temporada):
+        if por_temporada and 1 <= temporada <= len(por_temporada):
+            return por_temporada[temporada - 1]
+        return MAXIMO_OPCOES_SEM_DADOS
+
+    linha = tk.Frame(area, bg=COR_PAPEL)
+    linha.pack(anchor="w", pady=(6, 2))
+    estilo_menu = dict(
+        width=64, height=28, fg_color=COR_PAPEL_ESCURO, button_color=COR_VINHO, button_hover_color=COR_VERMELHO,
+        text_color=COR_TEXTO, dropdown_fg_color=COR_PAPEL, dropdown_text_color=COR_TEXTO, font=(FONTE_INTERFACE, 13, "bold")
+    )
+    tk.Label(linha, text="temporada", font=(FONTE_MANUSCRITA, -int(16 * escala)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL).pack(side="left")
+    menu_temporada = ctk.CTkOptionMenu(linha, values=[str(numero) for numero in range(1, total_temporadas + 1)], **estilo_menu)
+    menu_temporada.pack(side="left", padx=(6, 12))
+    tk.Label(linha, text="episódio", font=(FONTE_MANUSCRITA, -int(16 * escala)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL).pack(side="left")
+    menu_episodio = ctk.CTkOptionMenu(linha, values=["1"], **estilo_menu)
+    menu_episodio.pack(side="left", padx=(6, 12))
+
+    def trocar_temporada(valor):
+        quantidade = episodios_da(int(valor))
+        menu_episodio.configure(values=[str(numero) for numero in range(1, quantidade + 1)])
+        if int(menu_episodio.get()) > quantidade:
+            menu_episodio.set(str(quantidade))
+
+    menu_temporada.configure(command=trocar_temporada)
+
+    def depois_de_mudar(resultado):
+        aviso.configure(text="série concluída! 🎉 ela entrou no seu diário" if resultado else "")
+        mostrar()
+        if ao_mudar is not None:
+            ao_mudar()
+
+    def salvar():
+        try:
+            resultado = usuario.definir_progresso(serie, int(menu_temporada.get()), int(menu_episodio.get()))
+        except ValueError as erro:
+            aviso.configure(text=str(erro))
+            return
+        depois_de_mudar(resultado["terminou"])
+
+    def ver_o_proximo():
+        try:
+            _, _, terminou = usuario.avancar_episodio(serie)
+        except ValueError as erro:
+            aviso.configure(text=str(erro))
+            return
+        depois_de_mudar(terminou)
+
+    def apagar(event=None):
+        usuario.apagar_progresso(serie)
+        depois_de_mudar(False)
+
+    ctk.CTkButton(
+        linha, text="salvar", width=70, height=28, corner_radius=4, fg_color=COR_VINHO, hover_color=COR_VERMELHO,
+        text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 15, "bold"), command=salvar
+    ).pack(side="left")
+
+    botao_proximo = ctk.CTkButton(
+        area, text="", height=34, corner_radius=4, fg_color=COR_VERMELHO, hover_color=COR_VERMELHO_HOVER,
+        text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 17, "bold"), command=ver_o_proximo
+    )
+    botao_proximo.pack(anchor="w", pady=(6, 2))
+    link_apagar = tk.Label(area, text="", font=(FONTE_MANUSCRITA, -int(14 * escala)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL, cursor="hand2")
+    link_apagar.bind("<Button-1>", apagar)
+    aviso.pack(anchor="w")
+
+    def mostrar():
+        status.configure(text=texto_onde_parei(serie))
+        atual = usuario.obter_progresso(serie)
+        temporada, episodio = atual or (1, 1)
+        menu_temporada.set(str(temporada))
+        trocar_temporada(str(temporada))
+        menu_episodio.set(str(episodio))
+        proxima = usuario.proximo_episodio(serie)
+        botao_proximo.configure(text=f"▶  vi o próximo: {usuario.texto_do_episodio(*proxima)}" if atual else "▶  vi o primeiro episódio")
+        if atual:
+            link_apagar.configure(text="✕ apagar onde parei")
+            link_apagar.pack(anchor="w", before=aviso)
+        else:
+            link_apagar.pack_forget()
+
+    mostrar()
+    return area
 
 
 # ---------- Listas temáticas ("pra chorar", "com a família"...) ----------
@@ -626,6 +742,14 @@ def abrir_detalhes(filme):
         adicionar_campo_diario(pagina_direita, "Duração", formatar_duracao(filme.get("duracao_minutos")))
     if texto_elenco:
         adicionar_campo_diario(pagina_direita, "Elenco", texto_elenco)
+
+    # Séries: até onde você viu (S02E05)
+    if filmes.eh_serie(filme):
+        adicionar_titulo_secao(pagina_direita, "ONDE EU PAREI 📺")
+        criar_area_onde_parei(
+            pagina_direita, filme,
+            ao_mudar=lambda: (atualizar_botoes(), ponte.atualizar_meus_filmes(voltar_ao_topo=False))
+        )
 
     # Sinopse: pedaço de papel colado com fita
     adicionar_titulo_secao(pagina_direita, "SINOPSE")

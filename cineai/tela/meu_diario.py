@@ -987,6 +987,60 @@ def criar_area_da_meta(folha, escala, ano=None):
     ).pack()
 
 
+# ---------- Séries que você está vendo ("parei no S02E05") ----------
+MAXIMO_SERIES_NA_CAPA = 4
+
+
+def criar_area_assistindo_agora(folha, escala):
+    def px(valor):
+        return int(valor * escala)
+
+    em_andamento = usuario.series_em_andamento(filmes.filmes)
+    if not em_andamento:
+        return
+    area = tk.Frame(folha, bg=COR_PAPEL)
+    area.pack(pady=(0, px(16)))
+    tk.Label(
+        area, text="📺 assistindo agora:", font=(FONTE_MANUSCRITA, -px(20), "bold"), fg=COR_VERMELHO, bg=COR_PAPEL
+    ).pack()
+    for serie, temporada, episodio in em_andamento[:MAXIMO_SERIES_NA_CAPA]:
+        linha = tk.Frame(area, bg=COR_PAPEL)
+        linha.pack(pady=(px(3), 0))
+        nome = tk.Label(
+            linha, text=serie["nome"], font=(FONTE_MANUSCRITA, -px(19)), fg=COR_AZUL_CANETA, bg=COR_PAPEL, cursor="hand2"
+        )
+        nome.pack(side="left")
+        nome.bind("<Button-1>", lambda event, serie=serie: ponte.abrir_detalhes(serie))
+        porcentagem = usuario.porcentagem_da_serie(serie)
+        tk.Label(
+            linha, text=f"  parei no {usuario.texto_do_episodio(temporada, episodio)}"
+                        + (f" ({porcentagem}%)" if porcentagem is not None else ""),
+            font=(FONTE_MANUSCRITA, -px(17)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL
+        ).pack(side="left")
+        mais_um = tk.Label(
+            linha, text=" ▶ vi +1 ", font=(FONTE_MANUSCRITA, -px(15), "bold"), fg=COR_TEXTO_CAPA, bg=COR_VINHO,
+            cursor="hand2", padx=px(4)
+        )
+        mais_um.pack(side="left", padx=(px(10), 0))
+        mais_um.bind("<Button-1>", lambda event, serie=serie: vi_mais_um_episodio(serie))
+    if len(em_andamento) > MAXIMO_SERIES_NA_CAPA:
+        tk.Label(
+            area, text=f"... e mais {len(em_andamento) - MAXIMO_SERIES_NA_CAPA}", font=(FONTE_MANUSCRITA, -px(15)),
+            fg=COR_TEXTO_SUAVE, bg=COR_PAPEL
+        ).pack()
+
+
+def vi_mais_um_episodio(serie):
+    try:
+        _, _, terminou = usuario.avancar_episodio(serie)
+    except ValueError as erro:
+        messagebox.showinfo(serie["nome"], str(erro), parent=janela)
+        return
+    if terminou:
+        messagebox.showinfo(serie["nome"], "Série concluída! 🎉 Ela entrou no seu diário.", parent=janela)
+    ponte.atualizar_meus_filmes(voltar_ao_topo=False)
+
+
 def desenhar_capa():
     limpar_grade(widgets_meus_filmes, imagens_meus_filmes)
     numeros = usuario.estatisticas_do_diario(filmes.filmes)
@@ -1046,6 +1100,7 @@ def desenhar_capa():
         )
 
     criar_area_da_meta(folha, escala)
+    criar_area_assistindo_agora(folha, escala)
 
     # ---------- anotações à mão, em linhas de caderno ----------
     anotacoes = tk.Frame(folha, bg=COR_PAPEL)

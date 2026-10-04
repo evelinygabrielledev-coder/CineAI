@@ -44,6 +44,8 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
   - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).
   - **Listas temáticas** suas ("pra chorar", "com a família"...): crie quantas quiser e coloque os títulos
     pela página do filme ou pelo chat ("coloca esse na lista pra chorar").
+  - **Séries por episódio**: "parei no S02E05" na página da série (com "vi o próximo"), na Capa
+    ("assistindo agora") e no chat ("vi mais um episódio de Dark", "onde eu parei?").
   - **Meta do ano** ("ver 50 filmes em 2026") com barra de progresso na Capa e o ritmo até dezembro.
   - **Importar do Letterboxd**: o .zip exportado vira diário (datas, revisitas, notas, resenhas como
     anotações, curtidos como favoritos e a watchlist no Quero assistir).
@@ -109,6 +111,7 @@ python importadores/importar_series.py        # séries + pôsteres
 python importadores/importar_avaliacoes.py    # IMDb / Rotten Tomatoes (limite de 1.000 por dia no plano grátis)
 python importadores/importar_trailers.py      # trailers que faltarem
 python importadores/importar_letterboxd.py export.zip --adicionar   # seu histórico do Letterboxd
+python importadores/importar_episodios.py    # quantos episódios tem cada temporada das séries
 python importadores/importar_onde_assistir.py # em quais streamings do Brasil cada título está
 ```
 
@@ -139,6 +142,17 @@ Ele instala o PyInstaller, roda os testes e gera `dist/CineAI/CineAI.exe`
 
 ---
 
+### CineAI em outro computador
+
+```bash
+python montar_portatil.py        # ou --zip para gerar também um .zip
+```
+
+Monta a pasta **"CineAI portátil"** com o `.exe`, o catálogo, os pôsteres e o modelo de embeddings
+(sem o seu diário). No outro computador basta instalar o Ollama e seguir o `LEIA-ME.txt`.
+
+---
+
 ## ✅ Testes
 
 ```bash
@@ -156,6 +170,7 @@ Os testes usam uma pasta temporária e **nunca mexem** no seu `usuario.json` nem
 assistente_filmes/
 ├── main.py            ← abre o CineAI (python main.py)
 ├── construir_exe.py   ← gera o CineAI.exe
+├── montar_portatil.py ← monta a pasta "CineAI portátil" (para outro computador)
 ├── cineai/            ← o programa
 │   ├── interface.py   junta as partes da janela (navegação e inicialização)
 │   ├── tela/          a janela, uma parte por arquivo (base, recortes, detalhes, menu,

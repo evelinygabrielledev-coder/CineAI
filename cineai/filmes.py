@@ -27,7 +27,7 @@ import ollama
 from sentence_transformers import SentenceTransformer
 
 from cineai import perfil, retrato, streamings, usuario
-from cineai.caminhos import CAMINHO_CACHE_EMBEDDINGS, CAMINHO_CATALOGO, PASTA_PROJETO
+from cineai.caminhos import CAMINHO_CACHE_EMBEDDINGS, CAMINHO_CATALOGO, CAMINHO_MODELO_LOCAL, PASTA_PROJETO
 from cineai.rastreio import rastro
 
 
@@ -45,7 +45,12 @@ LIMITE_SIMILARIDADE = 0.25
 # Ex.: busca "ogro resgata princesa" e a sinopse tem as 3 palavras -> +0.20
 PESO_BONUS_PALAVRAS = 0.20
 
-modelo = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+NOME_MODELO_EMBEDDINGS = "paraphrase-multilingual-MiniLM-L12-v2"
+# Na pasta "CineAI portátil" o modelo vai junto, em dados/modelo_embeddings
+# (outro computador não tem a cópia que o sentence-transformers baixou neste).
+modelo = SentenceTransformer(
+    str(CAMINHO_MODELO_LOCAL) if CAMINHO_MODELO_LOCAL.is_dir() else NOME_MODELO_EMBEDDINGS
+)
 perfil.codificar_texto = modelo.encode  # as anotações do diário usam o mesmo modelo das sinopses
 
 with open(CAMINHO_JSON, "r", encoding="utf-8") as arquivo:
@@ -4045,6 +4050,96 @@ def responder_lista_tematica(cliente, pedido):
 
 
 # =========================================================
+# SÉRIES POR EPISÓDIO: "parei no S02E05 de Breaking Bad", "onde eu parei?"
+# =========================================================
+EXPRESSOES_ONDE_PAREI = [
+    "onde eu parei", "onde parei", "o que eu estava vendo", "o que eu estava assistindo",
+    "o que estou vendo", "o que estou assistindo", "series que estou vendo", "series que estou assistindo",
+    "assistindo agora", "continuar assistindo",
+]
+PALAVRAS_MAIS_UM_EPISODIO = ["mais um episodio", "proximo episodio", "outro episodio", "mais um ep", "proximo ep"]
+
+
+def ler_episodio(cliente):
+    """'S02E05', 's2e5', 'temporada 2 episódio 5', 'ep 5 da temporada 2' -> (2, 5); senão None."""
+    texto = normalizar_texto(cliente)
+    achado = re.search(r"\bs(\d{1,2})\s*e(\d{1,3})\b", texto)
+    if achado:
+        return int(achado.group(1)), int(achado.group(2))
+    temporada = re.search(r"\btemporada (\d{1,2})\b|\b(\d{1,2})a? temporada\b", texto)
+    episodio = re.search(r"\b(?:episodio|ep) (\d{1,3})\b|\b(\d{1,3})o? episodio\b", texto)
+    if temporada and episodio:
+        return int(temporada.group(1) or temporada.group(2)), int(episodio.group(1) or episodio.group(2))
+    return None
+
+
+def serie_da_conversa(cliente):
+    citada = encontrar_filme_citado(cliente)
+    if citada is not None and eh_serie(citada):
+        return citada
+    if citada is None and filme_atual is not None and eh_serie(filme_atual):
+        return filme_atual
+    return None
+
+
+def detectar_pedido_episodio(cliente):
+    """None | ("listar",) | ("definir", serie, temporada, episodio) | ("mais_um", serie) | ("qual_serie",)."""
+    if any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_ONDE_PAREI) and ler_episodio(cliente) is None:
+        serie = serie_da_conversa(cliente) if encontrar_filme_citado(cliente) else None
+        return ("listar", serie) if serie is None else ("ver", serie)
+    episodio = ler_episodio(cliente)
+    mais_um = any(contem_expressao(cliente, expressao) for expressao in PALAVRAS_MAIS_UM_EPISODIO)
+    if episodio is None and not mais_um:
+        return None
+    serie = serie_da_conversa(cliente)
+    if serie is None:
+        return ("qual_serie",)
+    if episodio is not None:
+        return ("definir", serie, episodio[0], episodio[1])
+    return ("mais_um", serie)
+
+
+def responder_episodio(pedido):
+    if pedido[0] == "qual_serie":
+        return criar_resultado('De qual série? Por exemplo: "parei no S02E05 de Breaking Bad".')
+    if pedido[0] == "listar":
+        em_andamento = usuario.series_em_andamento(filmes)
+        if not em_andamento:
+            return criar_resultado(
+                'Você não está vendo nenhuma série agora. Diga, por exemplo: "parei no S01E03 de Dark". 📺'
+            )
+        linhas = [
+            f"• {serie['nome']}: parei no {usuario.texto_do_episodio(temporada, episodio)}"
+            + (f" ({usuario.porcentagem_da_serie(serie)}%)" if usuario.porcentagem_da_serie(serie) is not None else "")
+            for serie, temporada, episodio in em_andamento
+        ]
+        return criar_resultado("📺 Assistindo agora:\n" + "\n".join(linhas))
+
+    serie = pedido[1]
+    if pedido[0] == "ver":
+        atual = usuario.obter_progresso(serie)
+        if atual is None:
+            return criar_resultado(f"Você ainda não marcou nenhum episódio de {serie['nome']}.")
+        return criar_resultado(f"📺 {serie['nome']}: você parou no {usuario.texto_do_episodio(*atual)}. "
+                               f"O próximo é o {usuario.texto_do_episodio(*usuario.proximo_episodio(serie))}.")
+    try:
+        if pedido[0] == "definir":
+            temporada, episodio = pedido[2], pedido[3]
+            terminou = usuario.definir_progresso(serie, temporada, episodio)["terminou"]
+        else:
+            temporada, episodio, terminou = usuario.avancar_episodio(serie)
+    except ValueError as erro:
+        return criar_resultado(str(erro))
+    if terminou:
+        return criar_resultado(f"🎉 Você terminou {serie['nome']}! Ela entrou no seu diário.", tipo="usuario_atualizado")
+    texto = f"📺 Anotado: {serie['nome']}, parei no {usuario.texto_do_episodio(temporada, episodio)}."
+    porcentagem = usuario.porcentagem_da_serie(serie)
+    if porcentagem is not None:
+        texto += f" ({porcentagem}% da série)"
+    return criar_resultado(texto, tipo="usuario_atualizado")
+
+
+# =========================================================
 # "ONDE ASSISTIR?" sobre o título da conversa
 # =========================================================
 EXPRESSOES_ONDE_ASSISTIR = [
@@ -4289,6 +4384,12 @@ def responder_mensagem(cliente):
     if eh_vi_de_novo(cliente):
         rota('"vi de novo": nova sessão do título no diário')
         return registrar_vi_de_novo(cliente)
+
+    # ---------------- Séries por episódio: "parei no S02E05", "onde eu parei?" ----------------
+    pedido_episodio = detectar_pedido_episodio(cliente)
+    if pedido_episodio is not None:
+        rota("série por episódio (onde parei / marcar episódio)")
+        return responder_episodio(pedido_episodio)
 
     # ---------------- Listas temáticas: "coloca esse na lista pra chorar" ----------------
     pedido_lista = detectar_pedido_lista_tematica(cliente)
