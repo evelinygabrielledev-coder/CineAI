@@ -26,7 +26,7 @@ import numpy as np
 import ollama
 from sentence_transformers import SentenceTransformer
 
-from cineai import perfil, streamings, usuario
+from cineai import perfil, retrato, streamings, usuario
 from cineai.caminhos import CAMINHO_CACHE_EMBEDDINGS, CAMINHO_CATALOGO, PASTA_PROJETO
 from cineai.rastreio import rastro
 
@@ -137,6 +137,8 @@ def finalidade_do_prompt(prompt):
         return "classificar intenção"
     if "Extraia apenas o assunto" in prompt:
         return "extrair assunto"
+    if retrato.MARCA_DO_PROMPT in prompt:
+        return "retrato do diário"
     return "responder pergunta"
 
 
@@ -3907,6 +3909,42 @@ def responder_retrospectiva(cliente):
 
 
 # =========================================================
+# "O QUE MEU DIÁRIO DIZ SOBRE MIM?" (a IA lê o diário e escreve um retrato)
+# =========================================================
+EXPRESSOES_RETRATO = [
+    "o que meu diario diz", "o que o meu diario diz", "meu diario diz sobre mim",
+    "o que o diario diz sobre mim", "meu retrato",
+    "como voce me descreveria", "como voce me descreve", "o que voce sabe sobre mim",
+]
+
+
+def eh_pedido_retrato(cliente):
+    return any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_RETRATO)
+
+
+def responder_retrato(cliente):
+    escrever_de_novo = any(
+        contem_expressao(cliente, expressao) for expressao in ("de novo", "outro", "outra vez", "novamente")
+    )
+    resultado_retrato = retrato.gerar_retrato(filmes, perguntar_ao_modelo, forcar=escrever_de_novo)
+    if resultado_retrato is None:
+        return criar_resultado(
+            f"Ainda é cedo para eu dizer quem você é. 📖\n"
+            f"Marque pelo menos {retrato.MINIMO_TITULOS_RETRATO} títulos como vistos "
+            "(e escreva umas anotações) que eu leio o seu diário."
+        )
+    texto = "✍ O que o seu diário diz sobre você:\n\n" + resultado_retrato["texto"]
+    if resultado_retrato["citacoes"]:
+        texto += "\n\nNas suas palavras:"
+        for citacao in resultado_retrato["citacoes"]:
+            texto += f'\n• "{citacao["texto"]}" ({citacao["filme"]})'
+    if resultado_retrato["origem"] == retrato.ORIGEM_REGRAS:
+        texto += "\n\n(desta vez escrito sem a IA: ela estava desligada ou a resposta não passou na conferência)"
+    texto += '\n\n💬 Ele também fica na página Meu perfil. Para outra versão, diga "meu retrato de novo".'
+    return criar_resultado(texto)
+
+
+# =========================================================
 # "ONDE ASSISTIR?" sobre o título da conversa
 # =========================================================
 EXPRESSOES_ONDE_ASSISTIR = [
@@ -4130,6 +4168,11 @@ def responder_mensagem(cliente):
     if eh_pedido_retrospectiva(cliente):
         rota("retrospectiva do ano (números do diário naquele ano)")
         return responder_retrospectiva(cliente)
+
+    # ---------------- "O que meu diário diz sobre mim?" ----------------
+    if eh_pedido_retrato(cliente):
+        rota("retrato do diário (IA lê as suas notas e anotações)")
+        return responder_retrato(cliente)
 
     # ---------------- "Onde assistir?" / "Tá na Netflix?" ----------------
     if eh_pergunta_onde_assistir(cliente):

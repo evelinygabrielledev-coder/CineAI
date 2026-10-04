@@ -14,7 +14,7 @@ from tkinter import messagebox
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageTk
 
-from cineai import conversas, diario_pdf, filmes, perfil, streamings, usuario
+from cineai import conversas, diario_pdf, filmes, perfil, retrato, streamings, usuario
 from cineai.caminhos import PASTA_POSTERS
 from cineai.rastreio import formatar_ms, rastro
 
@@ -5706,13 +5706,19 @@ area_resumo_perfil.grid(row=0, column=0, sticky="ew", padx=(10, 14), pady=(2, 12
 area_resumo_perfil.grid_columnconfigure(0, weight=3, uniform="resumo")
 area_resumo_perfil.grid_columnconfigure(1, weight=2, uniform="resumo")
 
-# Parte 2: título da grade
-cabecalho_para_voce = criar_titulo_secao(rolagem_perfil, "✦  PARA VOCÊ")
-cabecalho_para_voce.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 4))
+# Parte 2: "o que o seu diário diz sobre você" (retrato escrito pela IA)
+area_retrato = tk.Frame(
+    rolagem_perfil, bg=COR_PAPEL, highlightbackground=COR_BORDA_PAPEL, highlightthickness=1
+)
+area_retrato.grid(row=1, column=0, sticky="ew", padx=(10, 14), pady=(0, 14))
 
-# Parte 3: grade de filmes recomendados (sem rolagem própria: rola com a página)
+# Parte 3: título da grade
+cabecalho_para_voce = criar_titulo_secao(rolagem_perfil, "✦  PARA VOCÊ")
+cabecalho_para_voce.grid(row=2, column=0, sticky="ew", padx=10, pady=(0, 4))
+
+# Parte 4: grade de filmes recomendados (sem rolagem própria: rola com a página)
 scroll_para_voce = tk.Frame(rolagem_perfil, bg=COR_FUNDO)
-scroll_para_voce.grid(row=2, column=0, sticky="ew")
+scroll_para_voce.grid(row=3, column=0, sticky="ew")
 for coluna_grade in range(COLUNAS_CARDS):
     scroll_para_voce.grid_columnconfigure(coluna_grade, weight=1, uniform="grade")
 
@@ -5845,6 +5851,160 @@ def criar_coluna_pessoas(perfil_atual):
             ).pack(side="left", padx=(0, px(12)))
 
 
+# ---------- "O que o seu diário diz sobre você" ----------
+# A IA demora alguns segundos: ela escreve numa thread separada e a página
+# mostra "lendo o seu diário..." enquanto isso. O retrato fica guardado e só
+# é escrito de novo quando o diário muda (ou no "✎ escrever de novo").
+estado_retrato = {"escrevendo": False, "rotulos": []}
+
+
+def limpar_area_retrato():
+    for widget in area_retrato.winfo_children():
+        widget.destroy()
+    estado_retrato["rotulos"].clear()
+
+
+def cabecalho_do_retrato(escala):
+    def px(valor):
+        return int(valor * escala)
+
+    tk.Label(
+        area_retrato, text="✍ o que o seu diário diz sobre você", font=(FONTE_MANUSCRITA, -px(25), "bold"),
+        fg=COR_TITULO_MANUSCRITO, bg=COR_PAPEL
+    ).pack(anchor="w", padx=px(20), pady=(px(16), 0))
+    tk.Frame(area_retrato, bg=COR_MARCA_TEXTO, height=px(6), width=px(300)).pack(
+        anchor="w", padx=px(24), pady=(0, px(10))
+    )
+
+
+def ajustar_larguras_do_retrato(event=None):
+    largura_area = area_retrato.winfo_width()
+    for rotulo, margem in estado_retrato["rotulos"]:
+        if rotulo.winfo_exists() and largura_area - margem > 100:
+            rotulo.configure(wraplength=largura_area - margem)
+
+
+def texto_que_acompanha_largura(rotulo, margem):
+    """O texto quebra as linhas conforme a largura da página (a janela pode mudar de tamanho)."""
+    estado_retrato["rotulos"].append((rotulo, margem))
+    area_retrato.after(10, ajustar_larguras_do_retrato)
+
+
+area_retrato.bind("<Configure>", ajustar_larguras_do_retrato)
+
+
+def desenhar_retrato(resultado_retrato):
+    limpar_area_retrato()
+    escala = escala_da_tela(area_retrato)
+
+    def px(valor):
+        return int(valor * escala)
+
+    cabecalho_do_retrato(escala)
+    paragrafo = tk.Label(
+        area_retrato, text=resultado_retrato["texto"], font=(FONTE_MANUSCRITA, -px(21)),
+        fg=COR_AZUL_CANETA, bg=COR_PAPEL, justify="left", anchor="w", wraplength=px(800)
+    )
+    paragrafo.pack(fill="x", padx=px(26), pady=(0, px(12)))
+    texto_que_acompanha_largura(paragrafo, px(60))
+
+    filmes_por_nome = {filme["nome"]: filme for filme in filmes.filmes}
+    if resultado_retrato["citacoes"]:
+        tk.Label(
+            area_retrato, text="✎ nas suas palavras:", font=(FONTE_MANUSCRITA, -px(17), "bold"),
+            fg=COR_VERMELHO, bg=COR_PAPEL
+        ).pack(anchor="w", padx=px(26), pady=(px(2), px(4)))
+        for citacao in resultado_retrato["citacoes"]:
+            bilhete = tk.Frame(area_retrato, bg=COR_BILHETE, highlightbackground=COR_BORDA_PAPEL, highlightthickness=1)
+            bilhete.pack(fill="x", padx=(px(40), px(40)), pady=(0, px(6)))
+            frase = tk.Label(
+                bilhete, text=f"“{citacao['texto']}”", font=(FONTE_MANUSCRITA, -px(17)),
+                fg=COR_TEXTO_CONTEUDO, bg=COR_BILHETE, justify="left", anchor="w", wraplength=px(700)
+            )
+            frase.pack(side="left", fill="x", expand=True, padx=(px(12), px(8)), pady=px(6))
+            texto_que_acompanha_largura(frase, px(330))
+            estrelas = f"  {usuario.texto_estrelas(citacao['nota'])}" if citacao["nota"] else ""
+            nome = tk.Label(
+                bilhete, text=f"— {citacao['filme']}{estrelas}", font=(FONTE_MANUSCRITA, -px(16), "bold"),
+                fg=COR_VERMELHO, bg=COR_BILHETE, cursor="hand2"
+            )
+            nome.pack(side="right", padx=(0, px(12)))
+            filme_citado = filmes_por_nome.get(citacao["filme"])
+            if filme_citado is not None:
+                nome.bind("<Button-1>", lambda event, filme=filme_citado: abrir_detalhes(filme))
+
+    rodape_retrato = tk.Frame(area_retrato, bg=COR_PAPEL)
+    rodape_retrato.pack(fill="x", padx=px(26), pady=(px(4), px(16)))
+    try:
+        dia = date.fromisoformat(resultado_retrato["criado_em"]).strftime("%d/%m/%Y")
+    except (KeyError, ValueError):
+        dia = ""
+    if resultado_retrato["origem"] == retrato.ORIGEM_IA:
+        assinatura = f"escrito pela IA local (Ollama) em {dia}, só com o que está no seu diário"
+    else:
+        assinatura = f"escrito sem a IA em {dia} (ela estava desligada ou a resposta não passou na conferência)"
+    tk.Label(
+        rodape_retrato, text=assinatura, font=(FONTE_MANUSCRITA, -px(14)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL
+    ).pack(side="left")
+    link = tk.Label(
+        rodape_retrato, text="✎ escrever de novo", font=(FONTE_MANUSCRITA, -px(17), "bold"),
+        fg=COR_TEXTO_CAPA, bg=COR_VINHO, padx=px(12), pady=px(3), cursor="hand2"
+    )
+    link.pack(side="right")
+    link.bind("<Button-1>", lambda event: escrever_retrato(forcar=True))
+
+
+def desenhar_retrato_sem_dados():
+    limpar_area_retrato()
+    escala = escala_da_tela(area_retrato)
+    cabecalho_do_retrato(escala)
+    tk.Label(
+        area_retrato,
+        text=f"Ainda estou lendo as primeiras páginas... marque pelo menos {retrato.MINIMO_TITULOS_RETRATO} "
+             "títulos como vistos (e escreva anotações neles) que eu conto o que o seu diário diz sobre você.",
+        font=(FONTE_MANUSCRITA, -int(17 * escala)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL,
+        justify="left", wraplength=int(800 * escala)
+    ).pack(anchor="w", padx=int(26 * escala), pady=(0, int(18 * escala)))
+
+
+def desenhar_retrato_escrevendo():
+    limpar_area_retrato()
+    escala = escala_da_tela(area_retrato)
+    cabecalho_do_retrato(escala)
+    tk.Label(
+        area_retrato, text="✎ a IA está lendo o seu diário... (leva alguns segundos)",
+        font=(FONTE_MANUSCRITA, -int(19 * escala)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL
+    ).pack(anchor="w", padx=int(26 * escala), pady=(0, int(20 * escala)))
+
+
+def escrever_retrato(forcar=False):
+    """Mostra o retrato guardado ou pede um novo à IA (numa thread, sem travar a janela)."""
+    fatos = retrato.fatos_do_diario(filmes.filmes)
+    if fatos is None:
+        desenhar_retrato_sem_dados()
+        return
+    guardado = None if forcar else retrato.retrato_guardado(fatos)
+    if guardado is not None:
+        desenhar_retrato(guardado)
+        return
+    if estado_retrato["escrevendo"]:
+        return
+    estado_retrato["escrevendo"] = True
+    desenhar_retrato_escrevendo()
+
+    def trabalho():
+        texto_ia = retrato.escrever_com_ia(fatos, filmes.perguntar_ao_modelo)
+        janela.after(0, lambda: terminar(texto_ia))
+
+    def terminar(texto_ia):
+        estado_retrato["escrevendo"] = False
+        resultado_retrato = retrato.montar_retrato(fatos, texto_ia)
+        if area_retrato.winfo_exists():
+            desenhar_retrato(resultado_retrato)
+
+    threading.Thread(target=trabalho, daemon=True).start()
+
+
 def mostrar_perfil_incompleto(perfil_atual):
     faltam = perfil.MINIMO_FILMES_PARA_PERFIL - perfil_atual["quantidade_com_sinal"]
     aviso = ctk.CTkLabel(
@@ -5874,6 +6034,7 @@ def atualizar_pagina_perfil():
     widgets_resumo_perfil.clear()
 
     perfil_atual = perfil.calcular_perfil(filmes.filmes)
+    escrever_retrato()
 
     if not perfil_atual["suficiente"]:
         mostrar_perfil_incompleto(perfil_atual)

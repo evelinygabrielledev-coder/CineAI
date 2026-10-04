@@ -236,6 +236,17 @@ def ollama_simulado(model, messages, think=None):
             return resposta(mensagem.split(" sobre ", 1)[1].strip())
         return resposta("NENHUMA")
 
+    if "Escreva o retrato" in prompt:
+        # Cita o primeiro título das anotações (ou dos 5 estrelas), como o qwen faria.
+        titulos = re.findall(r"^  \* (.+?) \(", prompt, flags=re.MULTILINE)
+        cinco = re.findall(r"Deu 5 estrelas para: ([^,\n]+)", prompt)
+        titulo = (titulos or cinco or ["um filme"])[0]
+        return resposta(
+            "<think>lendo...</think>Retrato: Você é daquelas pessoas que sentem os filmes por inteiro. "
+            f"Quando fala de {titulo}, dá para perceber o carinho em cada palavra, e as suas notas "
+            "mostram alguém generoso, mas atento aos detalhes."
+        )
+
     return resposta("Resposta pela sinopse.")
 
 
@@ -997,6 +1008,120 @@ class TestDiarioPdf(TesteCineAI):
         from PIL import Image, ImageDraw
         lapis = ImageDraw.Draw(Image.new("RGB", (1, 1)))
         self.assertTrue(all(lapis.textlength(linha, font=fonte) <= 600 for linha in linhas))
+
+
+class TestRetrato(TesteCineAI):
+    """'O que meu diário diz sobre mim': a IA escreve, mas o CineAI confere."""
+    TEXTO_SHREK = "Ri do começo ao fim com a família, que filme gostoso."
+    TEXTO_TITANIC = "Longo demais e o final me irritou bastante."
+
+    def montar_diario(self):
+        usuario.definir_nota(self.filme("Shrek"), 5)
+        usuario.definir_anotacao(self.filme("Shrek"), self.TEXTO_SHREK)
+        usuario.definir_nota(self.filme("Titanic"), 2)
+        usuario.definir_anotacao(self.filme("Titanic"), self.TEXTO_TITANIC)
+        usuario.definir_nota(self.filme("A Origem"), 4)
+        usuario.definir_anotacao(self.filme("A Origem"), "ok")   # curta demais: não entra
+
+    @staticmethod
+    def ia_que_responde(texto, chamadas=None):
+        def perguntar(prompt):
+            if chamadas is not None:
+                chamadas.append(prompt)
+            return texto
+        return perguntar
+
+    TEXTO_BOM = (
+        "Retrato: Você ri alto e não tem vergonha disso: Shrek ganhou 5 estrelas e uma anotação cheia "
+        "de família. Já Titanic não te convenceu, e você disse isso sem rodeios. É alguém que sabe o que quer."
+    )
+
+    def test_poucos_titulos(self):
+        """Com menos de 3 títulos vistos, ainda não há retrato."""
+        from cineai import retrato
+        usuario.definir_nota(self.filme("Shrek"), 5)
+        self.assertIsNone(retrato.gerar_retrato(filmes.filmes))
+
+    def test_sem_ia_usa_frases_prontas(self):
+        """Sem a IA, o retrato sai das regras: cita a 5 estrelas, a anotação e a nota baixa."""
+        from cineai import retrato
+        self.montar_diario()
+        resultado = retrato.gerar_retrato(filmes.filmes, perguntar=None)
+        self.assertEqual(resultado["origem"], retrato.ORIGEM_REGRAS)
+        self.assertIn("Shrek", resultado["texto"])
+        self.assertIn("Titanic", resultado["texto"])
+        self.assertIn("Ri do começo ao fim", resultado["texto"])
+
+    def test_citacoes_sao_as_suas_palavras(self):
+        """As citações embaixo do texto são as anotações exatas (a mais curta que 3 palavras fica de fora)."""
+        from cineai import retrato
+        self.montar_diario()
+        resultado = retrato.gerar_retrato(filmes.filmes)
+        textos = [citacao["texto"] for citacao in resultado["citacoes"]]
+        self.assertEqual(textos, [self.TEXTO_SHREK, self.TEXTO_TITANIC])
+
+    def test_com_ia(self):
+        """Texto bom da IA: passa na conferência, sem o rótulo 'Retrato:'."""
+        from cineai import retrato
+        self.montar_diario()
+        resultado = retrato.gerar_retrato(filmes.filmes, self.ia_que_responde("<think>hm</think>" + self.TEXTO_BOM))
+        self.assertEqual(resultado["origem"], retrato.ORIGEM_IA)
+        self.assertTrue(resultado["texto"].startswith("Você ri alto"))
+
+    def test_ia_inventando_cai_nas_regras(self):
+        """Se a IA não cita nenhum título do diário, escreve em outro alfabeto ou falha, valem as regras."""
+        from cineai import retrato
+        self.montar_diario()
+        inventado = "Você adora " + "Matrix e Senhor dos Anéis, sempre com pipoca e muita emoção. " * 3
+
+        def ia_desligada(prompt):
+            raise ConnectionError("Ollama fechado")
+
+        for perguntar in (self.ia_que_responde(inventado), self.ia_que_responde("你好 Shrek " * 30),
+                          self.ia_que_responde("Shrek."), ia_desligada):
+            resultado = retrato.gerar_retrato(filmes.filmes, perguntar, forcar=True)
+            self.assertEqual(resultado["origem"], retrato.ORIGEM_REGRAS)
+
+    def test_guarda_e_so_reescreve_quando_muda(self):
+        """O retrato fica guardado; muda o diário (ou 'escrever de novo') e a IA é chamada outra vez."""
+        from cineai import retrato
+        self.montar_diario()
+        chamadas = []
+        perguntar = self.ia_que_responde(self.TEXTO_BOM, chamadas)
+        retrato.gerar_retrato(filmes.filmes, perguntar)
+        retrato.gerar_retrato(filmes.filmes, perguntar)
+        self.assertEqual(len(chamadas), 1)
+
+        usuario.dados_usuario = usuario.carregar_dados()   # "fecha e abre": continua guardado
+        retrato.gerar_retrato(filmes.filmes, perguntar)
+        self.assertEqual(len(chamadas), 1)
+
+        usuario.definir_anotacao(self.filme("Titanic"), "Revendo hoje, até que gostei do final.")
+        retrato.gerar_retrato(filmes.filmes, perguntar)
+        self.assertEqual(len(chamadas), 2)
+        retrato.gerar_retrato(filmes.filmes, perguntar, forcar=True)
+        self.assertEqual(len(chamadas), 3)
+
+    def test_prompt_so_com_o_diario(self):
+        """O prompt leva as anotações e proíbe inventar."""
+        from cineai import retrato
+        self.montar_diario()
+        prompt = retrato.montar_prompt(retrato.fatos_do_diario(filmes.filmes))
+        self.assertIn(self.TEXTO_SHREK, prompt)
+        self.assertIn("Use SOMENTE", prompt)
+        self.assertIn("Não gostou (1 ou 2 estrelas): Titanic", prompt)
+        self.assertNotIn('"ok"', prompt)
+
+    def test_pelo_chat(self):
+        """'O que meu diário diz sobre mim?' responde com o retrato e as suas palavras."""
+        self.montar_diario()
+        resultado = self.pedir("o que meu diário diz sobre mim?")
+        self.assertIn("O que o seu diário diz sobre você", resultado["texto"])
+        self.assertIn(self.TEXTO_SHREK, resultado["texto"])
+
+    def test_pelo_chat_sem_diario(self):
+        resultado = self.pedir("meu retrato")
+        self.assertIn("Ainda é cedo", resultado["texto"])
 
 
 class TestBackup(TesteCineAI):

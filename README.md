@@ -44,6 +44,10 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
   - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).
 - **Suas anotações viram recomendação**: o que você escreve no diário entra na busca por embeddings,
   e as estrelas dizem se aquilo é algo que você quer mais ou menos ("me recomenda pelo que eu escrevi").
+- **O que meu diário diz sobre mim**: a IA local lê as suas notas e anotações e escreve um parágrafo
+  sobre você como espectadora (em Meu perfil ou "o que meu diário diz sobre mim?" no chat).
+  O texto é conferido (precisa citar títulos que estão mesmo no diário) e, se a IA estiver
+  desligada, o CineAI escreve o retrato sozinho. Embaixo aparecem as suas anotações, palavra por palavra.
 - **Trailers**, notas do IMDb / Rotten Tomatoes e títulos semelhantes em cada página.
 - **Detalhes de papel**: polaroides tortas com fita, adesivo de coração nos favoritos, carimbo WATCHED
   e uma página que vira ao abrir um filme.
@@ -136,6 +140,7 @@ assistente_filmes/
 │   ├── usuario.py     favoritos, diário, notas e anotações (dados/usuario.json)
 │   ├── conversas.py   conversas salvas (dados/conversas.json)
 │   ├── diario_pdf.py  exporta o diário em PDF (dados/exportados/)
+│   ├── retrato.py     "o que meu diário diz sobre mim" (IA + conferência)
 │   ├── rastreio.py    etapas de cada resposta para o Painel do RAG
 │   └── caminhos.py    onde fica cada arquivo
 ├── importadores/      ← montam o catálogo a partir do TMDB e da OMDb
