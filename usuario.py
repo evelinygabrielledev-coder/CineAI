@@ -315,16 +315,58 @@ def definir_anotacao(filme, texto):
     salvar_dados()
 
 
+def data_do_registro(chave):
+    """A data guardada em "assistidos" para essa chave (um date), ou None."""
+    registro = dados_usuario["assistidos"].get(chave) or {}
+    try:
+        return date.fromisoformat(registro.get("adicionado_em") or "")
+    except ValueError:
+        return None
+
+
+def chaves_em_ordem_cronologica():
+    """
+    Os títulos vistos do mais antigo para o mais novo, PELA DATA em que você viu
+    (que dá para corrigir no Diário). Mesma data: vale a ordem em que foram marcados.
+    Sem data vai para o fim.
+    """
+    chaves = list(dados_usuario["assistidos"])
+    posicao_de_marcacao = {chave: posicao for posicao, chave in enumerate(chaves)}
+    return sorted(
+        chaves,
+        key=lambda chave: (data_do_registro(chave) or date.max, posicao_de_marcacao[chave])
+    )
+
+
 def numero_da_entrada(filme):
     """
-    "Entrada" do filme no seu diário: o 1º filme que você marcou como visto é a
-    entrada 1, o 2º é a 2... (na ordem em que foram marcados). None se não viu.
+    "Entrada" do filme no seu diário: o título visto há mais tempo é a entrada 1,
+    o seguinte é a 2... (pela data em que viu). None se não viu.
     """
     chave = chave_filme(filme)
-    for posicao, chave_vista in enumerate(dados_usuario["assistidos"], start=1):
+    for posicao, chave_vista in enumerate(chaves_em_ordem_cronologica(), start=1):
         if chave_vista == chave:
             return posicao
     return None
+
+
+DATA_MAIS_ANTIGA_PERMITIDA = date(1900, 1, 1)
+
+
+def definir_data_assistido(filme, nova_data):
+    """
+    Corrige o dia em que você viu o título (ex.: marcou hoje algo que viu em 2015).
+    Não aceita data no futuro nem título que você ainda não marcou como visto.
+    """
+    chave = chave_filme(filme)
+    if chave not in dados_usuario["assistidos"]:
+        raise ValueError("Esse título ainda não está marcado como visto.")
+    if nova_data > date.today():
+        raise ValueError("Essa data ainda não chegou. 🙂")
+    if nova_data < DATA_MAIS_ANTIGA_PERMITIDA:
+        raise ValueError("Essa data é antiga demais.")
+    dados_usuario["assistidos"][chave]["adicionado_em"] = nova_data.isoformat()
+    salvar_dados()
 
 
 
@@ -337,12 +379,8 @@ ORDEM_DIARIO_NOTA = "nota"
 
 
 def data_em_que_assistiu(filme):
-    """A data guardada quando você marcou como visto (um date), ou None."""
-    registro = dados_usuario["assistidos"].get(chave_filme(filme)) or {}
-    try:
-        return date.fromisoformat(registro.get("adicionado_em") or "")
-    except ValueError:
-        return None
+    """A data em que você viu (um date), ou None."""
+    return data_do_registro(chave_filme(filme))
 
 
 def entradas_do_diario(catalogo, ordem=ORDEM_DIARIO_RECENTES):
@@ -350,14 +388,14 @@ def entradas_do_diario(catalogo, ordem=ORDEM_DIARIO_RECENTES):
     Cada título visto vira uma entrada do diário:
         {"filme", "numero", "data", "nota", "anotacao"}
 
-    O número da entrada segue a ordem em que você marcou (1º visto = #1),
-    e nunca muda, mesmo que você troque a ordem de exibição.
+    O número da entrada segue a data em que você viu (o mais antigo = #1)
+    e não muda quando você troca a ordem de exibição.
     Ordens: "recentes" (padrão), "antigos" ou "nota" (5★ primeiro; sem nota no fim).
     """
     filmes_por_chave = {chave_filme(filme): filme for filme in catalogo}
 
     entradas = []
-    for numero, chave in enumerate(dados_usuario["assistidos"], start=1):
+    for numero, chave in enumerate(chaves_em_ordem_cronologica(), start=1):
         filme = filmes_por_chave.get(chave)
         if filme is None:
             continue  # saiu do catálogo: o número dele continua reservado

@@ -3,6 +3,7 @@ import re
 import threading
 import unicodedata
 import webbrowser
+from datetime import date
 from pathlib import Path
 import tkinter as tk
 from tkinter import font as tkfont
@@ -48,7 +49,6 @@ COR_DOURADO_CLARO = "#ECCB80"
 COR_INGRESSO = "#F3DACE"         # ingresso rosado ("ADMIT ONE")
 COR_INGRESSO_BORDA = "#C98279"
 COR_TEXTO_CAPA = "#FFF1DC"       # texto creme sobre o vermelho
-COR_ROSA_MARCA_TEXTO = "#D6337F" # marca-texto rosa do diário (detalhes do filme)
 COR_MARCA_TEXTO = COR_DOURADO_CLARO  # marca-texto dos títulos à mão (dourado, dentro da paleta)
 COR_RABISCO = COR_VERMELHO           # rabisco antes dos títulos à mão
 COR_TITULO_MANUSCRITO = COR_VERMELHO  # texto dos títulos à mão
@@ -827,7 +827,7 @@ def abrir_detalhes(filme):
     )
     titulo_detalhes.pack(fill="x", padx=(18, 34))
 
-    sublinhado = ctk.CTkFrame(pagina_direita, height=3, fg_color=COR_ROSA_MARCA_TEXTO, corner_radius=0)
+    sublinhado = ctk.CTkFrame(pagina_direita, height=3, fg_color=COR_VERMELHO, corner_radius=0)
     sublinhado.pack(fill="x", padx=(18, 34), pady=(4, 14))
 
     # Ficha escrita à mão, com linhas de caderno
@@ -1011,9 +1011,32 @@ def abrir_detalhes(filme):
         etiqueta.configure(text=texto_da_etiqueta_do_diario(filme))
         desenhar_polaroide_do_diario()
 
+    def animar_carimbo_do_adesivo():
+        """O coração "cai" na polaroide e assenta (5 quadros, ~0,3 s)."""
+        quadros = [
+            ImageTk.PhotoImage(desenhar_recorte(
+                filme, escala, COR_PAPEL, TAMANHO_POSTER_DIARIO, modo="diario", escala_adesivo=tamanho
+            ))
+            for tamanho in QUADROS_CARIMBO_ADESIVO
+        ]
+        imagens_da_janela.extend(quadros)   # mantém as imagens vivas durante a animação
+
+        def mostrar(indice):
+            if not polaroide_label.winfo_exists():
+                return
+            if indice >= len(quadros):
+                desenhar_polaroide_do_diario()
+                return
+            polaroide_label.configure(image=quadros[indice])
+            detalhes.after(INTERVALO_CARIMBO_MS, lambda: mostrar(indice + 1))
+
+        mostrar(0)
+
     def clicar_favorito():
-        usuario.alternar_favorito(filme)
+        ficou_favorito = usuario.alternar_favorito(filme)
         atualizar_botoes()
+        if ficou_favorito:
+            animar_carimbo_do_adesivo()
         ao_mudar_listas()
 
     def clicar_quero_ver():
@@ -3033,20 +3056,54 @@ def desenhar_carimbo_watched(largura, escala, data_texto):
     return carimbo.rotate(-13, resample=Image.BICUBIC, expand=True)
 
 
+# ---------- adesivo de coração (favoritos) ----------
+COR_ADESIVO_CORACAO = (190, 36, 30, 255)
+COR_BORDA_ADESIVO = (255, 253, 247, 255)
+TAMANHO_ADESIVO = {"cartao": 46, "diario": 46, "compacto": 22}
+INCLINACAO_ADESIVO = 14            # graus
+QUADROS_CARIMBO_ADESIVO = [1.45, 1.22, 0.92, 1.04, 1.0]   # "cai" e assenta
+INTERVALO_CARIMBO_MS = 55
+
+
+def desenhar_adesivo_coracao(tamanho):
+    """
+    Adesivo de coração: borda branca de papel recortado, coração vermelho,
+    um brilho no canto e uma sombrinha. Desenhado 4× maior e reduzido (bordas lisas).
+    """
+    lupa = 4
+    grande = tamanho * lupa
+    adesivo = Image.new("RGBA", (grande, grande), (0, 0, 0, 0))
+    lapis = ImageDraw.Draw(adesivo)
+
+    margem_branca = int(grande * 0.10)
+    sombra = (60, 40, 25, 70)
+    desenhar_coracao(lapis, margem_branca // 2 + lupa * 2, margem_branca // 2 + lupa * 3,
+                     grande - margem_branca, sombra)
+    desenhar_coracao(lapis, margem_branca // 2, margem_branca // 2, grande - margem_branca, COR_BORDA_ADESIVO)
+    desenhar_coracao(lapis, margem_branca, margem_branca, grande - 2 * margem_branca, COR_ADESIVO_CORACAO)
+    brilho = int(grande * 0.13)
+    lapis.ellipse(
+        [int(grande * 0.24), int(grande * 0.20), int(grande * 0.24) + brilho, int(grande * 0.20) + int(brilho * 0.7)],
+        fill=(255, 255, 255, 150)
+    )
+    adesivo = adesivo.resize((tamanho, tamanho), Image.LANCZOS)
+    return adesivo.rotate(-INCLINACAO_ADESIVO, resample=Image.BICUBIC, expand=True)
+
+
 def anotacao_do_recorte(filme):
     """O que vai escrito à mão embaixo da foto: nota, favorito ou o ano."""
     nota = usuario.obter_nota(filme)
     favorito = usuario.eh_favorito(filme)
     if nota is not None:
-        return f"nota {nota}/{usuario.NOTA_MAXIMA}", COR_TINTA_AZUL, favorito
+        return f"nota {nota}/{usuario.NOTA_MAXIMA}", COR_TINTA_AZUL, False
     if favorito:
-        return "favorito", COR_TINTA_VERMELHA, True
+        return "favorito", COR_TINTA_VERMELHA, False   # o coração agora é o adesivo no canto
     if usuario.quer_assistir(filme):
         return "pra ver depois", COR_TINTA_AZUL, False
     return "", COR_TINTA_SUAVE, False  # sem nota nem coração: polaroide limpa (o ano já vai embaixo)
 
 
-def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo="cartao"):
+def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo="cartao", escala_adesivo=1.0):
     """
     A polaroide inteira, inclinada, já "colada" na cor da página.
     modo "cartao":   anotação embaixo = nota / favorito (Catálogo, Home...)
@@ -3100,7 +3157,7 @@ def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo=
             data_vista = data_que_assistiu(filme)
             texto = data_vista or "movie night"
             cor_tinta = COR_TINTA_AZUL
-            com_coracao = usuario.eh_favorito(filme)
+            com_coracao = False   # o coração agora é o adesivo no canto
             com_estrela = not data_vista
         else:
             texto, cor_tinta, com_coracao = anotacao_do_recorte(filme)
@@ -3131,6 +3188,17 @@ def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo=
     com_sombra = com_sombra.filter(ImageFilter.GaussianBlur(px(3)))
     com_sombra.alpha_composite(papel, (folga, folga))
 
+    # ---------- adesivo de coração no canto (favoritos) ----------
+    if usuario.eh_favorito(filme):
+        tamanho_adesivo = max(8, int(px(TAMANHO_ADESIVO[modo]) * escala_adesivo))
+        adesivo = desenhar_adesivo_coracao(tamanho_adesivo)
+        centro_x = folga + largura - px(TAMANHO_ADESIVO[modo] * 0.38)
+        centro_y = folga + px(TAMANHO_ADESIVO[modo] * 0.38)
+        com_sombra.alpha_composite(
+            adesivo,
+            (max(0, int(centro_x - adesivo.width / 2)), max(0, int(centro_y - adesivo.height / 2)))
+        )
+
     inclinacao = sorteio.uniform(-INCLINACAO_MAXIMA_RECORTE, INCLINACAO_MAXIMA_RECORTE)
     recorte = com_sombra.rotate(inclinacao, resample=Image.BICUBIC, expand=True)
 
@@ -3143,7 +3211,9 @@ def desenhar_recorte(filme, escala, cor_fundo_pagina, tamanho_poster=None, modo=
         fita = fita.rotate(angulo, resample=Image.BICUBIC, expand=True)
         recorte.alpha_composite(fita, (int(centro_x - fita.width / 2), int(centro_y - fita.height / 2)))
 
-    if sorteio.random() < 0.65:
+    # Favorito: fita sempre no meio do topo, para não cobrir o adesivo de coração.
+    fita_no_meio = sorteio.random() < 0.65
+    if fita_no_meio or usuario.eh_favorito(filme):
         colar_fita(recorte.width / 2, folga + px(3), sorteio.uniform(-6, 6))
     else:
         colar_fita(folga + px(14), folga + px(10), 38)
@@ -3994,6 +4064,93 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False):
         vincular_clique([convite], abrir_edicao)
 
 
+ANO_MAIS_ANTIGO_NO_EDITOR = 1930
+
+
+def abrir_editor_de_data(filme):
+    """
+    Bilhetinho para corrigir quando você assistiu (dia / mês / ano).
+    Útil para o que você marcou hoje, mas viu anos atrás.
+    """
+    data_atual = usuario.data_em_que_assistiu(filme) or date.today()
+
+    editor = ctk.CTkToplevel(janela)
+    editor.title("Quando você assistiu?")
+    editor.geometry("360x250")
+    editor.resizable(False, False)
+    editor.configure(fg_color=COR_PAPEL)
+    editor.transient(janela)
+    janela.update_idletasks()
+    editor.geometry(f"+{janela.winfo_rootx() + 380}+{janela.winfo_rooty() + 220}")  # perto do diário
+    editor.after(50, editor.grab_set)   # só depois de a janela aparecer
+
+    ctk.CTkLabel(
+        editor, text="quando você assistiu?", font=(FONTE_MANUSCRITA, 24, "bold"),
+        text_color=COR_TITULO_MANUSCRITO
+    ).pack(pady=(18, 0))
+    ctk.CTkLabel(
+        editor, text=filme["nome"], font=(FONTE, 13, "italic"), text_color=COR_TEXTO_SECUNDARIO
+    ).pack()
+
+    linha_campos = ctk.CTkFrame(editor, fg_color="transparent")
+    linha_campos.pack(pady=(14, 4))
+
+    estilo_menu = {
+        "fg_color": COR_BILHETE, "button_color": COR_VERMELHO, "button_hover_color": COR_VERMELHO_HOVER,
+        "text_color": COR_TEXTO, "dropdown_fg_color": COR_PAPEL, "dropdown_text_color": COR_TEXTO,
+        "font": (FONTE_INTERFACE, 13, "bold"), "dropdown_font": (FONTE_INTERFACE, 12),
+    }
+    nomes_meses = [mes[:3] for mes in MESES_EM_PORTUGUES]
+    anos = [str(ano) for ano in range(date.today().year, ANO_MAIS_ANTIGO_NO_EDITOR - 1, -1)]
+
+    menu_dia = ctk.CTkOptionMenu(linha_campos, values=[f"{dia:02d}" for dia in range(1, 32)], width=70, **estilo_menu)
+    menu_mes = ctk.CTkOptionMenu(linha_campos, values=nomes_meses, width=80, **estilo_menu)
+    caixa_ano = ctk.CTkComboBox(
+        linha_campos, values=anos, width=95, fg_color=COR_BILHETE, border_color=COR_BORDA_PAPEL,
+        button_color=COR_VERMELHO, button_hover_color=COR_VERMELHO_HOVER, text_color=COR_TEXTO,
+        dropdown_fg_color=COR_PAPEL, dropdown_text_color=COR_TEXTO, font=(FONTE_INTERFACE, 13, "bold")
+    )
+    for campo in (menu_dia, menu_mes, caixa_ano):
+        campo.pack(side="left", padx=4)
+
+    def preencher(data_escolhida):
+        menu_dia.set(f"{data_escolhida.day:02d}")
+        menu_mes.set(nomes_meses[data_escolhida.month - 1])
+        caixa_ano.set(str(data_escolhida.year))
+
+    preencher(data_atual)
+
+    aviso = ctk.CTkLabel(editor, text="", font=(FONTE_MANUSCRITA, 15), text_color=COR_VERMELHO)
+    aviso.pack(pady=(2, 0))
+
+    def salvar():
+        try:
+            nova_data = date(int(caixa_ano.get()), nomes_meses.index(menu_mes.get()) + 1, int(menu_dia.get()))
+        except ValueError:
+            aviso.configure(text="esse dia não existe nesse mês (ou o ano está estranho)")
+            return
+        try:
+            usuario.definir_data_assistido(filme, nova_data)
+        except ValueError as erro:
+            aviso.configure(text=str(erro))
+            return
+        editor.destroy()
+        ao_mudar_listas()   # diário, capa e carimbo WATCHED das polaroides mudam juntos
+
+    linha_botoes = ctk.CTkFrame(editor, fg_color="transparent")
+    linha_botoes.pack(pady=(8, 0))
+    ctk.CTkButton(
+        linha_botoes, text="hoje", width=90, height=34, corner_radius=4, fg_color=COR_PAPEL_ESCURO,
+        hover_color=COR_BOTAO_NEUTRO_HOVER, text_color=COR_VINHO, font=(FONTE_MANUSCRITA, 16, "bold"),
+        command=lambda: preencher(date.today())
+    ).pack(side="left", padx=6)
+    ctk.CTkButton(
+        linha_botoes, text="salvar ✓", width=120, height=34, corner_radius=4, fg_color=COR_VERMELHO,
+        hover_color=COR_VERMELHO_HOVER, text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 16, "bold"),
+        command=salvar
+    ).pack(side="left", padx=6)
+
+
 def criar_entrada_do_diario(container, entrada, imagens):
     """
     Uma entrada:  [03 / OUT / 2026] [polaroide] ENTRADA #012 · SÉRIE
@@ -4020,23 +4177,30 @@ def criar_entrada_do_diario(container, entrada, imagens):
     tk.Frame(folha, bg=COR_VERMELHO, width=max(1, px(2))).pack(side="left", fill="y", pady=px(8))
 
     data_vista = entrada["data"]
+    rotulos_da_data = []
     if data_vista is not None:
-        tk.Label(
+        rotulos_da_data.append(tk.Label(
             margem, text=f"{data_vista.day:02d}", font=(FONTE_TITULO, -px(34)),
-            fg=COR_VERMELHO, bg=COR_CARD
-        ).pack(pady=(px(16), 0))
-        tk.Label(
+            fg=COR_VERMELHO, bg=COR_CARD, cursor="hand2"
+        ))
+        rotulos_da_data.append(tk.Label(
             margem, text=MESES_EM_PORTUGUES[data_vista.month - 1][:3],
-            font=(FONTE_INTERFACE, -px(12), "bold"), fg=COR_VINHO, bg=COR_CARD
-        ).pack()
-        tk.Label(
+            font=(FONTE_INTERFACE, -px(12), "bold"), fg=COR_VINHO, bg=COR_CARD, cursor="hand2"
+        ))
+        rotulos_da_data.append(tk.Label(
             margem, text=str(data_vista.year), font=(FONTE_INTERFACE, -px(10)),
-            fg=COR_TEXTO_SUAVE, bg=COR_CARD
-        ).pack()
+            fg=COR_TEXTO_SUAVE, bg=COR_CARD, cursor="hand2"
+        ))
     else:
-        tk.Label(
-            margem, text="?", font=(FONTE_TITULO, -px(30)), fg=COR_TEXTO_SUAVE, bg=COR_CARD
-        ).pack(pady=(px(18), 0))
+        rotulos_da_data.append(tk.Label(
+            margem, text="?", font=(FONTE_TITULO, -px(30)), fg=COR_TEXTO_SUAVE, bg=COR_CARD, cursor="hand2"
+        ))
+    rotulos_da_data.append(tk.Label(
+        margem, text="✎ data", font=(FONTE_MANUSCRITA, -px(12)), fg=COR_TEXTO_SUAVE, bg=COR_CARD, cursor="hand2"
+    ))
+    for posicao, rotulo in enumerate(rotulos_da_data):
+        rotulo.pack(pady=(px(16), 0) if posicao == 0 else (px(2) if rotulo.cget("text") == "✎ data" else 0, 0))
+    vincular_clique(rotulos_da_data + [margem], lambda event: abrir_editor_de_data(filme))
 
     # ---------- polaroide pequena ----------
     imagem = imagem_do_recorte(filme, escala, COR_CARD, TAMANHO_POSTER_ENTRADA, modo="compacto")
@@ -4546,7 +4710,6 @@ def atualizar_meus_filmes(voltar_ao_topo=True):
 # =========================================================
 # PÁGINA MEU PERFIL (gosto + recomendações "Para você")
 # =========================================================
-COR_BARRA_GOSTO = COR_VERMELHO
 QUANTIDADE_GENEROS_NO_PERFIL = 5
 QUANTIDADE_PARA_VOCE = 24
 
@@ -4556,24 +4719,42 @@ criar_cabecalho_pagina(
     "o que o CineAI aprendeu com as suas estrelas, favoritos e filmes vistos"
 )
 
-# Linha 1: resumo do gosto (gêneros à esquerda, pessoas à direita)
-area_resumo_perfil = ctk.CTkFrame(
+# A página inteira rola junto (resumo + "Para você"). Antes só a grade rolava,
+# e com o resumo grande ela ficava espremida numa faixa pequena embaixo.
+pagina_perfil.grid_rowconfigure(3, weight=0)
+pagina_perfil.grid_rowconfigure(1, weight=1)
+
+rolagem_perfil = ctk.CTkScrollableFrame(
     pagina_perfil,
+    corner_radius=0,
+    fg_color=COR_FUNDO,
+    scrollbar_button_color=COR_ROLAGEM,
+    scrollbar_button_hover_color=COR_ROLAGEM_HOVER
+)
+rolagem_perfil.grid(row=1, column=0, sticky="nsew", padx=(32, 20), pady=(0, 16))
+rolagem_perfil.grid_columnconfigure(0, weight=1)
+
+# Parte 1: resumo do gosto (gêneros à esquerda, pessoas à direita)
+area_resumo_perfil = ctk.CTkFrame(
+    rolagem_perfil,
     fg_color=COR_PAPEL,
     corner_radius=4,
     border_width=1,
     border_color=COR_BORDA_PAPEL
 )
-area_resumo_perfil.grid(row=1, column=0, sticky="ew", padx=42, pady=(2, 12))
+area_resumo_perfil.grid(row=0, column=0, sticky="ew", padx=(10, 14), pady=(2, 12))
 area_resumo_perfil.grid_columnconfigure(0, weight=3, uniform="resumo")
 area_resumo_perfil.grid_columnconfigure(1, weight=2, uniform="resumo")
 
-# Linha 2: título da grade
-cabecalho_para_voce = criar_titulo_secao(pagina_perfil, "✦  PARA VOCÊ")
-cabecalho_para_voce.grid(row=2, column=0, sticky="ew", padx=42, pady=(0, 4))
+# Parte 2: título da grade
+cabecalho_para_voce = criar_titulo_secao(rolagem_perfil, "✦  PARA VOCÊ")
+cabecalho_para_voce.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 4))
 
-# Linha 3: grade de filmes recomendados
-scroll_para_voce = criar_area_grade(pagina_perfil, 3)
+# Parte 3: grade de filmes recomendados (sem rolagem própria: rola com a página)
+scroll_para_voce = tk.Frame(rolagem_perfil, bg=COR_FUNDO)
+scroll_para_voce.grid(row=2, column=0, sticky="ew")
+for coluna_grade in range(COLUNAS_CARDS):
+    scroll_para_voce.grid_columnconfigure(coluna_grade, weight=1, uniform="grade")
 
 widgets_resumo_perfil = []
 widgets_para_voce = []
@@ -4584,105 +4765,124 @@ def formatar_afinidade(valor):
     return f"{valor:+.1f}".replace(".", ",")
 
 
-def criar_linha_genero(container, linha, item, maior_afinidade):
-    nome_label = ctk.CTkLabel(
-        container,
-        text=item["nome"],
-        font=(FONTE, 13, "bold"),
-        text_color=COR_TEXTO,
-        anchor="w",
-        width=150
-    )
-    nome_label.grid(row=linha, column=0, sticky="w", padx=(22, 10), pady=4)
+# Meu perfil no estilo do diário: em vez de barras de painel, anotações à mão.
+#   gêneros   -> escritos em caneta azul, com uma passada de marca-texto do
+#                tamanho do seu gosto (quanto mais curte, maior a passada)
+#   pessoas   -> etiquetas de papel coladas (diretores e atores)
+#   evitados  -> riscados à mão ("menos a sua praia")
+LARGURA_MAXIMA_MARCA_TEXTO = 260
+CORES_ETIQUETA_PESSOA = ["#FFFDF7", "#F3E6C8", "#FBF4E3"]
+ETIQUETAS_POR_LINHA = 2
 
-    barra = ctk.CTkProgressBar(
-        container,
-        height=12,
-        corner_radius=2,
-        fg_color=COR_PAPEL_ESCURO,
-        progress_color=COR_BARRA_GOSTO
-    )
-    barra.set(item["afinidade"] / maior_afinidade if maior_afinidade > 0 else 0)
-    barra.grid(row=linha, column=1, sticky="ew", pady=4)
 
-    quantidade_texto = f'{item["quantidade"]} filme{"s" if item["quantidade"] > 1 else ""}'
-    valor_label = ctk.CTkLabel(
-        container,
-        text=f'{formatar_afinidade(item["afinidade"])}  ·  {quantidade_texto}',
-        font=(FONTE_MANUSCRITA, 14),
-        text_color=COR_TEXTO_SECUNDARIO,
-        anchor="w",
-        width=110
-    )
-    valor_label.grid(row=linha, column=2, sticky="w", padx=(10, 15), pady=4)
+def criar_linha_genero(container, item, maior_afinidade, escala):
+    def px(valor):
+        return int(valor * escala)
+
+    linha = tk.Frame(container, bg=COR_PAPEL)
+    linha.pack(fill="x", padx=px(24), pady=(px(2), px(4)))
+
+    tk.Label(
+        linha, text=item["nome"], font=(FONTE_MANUSCRITA, -px(21), "bold"),
+        fg=COR_AZUL_CANETA, bg=COR_PAPEL
+    ).pack(side="left")
+    quantidade = f'{item["quantidade"]} título{"s" if item["quantidade"] > 1 else ""}'
+    tk.Label(
+        linha, text=f"  ·  {quantidade}  ({formatar_afinidade(item['afinidade'])})",
+        font=(FONTE_MANUSCRITA, -px(14)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL
+    ).pack(side="left", pady=(px(4), 0))
+
+    proporcao = item["afinidade"] / maior_afinidade if maior_afinidade > 0 else 0
+    tk.Frame(
+        container, bg=COR_MARCA_TEXTO, height=px(7),
+        width=max(px(24), int(px(LARGURA_MAXIMA_MARCA_TEXTO) * proporcao))
+    ).pack(anchor="w", padx=(px(28), 0), pady=(0, px(4)))
 
 
 def criar_coluna_generos(perfil_atual):
-    coluna = ctk.CTkFrame(area_resumo_perfil, fg_color="transparent")
-    coluna.grid(row=0, column=0, sticky="nsew", pady=15)
-    coluna.grid_columnconfigure(1, weight=1)
+    escala = escala_da_tela(area_resumo_perfil)
+
+    def px(valor):
+        return int(valor * escala)
+
+    coluna = tk.Frame(area_resumo_perfil, bg=COR_PAPEL)
+    coluna.grid(row=0, column=0, sticky="nsew", pady=px(16))
     widgets_resumo_perfil.append(coluna)
 
-    titulo = ctk.CTkLabel(
-        coluna,
-        text="GÊNEROS QUE VOCÊ MAIS CURTE",
-        font=(FONTE_TITULO, 17),
-        text_color=COR_VERMELHO,
-        anchor="w"
-    )
-    titulo.grid(row=0, column=0, columnspan=3, sticky="w", padx=22, pady=(0, 8))
+    tk.Label(
+        coluna, text="✦ o que eu mais curto", font=(FONTE_MANUSCRITA, -px(25), "bold"),
+        fg=COR_TITULO_MANUSCRITO, bg=COR_PAPEL
+    ).pack(anchor="w", padx=px(20), pady=(0, px(8)))
 
     generos_top = perfil.itens_ordenados(perfil_atual["generos"], quantidade=QUANTIDADE_GENEROS_NO_PERFIL)
 
     if not generos_top:
-        vazio = ctk.CTkLabel(
-            coluna,
-            text="ainda não há um gênero que se destaque",
-            font=(FONTE_MANUSCRITA, 15),
-            text_color=COR_TEXTO_SECUNDARIO
-        )
-        vazio.grid(row=1, column=0, columnspan=3, sticky="w", padx=20)
+        tk.Label(
+            coluna, text="ainda não há um gênero que se destaque",
+            font=(FONTE_MANUSCRITA, -px(16)), fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL
+        ).pack(anchor="w", padx=px(24))
         return
 
     maior_afinidade = generos_top[0]["afinidade"]
-    for posicao, item in enumerate(generos_top, start=1):
-        criar_linha_genero(coluna, posicao, item, maior_afinidade)
+    for item in generos_top:
+        criar_linha_genero(coluna, item, maior_afinidade, escala)
+
+
+def criar_etiquetas(container, nomes, escala):
+    """Etiquetas de papel coladas lado a lado (até 2 por linha, nomes longos cabem), cada uma de um papel."""
+    def px(valor):
+        return int(valor * escala)
+
+    linha = None
+    for posicao, nome in enumerate(nomes):
+        if posicao % ETIQUETAS_POR_LINHA == 0:
+            linha = tk.Frame(container, bg=COR_PAPEL)
+            linha.pack(anchor="w", pady=(0, px(6)))
+        tk.Label(
+            linha, text=nome, font=(FONTE, -px(13), "bold"), fg=COR_TEXTO,
+            bg=CORES_ETIQUETA_PESSOA[posicao % len(CORES_ETIQUETA_PESSOA)],
+            highlightbackground=COR_BORDA_PAPEL, highlightthickness=1,
+            padx=px(9), pady=px(4)
+        ).pack(side="left", padx=(0, px(6)), pady=(px((posicao % 2) * 3), 0))
 
 
 def criar_coluna_pessoas(perfil_atual):
-    coluna = ctk.CTkFrame(area_resumo_perfil, fg_color="transparent")
-    coluna.grid(row=0, column=1, sticky="nsew", pady=15, padx=(0, 20))
+    escala = escala_da_tela(area_resumo_perfil)
+
+    def px(valor):
+        return int(valor * escala)
+
+    coluna = tk.Frame(area_resumo_perfil, bg=COR_PAPEL)
+    coluna.grid(row=0, column=1, sticky="nsew", pady=px(16), padx=(0, px(20)))
     widgets_resumo_perfil.append(coluna)
 
     blocos = [
-        ("DIRETORES", perfil.itens_ordenados(perfil_atual["diretores"], quantidade=3)),
-        ("ATORES", perfil.itens_ordenados(perfil_atual["atores"], quantidade=3)),
-        ("MENOS A SUA PRAIA", perfil.itens_ordenados(perfil_atual["generos"], positivos=False, quantidade=3)),
+        ("diretores (e criadores) que eu sigo", perfil.itens_ordenados(perfil_atual["diretores"], quantidade=3)),
+        ("atores que sempre me ganham", perfil.itens_ordenados(perfil_atual["atores"], quantidade=3)),
     ]
-
     for titulo_bloco, itens in blocos:
         if not itens:
             continue
+        tk.Label(
+            coluna, text="✎ " + titulo_bloco, font=(FONTE_MANUSCRITA, -px(17), "bold"),
+            fg=COR_VERMELHO, bg=COR_PAPEL
+        ).pack(anchor="w", pady=(0, px(4)))
+        criar_etiquetas(coluna, [item["nome"] for item in itens], escala)
+        tk.Frame(coluna, bg=COR_PAPEL, height=px(6)).pack()
 
-        titulo = ctk.CTkLabel(
-            coluna,
-            text=titulo_bloco,
-            font=(FONTE_TITULO, 15),
-            text_color=COR_VERMELHO,
-            anchor="w"
-        )
-        titulo.pack(fill="x", pady=(0, 0))
-
-        nomes = ctk.CTkLabel(
-            coluna,
-            text=", ".join(item["nome"] for item in itens),
-            font=(FONTE_MANUSCRITA, 16),
-            text_color=COR_AZUL_CANETA,
-            anchor="w",
-            justify="left",
-            wraplength=300
-        )
-        nomes.pack(fill="x", pady=(0, 10))
+    evitados = perfil.itens_ordenados(perfil_atual["generos"], positivos=False, quantidade=3)
+    if evitados:
+        tk.Label(
+            coluna, text="✎ menos a minha praia", font=(FONTE_MANUSCRITA, -px(17), "bold"),
+            fg=COR_VERMELHO, bg=COR_PAPEL
+        ).pack(anchor="w", pady=(0, px(2)))
+        linha = tk.Frame(coluna, bg=COR_PAPEL)
+        linha.pack(anchor="w")
+        for item in evitados:
+            tk.Label(
+                linha, text=item["nome"], font=(FONTE_MANUSCRITA, -px(18), "overstrike"),
+                fg=COR_TEXTO_SUAVE, bg=COR_PAPEL
+            ).pack(side="left", padx=(0, px(12)))
 
 
 def mostrar_perfil_incompleto(perfil_atual):
@@ -4736,6 +4936,7 @@ def atualizar_pagina_perfil():
         imagens_para_voce,
         "Você já assistiu a todos os filmes do catálogo! 🎉"
     )
+    rolagem_perfil._parent_canvas.yview_moveto(0)  # volta para o topo da página
 
 
 # =========================================================

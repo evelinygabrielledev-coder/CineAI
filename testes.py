@@ -625,6 +625,22 @@ class TestDiario(TesteCineAI):
             titanic = next(e for e in usuario.entradas_do_diario(filmes.filmes, ordem) if e["filme"]["nome"] == "Titanic")
             self.assertEqual(titanic["numero"], 1)
 
+    def test_corrigir_a_data(self):
+        """Corrigir a data reordena o diário (por data) e renumera as entradas."""
+        from datetime import date, timedelta
+        self.marcar_tres()   # Titanic, Shrek, Dunkirk: todos hoje
+        usuario.definir_data_assistido(self.filme("Dunkirk"), date(2015, 7, 20))
+        self.assertEqual(usuario.data_em_que_assistiu(self.filme("Dunkirk")), date(2015, 7, 20))
+        self.assertEqual(usuario.numero_da_entrada(self.filme("Dunkirk")), 1)
+        self.assertEqual(usuario.numero_da_entrada(self.filme("Titanic")), 2)
+        self.assertEqual(self.nomes(usuario.entradas_do_diario(filmes.filmes))[-1], "Dunkirk")
+        usuario.dados_usuario = usuario.carregar_dados()   # "fecha e abre"
+        self.assertEqual(usuario.data_em_que_assistiu(self.filme("Dunkirk")), date(2015, 7, 20))
+        with self.assertRaises(ValueError):
+            usuario.definir_data_assistido(self.filme("Dunkirk"), date.today() + timedelta(days=1))
+        with self.assertRaises(ValueError):
+            usuario.definir_data_assistido(self.filme("A Origem"), date(2020, 1, 1))  # não foi visto
+
     def test_diario_vazio_e_data_estranha(self):
         """Sem nada visto: lista vazia. Data inválida no arquivo: data None (não quebra)."""
         self.assertEqual(usuario.entradas_do_diario(filmes.filmes), [])
