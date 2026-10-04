@@ -786,6 +786,88 @@ class TestOndeAssistir(TesteCineAI):
         self.assertEqual(nomes, ["Toy Story: Um Mundo de Aventuras"])
 
 
+class TestSugestaoDaNoite(TesteCineAI):
+    """Uma sugestão por dia: da lista Quero assistir, do seu gosto ou dos populares."""
+
+    def test_mesma_sugestao_no_mesmo_dia(self):
+        """No mesmo dia a sugestão não muda; ela nunca é algo que você já viu."""
+        from datetime import date
+        primeira = filmes.sugestao_da_noite(date(2026, 10, 4))[0]
+        self.assertIs(filmes.sugestao_da_noite(date(2026, 10, 4))[0], primeira)
+        self.assertFalse(usuario.foi_assistido(primeira))
+
+    def test_vem_da_lista_quero_assistir(self):
+        """Com títulos guardados, a sugestão sai da lista (e o motivo diz isso)."""
+        usuario.guardar_para_depois(self.filme("Dunkirk"))
+        filme, motivo, _ = filmes.sugestao_da_noite()
+        self.assertEqual(filme["nome"], "Dunkirk")
+        self.assertIn("Quero assistir", motivo)
+
+    @apenas_modo_rapido  # usa os streamings do catálogo de teste
+    def test_prefere_meus_streamings(self):
+        """Entre os guardados, prefere o que está num streaming que você assina."""
+        usuario.guardar_para_depois(self.filme("Dunkirk"))
+        usuario.guardar_para_depois(self.filme("Interestelar"))
+        usuario.definir_meus_streamings(["Max"])
+        filme, motivo, _ = filmes.sugestao_da_noite()
+        self.assertEqual(filme["nome"], "Interestelar")
+        self.assertIn("Max ✓", motivo)
+
+    def test_pelo_chat(self):
+        """'O que eu vejo hoje?' traz a sugestão; 'quero outro' traz outra."""
+        resultado = self.pedir("o que eu vejo hoje?")
+        self.assertEqual(resultado["tipo"], "recomendacao")
+        self.assertIn("Sugestão da noite", resultado["texto"])
+        self.assertNotEqual(self.recomendado("quero outro"), resultado["filme"]["nome"])
+
+
+class TestBackup(TesteCineAI):
+    """Backup do diário: cópias com data em dados/backups (aqui, na pasta temporária)."""
+
+    def setUp(self):
+        super().setUp()
+        import shutil
+        shutil.rmtree(usuario.PASTA_BACKUPS, ignore_errors=True)
+
+    def test_fazer_e_restaurar(self):
+        """Backup guarda tudo; restaurar volta o diário como estava (e guarda o estado atual antes)."""
+        usuario.definir_nota(self.filme("Shrek"), 5)
+        usuario.definir_anotacao(self.filme("Shrek"), "Ri muito com o burro.")
+        caminho = usuario.fazer_backup()
+        self.assertTrue(caminho.exists())
+        self.assertIn("1 vistos", usuario.resumo_do_backup(caminho))
+
+        usuario.alternar_assistido(self.filme("Shrek"))          # "apagou sem querer"
+        usuario.definir_anotacao(self.filme("Shrek"), "")
+        self.assertFalse(usuario.foi_assistido(self.filme("Shrek")))
+
+        usuario.restaurar_backup(caminho)
+        self.assertEqual(usuario.obter_nota(self.filme("Shrek")), 5)
+        self.assertEqual(usuario.obter_anotacao(self.filme("Shrek")), "Ri muito com o burro.")
+        self.assertEqual(len(usuario.listar_backups()), 2)        # o original + o "antes de restaurar"
+
+    def test_guarda_so_os_10_mais_novos(self):
+        """Com mais de 10 backups, os mais antigos são apagados."""
+        from datetime import datetime, timedelta
+        usuario.alternar_assistido(self.filme("Titanic"))
+        inicio = datetime(2026, 1, 1, 12, 0, 0)
+        for dias in range(13):
+            usuario.fazer_backup(inicio + timedelta(days=dias))
+        backups = usuario.listar_backups()
+        self.assertEqual(len(backups), usuario.MAXIMO_BACKUPS)
+        self.assertEqual(backups[0][1], inicio + timedelta(days=12))
+
+    def test_automatico_so_depois_de_7_dias(self):
+        """Sem nada no diário não faz; depois faz e só repete após 7 dias."""
+        from datetime import datetime, timedelta
+        agora = datetime(2026, 10, 4, 21, 0, 0)
+        self.assertIsNone(usuario.backup_automatico_se_precisar(agora))   # diário vazio
+        usuario.alternar_assistido(self.filme("Titanic"))
+        self.assertIsNotNone(usuario.backup_automatico_se_precisar(agora))
+        self.assertIsNone(usuario.backup_automatico_se_precisar(agora + timedelta(days=3)))
+        self.assertIsNotNone(usuario.backup_automatico_se_precisar(agora + timedelta(days=8)))
+
+
 class TestQueroAssistir(TesteCineAI):
     """Lista "Quero assistir": guardar pra depois, pelo botão ou pelo chat."""
 

@@ -43,3 +43,6 @@ venv/
 Thumbs.db
 .vscode/
 .idea/
+
+# Backups do diário (têm os seus dados pessoais)
+dados/backups/

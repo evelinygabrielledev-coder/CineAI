@@ -2,6 +2,8 @@ import random
 import re
 import threading
 import unicodedata
+import os
+import sys
 import webbrowser
 from datetime import date
 from pathlib import Path
@@ -4801,6 +4803,126 @@ def criar_linha_do_nome(folha, escala):
     tk.Frame(folha, bg=COR_VERMELHO, height=max(1, px(2)), width=px(LARGURA_LINHA_DO_NOME)).pack(pady=(0, px(4)))
 
 
+# ---------- Backup do diário (rodapé da Capa) ----------
+def texto_do_ultimo_backup():
+    ultimo = usuario.ultimo_backup()
+    if ultimo is None:
+        return "💾 nenhum backup ainda"
+    return f"💾 último backup: {ultimo.strftime('%d/%m/%Y às %H:%M')}  ·  automático toda semana"
+
+
+def abrir_pasta_de_backups(event=None):
+    usuario.PASTA_BACKUPS.mkdir(parents=True, exist_ok=True)
+    if sys.platform.startswith("win"):
+        os.startfile(usuario.PASTA_BACKUPS)   # abre no Explorador de Arquivos
+    else:
+        webbrowser.open(usuario.PASTA_BACKUPS.as_uri())
+
+
+def fazer_backup_agora(event=None):
+    caminho = usuario.fazer_backup()
+    messagebox.showinfo(
+        "Backup feito",
+        f"Uma cópia do seu diário foi guardada em:\n{caminho}\n\n"
+        "Se algo der errado, use  ↺ restaurar  na Capa.",
+        parent=janela
+    )
+    atualizar_meus_filmes(voltar_ao_topo=False)
+
+
+def abrir_restaurar_backup(event=None):
+    """Lista os backups (do mais novo ao mais antigo); cada um pode ser restaurado."""
+    backups = usuario.listar_backups()
+    if not backups:
+        messagebox.showinfo("Restaurar", "Ainda não há nenhum backup guardado.", parent=janela)
+        return
+
+    janela_backups = ctk.CTkToplevel(janela)
+    janela_backups.title("Restaurar um backup")
+    janela_backups.resizable(False, False)
+    janela_backups.configure(fg_color=COR_PAPEL)
+    janela_backups.transient(janela)
+    janela.update_idletasks()
+    janela_backups.geometry(f"+{janela.winfo_rootx() + 360}+{janela.winfo_rooty() + 160}")
+    janela_backups.after(50, janela_backups.grab_set)
+
+    ctk.CTkLabel(
+        janela_backups, text="voltar o diário para qual dia?", font=(FONTE_MANUSCRITA, 22, "bold"),
+        text_color=COR_TITULO_MANUSCRITO
+    ).pack(padx=24, pady=(18, 2))
+    ctk.CTkLabel(
+        janela_backups, text="antes de restaurar, o CineAI guarda uma cópia de como está agora",
+        font=(FONTE_MANUSCRITA, 14), text_color=COR_TEXTO_SUAVE
+    ).pack(padx=24, pady=(0, 10))
+
+    def restaurar(caminho, momento):
+        if not messagebox.askyesno(
+            "Restaurar backup",
+            f"Voltar o diário para como estava em {momento.strftime('%d/%m/%Y às %H:%M')}?\n\n"
+            "O que você fez depois disso sai do diário (mas fica guardado num backup novo).",
+            parent=janela_backups
+        ):
+            return
+        fechar_edicao_do_diario()
+        usuario.restaurar_backup(caminho)
+        conversas.recarregar()
+        janela_backups.destroy()
+        atualizar_lista_conversas()
+        ao_mudar_listas()
+        messagebox.showinfo("Pronto", "Diário restaurado. ✓", parent=janela)
+
+    lista = ctk.CTkScrollableFrame(janela_backups, width=440, height=260, fg_color=COR_BILHETE)
+    lista.pack(padx=20, pady=(0, 16))
+    for caminho, momento in backups:
+        linha = ctk.CTkFrame(lista, fg_color="transparent")
+        linha.pack(fill="x", pady=4)
+        ctk.CTkLabel(
+            linha, text=momento.strftime("%d/%m/%Y  %H:%M"), font=(FONTE_INTERFACE, 13, "bold"),
+            text_color=COR_TEXTO, width=130, anchor="w"
+        ).pack(side="left", padx=(6, 6))
+        ctk.CTkLabel(
+            linha, text=usuario.resumo_do_backup(caminho), font=(FONTE_MANUSCRITA, 14),
+            text_color=COR_TEXTO_SECUNDARIO, anchor="w"
+        ).pack(side="left")
+        ctk.CTkButton(
+            linha, text="↺ restaurar", width=90, height=28, corner_radius=4, fg_color=COR_VINHO,
+            hover_color=COR_VERMELHO, text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 14, "bold"),
+            command=lambda caminho=caminho, momento=momento: restaurar(caminho, momento)
+        ).pack(side="right", padx=6)
+
+
+def criar_area_de_backup(folha, escala):
+    """
+    Rodapé da Capa: a data do último backup numa linha e, embaixo, os três botões
+    grandes (antes ficava tudo numa linha só e o primeiro botão era cortado).
+    """
+    def px(valor):
+        return int(valor * escala)
+
+    tk.Frame(folha, bg=COR_PAUTA_CADERNO, height=1).pack(fill="x", padx=px(70), pady=(0, px(14)))
+
+    area = tk.Frame(folha, bg=COR_PAPEL)
+    area.pack(pady=(0, px(28)))
+    tk.Label(
+        area, text=texto_do_ultimo_backup(), font=(FONTE_MANUSCRITA, -px(17)),
+        fg=COR_TEXTO_SECUNDARIO, bg=COR_PAPEL
+    ).pack(pady=(0, px(10)))
+
+    linha_botoes = tk.Frame(area, bg=COR_PAPEL)
+    linha_botoes.pack()
+    for texto, acao, cor in (
+        ("💾  fazer backup agora", fazer_backup_agora, COR_VERMELHO),
+        ("↺  restaurar um backup…", abrir_restaurar_backup, COR_VINHO),
+        ("📂  abrir a pasta", abrir_pasta_de_backups, COR_VINHO),
+    ):
+        botao = tk.Label(
+            linha_botoes, text=texto, font=(FONTE_MANUSCRITA, -px(18), "bold"),
+            fg=COR_TEXTO_CAPA, bg=cor, cursor="hand2", padx=px(16), pady=px(7)
+        )
+        botao.pack(side="left", padx=px(6))
+        botao.bind("<Button-1>", acao)
+
+
 def desenhar_capa():
     limpar_grade(widgets_meus_filmes, imagens_meus_filmes)
     numeros = usuario.estatisticas_do_diario(filmes.filmes)
@@ -4844,7 +4966,8 @@ def desenhar_capa():
             text="Os números deste diário aparecem aqui quando você marcar\n"
                  "o primeiro título como visto (ou der estrelas a ele). ✎",
             font=(FONTE_MANUSCRITA, -px(17)), fg=COR_TEXTO_SUAVE, bg=COR_PAPEL, justify="center"
-        ).pack(pady=(px(6), px(34)))
+        ).pack(pady=(px(6), px(20)))
+        criar_area_de_backup(folha, escala)
         return
 
     # ---------- carimbos com os números ----------
@@ -4877,6 +5000,8 @@ def desenhar_capa():
         if filme_da_linha is not None:
             valor.bind("<Button-1>", lambda event, filme=filme_da_linha: abrir_detalhes(filme))
         tk.Frame(anotacoes, bg=COR_PAUTA_CADERNO, height=1).pack(fill="x")
+
+    criar_area_de_backup(folha, escala)
 
     canvas_rolagem = getattr(scroll_meus_filmes, "_parent_canvas", None)
     if canvas_rolagem is not None:
@@ -5553,6 +5678,22 @@ botao_rag_menu.configure(command=lambda: mostrar_pagina(pagina_rag, botao_rag_me
 # =========================================================
 for coluna in range(COLUNAS_CARDS):
     criar_card_recomendacao(coluna)  # os 4 recortes da Home ("cole aqui")
+
+# Backup automático (se o último tem mais de 7 dias) — silencioso
+try:
+    usuario.backup_automatico_se_precisar()
+except OSError as erro_backup:
+    print(f"Não consegui fazer o backup automático: {erro_backup}")
+
+# Sugestão da noite: o primeiro recorte já vem colado, com um bilhete no chat
+sugestao_da_noite, motivo_da_sugestao, _ = filmes.sugestao_da_noite()
+if sugestao_da_noite is not None:
+    adicionar_filme_aos_cards(sugestao_da_noite)
+    adicionar_mensagem(
+        NOME_IA,
+        f"🌙 Sugestão da noite: {filmes.descrever_filme_curto(sugestao_da_noite)} — {motivo_da_sugestao}. "
+        'Clique no recorte para abrir, ou me pergunte "o que eu vejo hoje?".'
+    )
 
 atualizar_catalogo()
 atualizar_recomendacoes()

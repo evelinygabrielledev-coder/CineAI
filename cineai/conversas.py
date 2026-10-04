@@ -85,6 +85,11 @@ def salvar_todas():
 lista_conversas = carregar_todas()
 
 
+def recarregar():
+    """Lê o conversas.json de novo (depois de restaurar um backup)."""
+    lista_conversas[:] = carregar_todas()
+
+
 # =========================================================
 # AUXILIARES
 # =========================================================

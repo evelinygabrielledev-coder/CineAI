@@ -23,7 +23,7 @@ mesmas funções.
 
 import json
 import os
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 
@@ -652,3 +652,119 @@ def estatisticas_do_diario(catalogo):
         "sessoes": len(sessoes),
         "revistos": sum(1 for entrada in entradas if quantas_vezes_viu(entrada["filme"]) > 1),
     }
+
+
+# =========================================================
+# BACKUP DO DIÁRIO (cópias com data, em dados/backups/)
+# =========================================================
+# Cada backup é UM arquivo com tudo: favoritos, diário, notas, anotações,
+# listas e as conversas. Assim dá para voltar no tempo se algo der errado.
+#   - automático: ao abrir o CineAI, se o último tiver mais de 7 dias;
+#   - manual: botão na Capa do Meu diário.
+# Só os 10 mais novos ficam guardados.
+PASTA_BACKUPS = PASTA_DADOS / "backups"
+MAXIMO_BACKUPS = 10
+DIAS_ENTRE_BACKUPS_AUTOMATICOS = 7
+PREFIXO_BACKUP = "diario_"
+FORMATO_DATA_BACKUP = "%Y-%m-%d_%H%M%S"
+
+
+def caminho_das_conversas():
+    return PASTA_DADOS / "conversas.json"
+
+
+def listar_backups():
+    """Backups do mais novo para o mais antigo: [(caminho, datetime)]."""
+    if not PASTA_BACKUPS.exists():
+        return []
+    backups = []
+    for caminho in PASTA_BACKUPS.glob(f"{PREFIXO_BACKUP}*.json"):
+        try:
+            momento = datetime.strptime(caminho.stem[len(PREFIXO_BACKUP):], FORMATO_DATA_BACKUP)
+        except ValueError:
+            continue
+        backups.append((caminho, momento))
+    backups.sort(key=lambda par: par[1], reverse=True)
+    return backups
+
+
+def ultimo_backup():
+    backups = listar_backups()
+    return backups[0][1] if backups else None
+
+
+def fazer_backup(momento=None):
+    """Guarda uma cópia de tudo agora. Devolve o caminho do arquivo criado."""
+    momento = momento or datetime.now()
+    PASTA_BACKUPS.mkdir(parents=True, exist_ok=True)
+
+    conversas_salvas = []
+    if caminho_das_conversas().exists():
+        try:
+            conversas_salvas = json.loads(caminho_das_conversas().read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            conversas_salvas = []
+
+    conteudo = {
+        "criado_em": momento.isoformat(timespec="seconds"),
+        "usuario": dados_usuario,
+        "conversas": conversas_salvas,
+    }
+    caminho = PASTA_BACKUPS / f"{PREFIXO_BACKUP}{momento.strftime(FORMATO_DATA_BACKUP)}.json"
+    while caminho.exists():   # dois backups no mesmo segundo: um não pode apagar o outro
+        momento += timedelta(seconds=1)
+        caminho = PASTA_BACKUPS / f"{PREFIXO_BACKUP}{momento.strftime(FORMATO_DATA_BACKUP)}.json"
+    conteudo["criado_em"] = momento.isoformat(timespec="seconds")
+    caminho.write_text(json.dumps(conteudo, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    for caminho_antigo, _ in listar_backups()[MAXIMO_BACKUPS:]:
+        caminho_antigo.unlink(missing_ok=True)
+    return caminho
+
+
+def backup_automatico_se_precisar(agora=None):
+    """Faz backup se nunca foi feito ou se o último tem mais de 7 dias (e se há algo a guardar)."""
+    agora = agora or datetime.now()
+    tem_algo = any(dados_usuario.get(nome_lista) for nome_lista in LISTAS)
+    if not tem_algo:
+        return None
+    ultimo = ultimo_backup()
+    if ultimo is not None and agora - ultimo < timedelta(days=DIAS_ENTRE_BACKUPS_AUTOMATICOS):
+        return None
+    return fazer_backup(agora)
+
+
+def resumo_do_backup(caminho):
+    """'12 entradas · 5 favoritos · 3 anotações' (para a lista de backups)."""
+    try:
+        conteudo = json.loads(Path(caminho).read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return "arquivo com problema"
+    dados = conteudo.get("usuario", {})
+    return (
+        f"{len(dados.get('assistidos', {}))} vistos · {len(dados.get('favoritos', {}))} favoritos · "
+        f"{len(dados.get('anotacoes', {}))} anotações"
+    )
+
+
+def restaurar_backup(caminho):
+    """
+    Volta o diário (e as conversas) para como estavam no backup.
+    Antes, guarda um backup do estado atual: dá para desfazer a restauração.
+    """
+    global dados_usuario
+    conteudo = json.loads(Path(caminho).read_text(encoding="utf-8"))
+
+    fazer_backup(datetime.now())   # rede de segurança
+
+    dados_restaurados = criar_dados_vazios()
+    for nome_lista in LISTAS:
+        lista = conteudo.get("usuario", {}).get(nome_lista, {})
+        if isinstance(lista, dict):
+            dados_restaurados[nome_lista] = lista
+    dados_usuario = dados_restaurados
+    salvar_dados()
+
+    caminho_das_conversas().write_text(
+        json.dumps(conteudo.get("conversas", []), ensure_ascii=False, indent=2), encoding="utf-8"
+    )

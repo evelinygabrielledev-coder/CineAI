@@ -3738,6 +3738,101 @@ def responder_quero_assistir(cliente):
 
 
 # =========================================================
+# SUGESTÃO DA NOITE ("o que eu vejo hoje?")
+# =========================================================
+# Uma sugestão por dia (a mesma o dia inteiro, outra amanhã). De onde ela vem:
+#   1. da sua lista "Quero assistir" (o que você já queria ver);
+#   2. senão, dos que mais combinam com o seu gosto;
+#   3. senão, dos mais amados do catálogo.
+# Se você marcou os streamings que assina, ela prefere o que está neles.
+QUANTIDADE_PARA_SORTEAR_NA_NOITE = 12
+EXPRESSOES_SUGESTAO_DA_NOITE = [
+    "sugestao da noite", "sugestao de hoje", "sugestao do dia", "o que eu vejo hoje",
+    "o que eu assisto hoje", "o que assistir hoje", "o que ver hoje", "o que vejo hoje",
+    "o que assisto hoje", "filme de hoje", "filme pra hoje", "filme para hoje",
+]
+
+
+def candidatos_da_noite():
+    """(lista de candidatos, origem): origem é "lista", "gosto" ou "populares"."""
+    da_lista = [
+        filme for filme in usuario.filmes_da_lista("quero_assistir", filmes)[::-1]
+        if not usuario.foi_assistido(filme)
+    ]
+    if da_lista:
+        return da_lista, "lista"
+    perfil_atual = perfil.calcular_perfil(filmes)
+    if perfil_atual["suficiente"]:
+        return perfil.recomendar(filmes, perfil_atual, QUANTIDADE_PARA_SORTEAR_NA_NOITE), "gosto"
+    nao_vistos = [filme for filme in filmes if not usuario.foi_assistido(filme)]
+    return ordenar_sem_perfil(nao_vistos)[:QUANTIDADE_PARA_SORTEAR_NA_NOITE], "populares"
+
+
+def sugestao_da_noite(dia=None):
+    """
+    (filme, motivo, candidatos) da sugestão do dia, ou (None, "", []) se não houver.
+    O sorteio usa a data como semente: a mesma sugestão o dia todo.
+    """
+    dia = dia or date.today()
+    candidatos, origem = candidatos_da_noite()
+    if not candidatos:
+        return None, "", []
+
+    nos_meus = [filme for filme in candidatos if streamings.esta_nos_meus_streamings(filme)]
+    if nos_meus:
+        candidatos = nos_meus
+
+    escolhido = random.Random(dia.isoformat()).choice(candidatos[:QUANTIDADE_PARA_SORTEAR_NA_NOITE])
+    candidatos = [escolhido] + [filme for filme in candidatos if filme is not escolhido]
+
+    if origem == "lista":
+        guardado_em = usuario.data_em_que_guardou(escolhido)
+        motivo = "está na sua lista Quero assistir" + (
+            f" desde {guardado_em.strftime('%d/%m')}" if guardado_em else ""
+        )
+    elif origem == "gosto":
+        motivo = "combina com o seu gosto"
+    else:
+        motivo = "um dos mais amados do catálogo"
+
+    no_meu_streaming = [
+        nome for nome in (streamings.onde_assistir(escolhido) or [])
+        if nome in usuario.obter_meus_streamings()
+    ]
+    if no_meu_streaming:
+        motivo += f" e está no {no_meu_streaming[0]} ✓"
+    return escolhido, motivo, candidatos
+
+
+def eh_pedido_sugestao_da_noite(cliente):
+    return any(contem_expressao(cliente, expressao) for expressao in EXPRESSOES_SUGESTAO_DA_NOITE)
+
+
+def recomendar_sugestao_da_noite():
+    """Mostra a sugestão do dia; "quero outro" traz a próxima da mesma lista."""
+    global filme_atual, pedido_anterior, candidatos_anteriores, filmes_recomendados
+    global qualidade_pedida, busca_usou_perfil, contexto_relativo, ultima_busca_semantica
+
+    escolhido, motivo, candidatos = sugestao_da_noite()
+    if escolhido is None:
+        return criar_resultado("Você já viu tudo o que eu tinha para sugerir hoje! 🎬")
+
+    filmes_recomendados = []
+    pedido_anterior = "sugestão da noite"
+    candidatos_anteriores = candidatos
+    qualidade_pedida = None
+    busca_usou_perfil = False
+    contexto_relativo = None
+    ultima_busca_semantica = None
+
+    filme_atual = escolhido
+    registrar_recomendacao(escolhido)
+    texto = f"🌙 Sugestão da noite ({motivo}):\n\n" + gerar_resposta(escolhido)
+    texto += '\n\n💬 Não é o clima de hoje? Diga "quero outro".'
+    return criar_resultado(texto, tipo="recomendacao", filme=escolhido)
+
+
+# =========================================================
 # "ONDE ASSISTIR?" sobre o título da conversa
 # =========================================================
 EXPRESSOES_ONDE_ASSISTIR = [
@@ -3951,6 +4046,11 @@ def responder_mensagem(cliente):
             "Pode ser um gênero, um ator, um diretor, um ano "
             "ou o assunto da história."
         )
+
+    # ---------------- Sugestão da noite: "o que eu vejo hoje?" ----------------
+    if eh_pedido_sugestao_da_noite(cliente):
+        rota("sugestão da noite (lista Quero assistir > seu gosto > populares)")
+        return recomendar_sugestao_da_noite()
 
     # ---------------- "Onde assistir?" / "Tá na Netflix?" ----------------
     if eh_pergunta_onde_assistir(cliente):
