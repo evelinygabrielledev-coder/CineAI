@@ -42,6 +42,11 @@ Projeto pessoal de **Eveliny**, estudante de Ciência da Computação na UNIFOR.
   - **Diário automático**: cada título visto vira uma entrada com data (editável), estrelas e a sua anotação,
     separada por mês. Viu de novo? **"↻ vi de novo"** cria outra entrada, com outra data e outra anotação.
   - **Favoritos** e **Quero assistir** (uma checklist: marcar ☐ leva o título para o diário).
+  - **Listas temáticas** suas ("pra chorar", "com a família"...): crie quantas quiser e coloque os títulos
+    pela página do filme ou pelo chat ("coloca esse na lista pra chorar").
+  - **Meta do ano** ("ver 50 filmes em 2026") com barra de progresso na Capa e o ritmo até dezembro.
+  - **Importar do Letterboxd**: o .zip exportado vira diário (datas, revisitas, notas, resenhas como
+    anotações, curtidos como favoritos e a watchlist no Quero assistir).
 - **Suas anotações viram recomendação**: o que você escreve no diário entra na busca por embeddings,
   e as estrelas dizem se aquilo é algo que você quer mais ou menos ("me recomenda pelo que eu escrevi").
 - **O que meu diário diz sobre mim**: a IA local lê as suas notas e anotações e escreve um parágrafo
@@ -103,6 +108,7 @@ python importadores/importar_tmdb.py          # filmes + pôsteres
 python importadores/importar_series.py        # séries + pôsteres
 python importadores/importar_avaliacoes.py    # IMDb / Rotten Tomatoes (limite de 1.000 por dia no plano grátis)
 python importadores/importar_trailers.py      # trailers que faltarem
+python importadores/importar_letterboxd.py export.zip --adicionar   # seu histórico do Letterboxd
 python importadores/importar_onde_assistir.py # em quais streamings do Brasil cada título está
 ```
 
@@ -151,12 +157,15 @@ assistente_filmes/
 ├── main.py            ← abre o CineAI (python main.py)
 ├── construir_exe.py   ← gera o CineAI.exe
 ├── cineai/            ← o programa
-│   ├── interface.py   janela (chat, catálogo, diário, painel do RAG)
+│   ├── interface.py   junta as partes da janela (navegação e inicialização)
+│   ├── tela/          a janela, uma parte por arquivo (base, recortes, detalhes, menu,
+│   │                  início, chat, catálogo, meu diário, retrospectiva, meu perfil, painel do RAG)
 │   ├── filmes.py      cérebro: regras, filtros, busca semântica e respostas
 │   ├── perfil.py      perfil de gosto (notas, favoritos e anotações)
 │   ├── usuario.py     favoritos, diário, notas e anotações (dados/usuario.json)
 │   ├── conversas.py   conversas salvas (dados/conversas.json)
 │   ├── diario_pdf.py  exporta o diário em PDF (dados/exportados/)
+│   ├── letterboxd.py  lê a exportação do Letterboxd e junta ao diário
 │   ├── retrato.py     "o que meu diário diz sobre mim" (IA + conferência)
 │   ├── rastreio.py    etapas de cada resposta para o Painel do RAG
 │   └── caminhos.py    onde fica cada arquivo

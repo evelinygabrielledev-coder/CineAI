@@ -22,6 +22,7 @@ mesmas funções.
 """
 
 import json
+import unicodedata
 import os
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -53,7 +54,7 @@ trazer_arquivo_do_lugar_antigo("usuario.json")
 
 # anotacoes = "Minhas anotações" de cada filme | quero_assistir = guardados "pra depois"
 # configuracoes = coisas suas que não são filmes (ex.: o nome na capa do diário)
-LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir", "configuracoes")
+LISTAS = ("favoritos", "assistidos", "anotacoes", "quero_assistir", "configuracoes", "listas")
 
 
 # =========================================================
@@ -655,6 +656,174 @@ def estatisticas_do_diario(catalogo):
 
 
 # =========================================================
+# LISTAS TEMÁTICAS ("pra chorar", "com a família", "maratona de Natal"...)
+# =========================================================
+# No usuario.json:
+#   "listas": {"pra chorar": {"criada_em": "2026-10-04",
+#                             "titulos": {"597": {"nome": "Titanic", "ano": 1997, "adicionado_em": "..."}}}}
+TAMANHO_MAXIMO_NOME_LISTA = 40
+MAXIMO_LISTAS = 30
+
+
+def nomes_das_listas():
+    """As listas na ordem em que foram criadas."""
+    return list(dados_usuario["listas"].keys())
+
+
+def achar_lista(nome):
+    """O nome exato de uma lista, sem ligar para maiúsculas/acentos ('Pra Chorar' -> 'pra chorar'), ou None."""
+    procurado = simplificar_nome_lista(nome)
+    for existente in dados_usuario["listas"]:
+        if simplificar_nome_lista(existente) == procurado:
+            return existente
+    return None
+
+
+def simplificar_nome_lista(nome):
+    texto = unicodedata.normalize("NFD", " ".join((nome or "").split()).lower())
+    return "".join(caractere for caractere in texto if unicodedata.category(caractere) != "Mn")
+
+
+def limpar_nome_lista(nome):
+    nome = " ".join((nome or "").split())[:TAMANHO_MAXIMO_NOME_LISTA]
+    if not nome:
+        raise ValueError("Dê um nome para a lista.")
+    return nome
+
+
+def criar_lista(nome):
+    """Cria a lista e devolve o nome dela (já arrumado). Erro se já existir uma igual."""
+    nome = limpar_nome_lista(nome)
+    if achar_lista(nome) is not None:
+        raise ValueError(f'Você já tem a lista "{achar_lista(nome)}".')
+    if len(dados_usuario["listas"]) >= MAXIMO_LISTAS:
+        raise ValueError(f"Dá para ter até {MAXIMO_LISTAS} listas.")
+    dados_usuario["listas"][nome] = {"criada_em": date.today().isoformat(), "titulos": {}}
+    salvar_dados()
+    return nome
+
+
+def renomear_lista(nome_atual, nome_novo):
+    nome_novo = limpar_nome_lista(nome_novo)
+    outra = achar_lista(nome_novo)
+    if outra is not None and outra != nome_atual:
+        raise ValueError(f'Você já tem a lista "{outra}".')
+    # recria o dicionário para a lista renomeada continuar no mesmo lugar
+    dados_usuario["listas"] = {
+        (nome_novo if nome == nome_atual else nome): conteudo
+        for nome, conteudo in dados_usuario["listas"].items()
+    }
+    salvar_dados()
+    return nome_novo
+
+
+def apagar_lista(nome):
+    if dados_usuario["listas"].pop(nome, None) is not None:
+        salvar_dados()
+
+
+def esta_na_lista_tematica(nome, filme):
+    lista = dados_usuario["listas"].get(nome)
+    return bool(lista) and chave_filme(filme) in lista["titulos"]
+
+
+def alternar_na_lista_tematica(nome, filme):
+    """Coloca (ou tira) o título da lista. True se ficou na lista."""
+    titulos = dados_usuario["listas"][nome]["titulos"]
+    chave = chave_filme(filme)
+    if chave in titulos:
+        del titulos[chave]
+        ficou = False
+    else:
+        titulos[chave] = {"nome": filme["nome"], "ano": filme.get("ano"), "adicionado_em": date.today().isoformat()}
+        ficou = True
+    salvar_dados()
+    return ficou
+
+
+def filmes_da_lista_tematica(nome, catalogo):
+    """Os títulos da lista, do colocado por último para o primeiro."""
+    filmes_por_chave = {chave_filme(filme): filme for filme in catalogo}
+    titulos = dados_usuario["listas"].get(nome, {}).get("titulos", {})
+    return [filmes_por_chave[chave] for chave in list(titulos)[::-1] if chave in filmes_por_chave]
+
+
+def listas_do_filme(filme):
+    """Em quais listas o título está."""
+    chave = chave_filme(filme)
+    return [nome for nome, lista in dados_usuario["listas"].items() if chave in lista["titulos"]]
+
+
+# =========================================================
+# META DO ANO ("ver 50 filmes em 2027")
+# =========================================================
+# Guardada em configuracoes["metas"] = {"2027": 50}. Conta os TÍTULOS diferentes
+# vistos no ano (rever o mesmo filme não conta duas vezes).
+META_MAXIMA = 1000
+
+
+def obter_meta(ano):
+    """A meta de títulos daquele ano, ou None."""
+    meta = dados_usuario["configuracoes"].get("metas", {}).get(str(ano))
+    return meta if isinstance(meta, int) and meta > 0 else None
+
+
+def definir_meta(ano, quantidade):
+    """quantidade=None (ou 0) apaga a meta do ano."""
+    metas = dados_usuario["configuracoes"].setdefault("metas", {})
+    if not quantidade:
+        metas.pop(str(ano), None)
+    else:
+        quantidade = int(quantidade)
+        if not 1 <= quantidade <= META_MAXIMA:
+            raise ValueError(f"A meta precisa ser de 1 a {META_MAXIMA} títulos.")
+        metas[str(ano)] = quantidade
+    salvar_dados()
+
+
+def titulos_vistos_no_ano(catalogo, ano):
+    """Quantos títulos diferentes têm alguma sessão naquele ano."""
+    return len({
+        chave_filme(entrada["filme"]) for entrada in entradas_do_diario(catalogo)
+        if entrada["data"] is not None and entrada["data"].year == ano
+    })
+
+
+def progresso_da_meta(catalogo, ano, hoje=None):
+    """
+    {meta, feitos, falta, porcentagem, batida, esperado_ate_hoje, no_ritmo, por_mes}
+    ou None se o ano não tem meta.
+      esperado_ate_hoje: quantos já "deveriam" estar vistos, dividindo a meta pelo ano
+      por_mes: quantos por mês faltam, do mês atual até dezembro (só no ano corrente)
+    """
+    meta = obter_meta(ano)
+    if meta is None:
+        return None
+    hoje = hoje or date.today()
+    feitos = titulos_vistos_no_ano(catalogo, ano)
+    inicio, fim = date(ano, 1, 1), date(ano, 12, 31)
+    if hoje < inicio:
+        fracao_do_ano = 0.0
+    elif hoje > fim:
+        fracao_do_ano = 1.0
+    else:
+        fracao_do_ano = ((hoje - inicio).days + 1) / ((fim - inicio).days + 1)
+    esperado = round(meta * fracao_do_ano)
+    falta = max(0, meta - feitos)
+    meses_restantes = 12 - hoje.month + 1 if hoje.year == ano else None
+    return {
+        "meta": meta,
+        "feitos": feitos,
+        "falta": falta,
+        "porcentagem": min(100, round(100 * feitos / meta)),
+        "batida": feitos >= meta,
+        "esperado_ate_hoje": esperado,
+        "no_ritmo": feitos >= esperado,
+        "por_mes": -(-falta // meses_restantes) if meses_restantes and falta else 0,   # arredonda para cima
+    }
+
+
+# =========================================================
 # RETROSPECTIVA DO ANO (o "Wrapped" do diário)
 # =========================================================
 # Só entram as sessões com data naquele ano: a 1ª vez de um título e também
@@ -780,6 +949,7 @@ def retrospectiva_do_ano(catalogo, ano):
         "ultima": sessoes[-1],
         "dia": dia,
         "revistos": [sessao for sessao in sessoes if sessao["sessao"] is not None],
+        "meta": obter_meta(ano),
     }
 
 

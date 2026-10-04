@@ -1124,6 +1124,202 @@ class TestRetrato(TesteCineAI):
         self.assertIn("Ainda é cedo", resultado["texto"])
 
 
+class TestListasTematicas(TesteCineAI):
+    """Listas com nome ('pra chorar', 'com a família'...) que você mesma cria."""
+
+    def test_criar_colocar_e_ver(self):
+        usuario.criar_lista("  pra   chorar ")
+        titanic, shrek = self.filme("Titanic"), self.filme("Shrek")
+        self.assertTrue(usuario.alternar_na_lista_tematica("pra chorar", titanic))
+        usuario.alternar_na_lista_tematica("pra chorar", shrek)
+        self.assertEqual([f["nome"] for f in usuario.filmes_da_lista_tematica("pra chorar", filmes.filmes)],
+                         ["Shrek", "Titanic"])
+        self.assertEqual(usuario.listas_do_filme(titanic), ["pra chorar"])
+        self.assertFalse(usuario.alternar_na_lista_tematica("pra chorar", titanic))
+        usuario.dados_usuario = usuario.carregar_dados()   # "fecha e abre"
+        self.assertEqual(usuario.nomes_das_listas(), ["pra chorar"])
+
+    def test_nomes_repetidos_e_vazios(self):
+        usuario.criar_lista("Com a Família")
+        with self.assertRaises(ValueError):
+            usuario.criar_lista("com a familia")    # mesma lista, só muda maiúscula/acento
+        with self.assertRaises(ValueError):
+            usuario.criar_lista("   ")
+
+    def test_renomear_e_apagar(self):
+        usuario.criar_lista("natal")
+        usuario.criar_lista("terror")
+        usuario.alternar_na_lista_tematica("natal", self.filme("Shrek"))
+        usuario.renomear_lista("natal", "maratona de Natal")
+        self.assertEqual(usuario.nomes_das_listas(), ["maratona de Natal", "terror"])   # continua no lugar
+        self.assertTrue(usuario.esta_na_lista_tematica("maratona de Natal", self.filme("Shrek")))
+        usuario.apagar_lista("terror")
+        self.assertEqual(usuario.nomes_das_listas(), ["maratona de Natal"])
+
+    def test_pelo_chat(self):
+        usuario.criar_lista("pra chorar")
+        resultado = self.pedir("coloca Titanic na lista pra chorar")
+        self.assertEqual(resultado["tipo"], "usuario_atualizado")
+        self.assertTrue(usuario.esta_na_lista_tematica("pra chorar", self.filme("Titanic")))
+        self.assertIn("Titanic", self.pedir("o que tem na lista pra chorar?")["texto"])
+        self.assertIn("pra chorar", self.pedir("quais são minhas listas?")["texto"])
+        self.pedir("tira Titanic da lista pra chorar")
+        self.assertFalse(usuario.esta_na_lista_tematica("pra chorar", self.filme("Titanic")))
+
+    def test_minha_lista_continua_sendo_quero_assistir(self):
+        """'Salva esse na minha lista' segue indo para o Quero assistir."""
+        usuario.criar_lista("pra chorar")
+        self.pedir("me fala do Titanic")
+        self.pedir("salva esse na minha lista")
+        self.assertTrue(usuario.quer_assistir(self.filme("Titanic")))
+
+
+class TestMetaDoAno(TesteCineAI):
+    """Meta do ano: títulos diferentes vistos no ano, com o ritmo até hoje."""
+
+    def ver(self, nome, data):
+        filme = self.filme(nome)
+        usuario.alternar_assistido(filme)
+        usuario.definir_data_assistido(filme, data)
+        return filme
+
+    def test_sem_meta(self):
+        self.assertIsNone(usuario.progresso_da_meta(filmes.filmes, 2025))
+
+    def test_progresso_e_ritmo(self):
+        """Revisita não conta duas vezes; no meio do ano, metade da meta é 'no ritmo'."""
+        from datetime import date
+        usuario.definir_meta(2025, 4)
+        shrek = self.ver("Shrek", date(2025, 1, 10))
+        usuario.registrar_revisita(shrek, date(2025, 2, 1))
+        self.ver("Titanic", date(2025, 3, 1))
+        self.ver("Dunkirk", date(2024, 3, 1))   # outro ano: não conta
+        progresso = usuario.progresso_da_meta(filmes.filmes, 2025, hoje=date(2025, 7, 2))
+        self.assertEqual((progresso["feitos"], progresso["falta"], progresso["porcentagem"]), (2, 2, 50))
+        self.assertTrue(progresso["no_ritmo"])
+        self.assertEqual(progresso["por_mes"], 1)       # 2 faltando em 6 meses
+        atrasado = usuario.progresso_da_meta(filmes.filmes, 2025, hoje=date(2025, 11, 15))
+        self.assertFalse(atrasado["no_ritmo"])
+        self.assertEqual(atrasado["por_mes"], 1)        # 2 faltando em 2 meses
+
+    def test_batida_e_apagar(self):
+        from datetime import date
+        usuario.definir_meta(2025, 1)
+        self.ver("Shrek", date(2025, 1, 10))
+        self.assertTrue(usuario.progresso_da_meta(filmes.filmes, 2025)["batida"])
+        self.assertEqual(usuario.retrospectiva_do_ano(filmes.filmes, 2025)["meta"], 1)
+        usuario.definir_meta(2025, 0)
+        self.assertIsNone(usuario.obter_meta(2025))
+        with self.assertRaises(ValueError):
+            usuario.definir_meta(2025, 5000)
+
+    def test_pelo_chat(self):
+        """'Minha meta é ver 30 filmes em 2025' grava; 'como está minha meta de 2025?' responde."""
+        resultado = self.pedir("minha meta é ver 30 filmes em 2025")
+        self.assertEqual(usuario.obter_meta(2025), 30)
+        self.assertIn("30", resultado["texto"])
+        self.assertIn("0 de 30", self.pedir("como está minha meta de 2025?")["texto"])
+
+
+class TestLetterboxd(TesteCineAI):
+    """Importar do Letterboxd: o .zip exportado vira diário, notas, anotações, favoritos e lista."""
+    DIARIO = (
+        "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Tags,Watched Date\n"
+        "2025-02-01,Shrek,2001,x,4.5,,,2025-01-31\n"
+        "2025-06-10,Shrek,2001,x,5,Yes,,2025-06-09\n"
+        "2025-03-05,Inception,2010,x,3.5,,,2025-03-04\n"
+        "2025-03-06,Um Filme Que Não Existe,1999,x,3,,,2025-03-06\n"
+    )
+    NOTAS = "Date,Name,Year,Letterboxd URI,Rating\n2025-06-10,Shrek,2001,x,5\n2025-03-05,Inception,2010,x,3.5\n"
+    RESENHAS = (
+        "Date,Name,Year,Letterboxd URI,Rating,Rewatch,Review,Tags,Watched Date\n"
+        "2025-06-10,Shrek,2001,x,5,Yes,<i>Ainda</i> ri muito com a família.,,2025-06-09\n"
+    )
+    VISTOS = "Date,Name,Year,Letterboxd URI\n2024-12-25,Titanic,1997,x\n2025-02-01,Shrek,2001,x\n"
+    QUERO = "Date,Name,Year,Letterboxd URI\n2025-01-01,Dunkirk,2017,x\n"
+    CURTIDOS = "Date,Name,Year,Letterboxd URI\n2025-02-02,Shrek,2001,x\n"
+
+    def setUp(self):
+        super().setUp()
+        import copy
+        import zipfile
+        self.catalogo = copy.deepcopy(filmes.filmes)
+        for filme in self.catalogo:
+            if filme["nome"] == "A Origem":
+                filme["titulo_original"] = "Inception"   # o Letterboxd usa o título em inglês
+        self.zip = PASTA_TEMPORARIA / "letterboxd.zip"
+        with zipfile.ZipFile(self.zip, "w") as pacote:
+            pacote.writestr("diary.csv", "﻿" + self.DIARIO)
+            pacote.writestr("ratings.csv", self.NOTAS)
+            pacote.writestr("reviews.csv", self.RESENHAS)
+            pacote.writestr("watched.csv", self.VISTOS)
+            pacote.writestr("watchlist.csv", self.QUERO)
+            pacote.writestr("likes/films.csv", self.CURTIDOS)
+
+    def filme_do_catalogo(self, nome):
+        return next(filme for filme in self.catalogo if filme["nome"] == nome)
+
+    def test_importa_tudo(self):
+        """Sessões, revisita com resenha, nota arredondada, favorito, lista e quem ficou de fora."""
+        from datetime import date
+        from cineai import letterboxd
+        resumo = letterboxd.importar(self.catalogo, self.zip)
+        shrek = self.filme_do_catalogo("Shrek")
+        origem = self.filme_do_catalogo("A Origem")
+
+        self.assertEqual(usuario.data_do_registro(usuario.chave_filme(shrek)), date(2025, 1, 31))
+        self.assertEqual(usuario.quantas_vezes_viu(shrek), 2)
+        self.assertEqual(usuario.obter_anotacao(shrek, sessao=0), "Ainda ri muito com a família.")
+        self.assertEqual(usuario.obter_nota(shrek), 5)
+        self.assertEqual(usuario.obter_nota(origem), 4)            # 3,5 -> 4
+        self.assertTrue(usuario.foi_assistido(self.filme_do_catalogo("Titanic")))
+        self.assertTrue(usuario.eh_favorito(shrek))
+        self.assertTrue(usuario.quer_assistir(self.filme_do_catalogo("Dunkirk")))
+        self.assertEqual(resumo["nao_encontrados"], ["Um Filme Que Não Existe (1999)"])
+        self.assertEqual(resumo["filmes"], 3)
+        self.assertEqual(resumo["sessoes"], 4)
+
+    def test_importar_de_novo_nao_duplica(self):
+        from cineai import letterboxd
+        letterboxd.importar(self.catalogo, self.zip)
+        resumo = letterboxd.importar(self.catalogo, self.zip)
+        self.assertEqual((resumo["filmes"], resumo["sessoes"], resumo["notas"]), (0, 0, 0))
+        self.assertEqual(usuario.quantas_vezes_viu(self.filme_do_catalogo("Shrek")), 2)
+
+    def test_nao_apaga_o_que_ja_existe(self):
+        """Nota e anotação do CineAI ficam; o backup é feito antes."""
+        from cineai import letterboxd
+        shrek = self.filme_do_catalogo("Shrek")
+        usuario.definir_nota(shrek, 3)
+        usuario.definir_anotacao(shrek, "Minha anotação do CineAI.")
+        resumo = letterboxd.importar(self.catalogo, self.zip)
+        self.assertEqual(usuario.obter_nota(shrek), 3)
+        self.assertEqual(usuario.obter_anotacao(shrek), "Minha anotação do CineAI.")
+        self.assertIsNotNone(resumo["backup"])
+        # marcado hoje no CineAI, mas visto em janeiro segundo o Letterboxd: vale a data antiga
+        from datetime import date
+        self.assertEqual(usuario.data_do_registro(usuario.chave_filme(shrek)), date(2025, 1, 31))
+
+    def test_simular_nao_grava(self):
+        from cineai import letterboxd
+        resumo = letterboxd.importar(self.catalogo, self.zip, simular=True)
+        self.assertEqual(resumo["filmes"], 3)
+        self.assertEqual(usuario.dados_usuario["assistidos"], {})
+
+    def test_arquivo_errado(self):
+        from cineai import letterboxd
+        arquivo = PASTA_TEMPORARIA / "qualquer.txt"
+        arquivo.write_text("oi", encoding="utf-8")
+        with self.assertRaises(ValueError):
+            letterboxd.importar(self.catalogo, arquivo)
+
+    def test_conversoes(self):
+        from cineai import letterboxd
+        self.assertEqual([letterboxd.converter_nota(valor) for valor in ("0.5", "3.5", "4", "", "5")], [1, 4, 4, None, 5])
+        self.assertEqual(letterboxd.limpar_resenha("Muito <b>bom</b>!<br/>Recomendo &amp; reveria"),
+                         "Muito bom!\nRecomendo & reveria")
+
+
 class TestBackup(TesteCineAI):
     """Backup do diário: cópias com data em dados/backups (aqui, na pasta temporária)."""
 

@@ -3884,6 +3884,9 @@ def texto_da_retrospectiva(numeros):
         linhas.append(f"• o melhor: {melhor['filme']['nome']} {usuario.texto_estrelas(melhor['nota'])}")
     if numeros["revistos"]:
         linhas.append(f"• vi de novo: {plural(len(numeros['revistos']), 'vez', 'vezes')} ↻")
+    if numeros.get("meta"):
+        situacao = "batida! 🎉" if numeros["titulos"] >= numeros["meta"] else f"{numeros['titulos']} de {numeros['meta']}"
+        linhas.append(f"• meta do ano: {situacao}")
     if numeros["anotacao"]:
         anotacao = numeros["anotacao"]
         linhas.append(f'• nas suas palavras: "{anotacao["anotacao"].strip()}" ({anotacao["filme"]["nome"]})')
@@ -3942,6 +3945,103 @@ def responder_retrato(cliente):
         texto += "\n\n(desta vez escrito sem a IA: ela estava desligada ou a resposta não passou na conferência)"
     texto += '\n\n💬 Ele também fica na página Meu perfil. Para outra versão, diga "meu retrato de novo".'
     return criar_resultado(texto)
+
+
+# =========================================================
+# META DO ANO: "minha meta é ver 50 filmes em 2027" / "como está minha meta?"
+# =========================================================
+def detectar_pedido_meta(cliente):
+    """None (não é sobre meta) | ("ver", ano) | ("definir", ano, quantidade)."""
+    palavras = extrair_palavras(cliente)
+    if "meta" not in palavras and "metas" not in palavras:
+        return None
+    ano = ano_citado(cliente) or date.today().year
+    numeros = [int(palavra) for palavra in palavras if palavra.isdigit() and int(palavra) != ano]
+    if numeros and any(palavra in palavras for palavra in ("e", "eh", "sera", "quero", "definir", "define", "coloca", "colocar", "muda", "mudar", "nova")):
+        return ("definir", ano, numeros[0])
+    return ("ver", ano)
+
+
+def responder_meta(pedido):
+    ano = pedido[1]
+    if pedido[0] == "definir":
+        try:
+            usuario.definir_meta(ano, pedido[2])
+        except ValueError as erro:
+            return criar_resultado(str(erro))
+        resposta = f"🎯 Anotado! Meta de {ano}: {pedido[2]} títulos."
+        progresso = usuario.progresso_da_meta(filmes, ano)
+        if progresso and progresso["feitos"]:
+            resposta += f" Você já tem {progresso['feitos']}."
+        return criar_resultado(resposta + " Ela aparece na Capa do Meu diário.", tipo="usuario_atualizado")
+
+    progresso = usuario.progresso_da_meta(filmes, ano)
+    if progresso is None:
+        return criar_resultado(
+            f'Você ainda não tem uma meta para {ano}. Diga, por exemplo: "minha meta é ver 50 filmes em {ano}". 🎯'
+        )
+    if progresso["batida"]:
+        situacao = "meta batida! 🎉"
+    elif progresso["no_ritmo"]:
+        situacao = "você está no ritmo certo ✓"
+    else:
+        situacao = f"faltam {progresso['falta']}" + (f" (uns {progresso['por_mes']} por mês)" if progresso["por_mes"] else "")
+    return criar_resultado(f"🎯 Meta de {ano}: {progresso['feitos']} de {progresso['meta']} títulos ({progresso['porcentagem']}%), {situacao}")
+
+
+# =========================================================
+# LISTAS TEMÁTICAS: "coloca esse na lista pra chorar", "o que tem na lista família?"
+# =========================================================
+PALAVRAS_COLOCAR_NA_LISTA = {"coloca", "coloque", "adiciona", "adicione", "poe", "bota", "salva", "salve",
+                             "guarda", "guarde", "inclui", "inclua", "add", "acrescenta"}
+PALAVRAS_TIRAR_DA_LISTA = {"tira", "tire", "remove", "remova", "apaga", "apague", "exclui"}
+
+
+def detectar_pedido_lista_tematica(cliente):
+    """None | ("todas",) | (acao, nome da lista) com acao "colocar", "tirar" ou "ver"."""
+    if contem_expressao(cliente, "minhas listas"):
+        return ("todas",)
+    nomes = sorted(usuario.nomes_das_listas(), key=len, reverse=True)
+    lista = next((nome for nome in nomes if contem_expressao(cliente, f"lista {nome}")), None)
+    if lista is None:
+        return None
+    palavras = set(extrair_palavras(cliente))
+    if palavras & PALAVRAS_TIRAR_DA_LISTA:
+        return ("tirar", lista)
+    if palavras & PALAVRAS_COLOCAR_NA_LISTA:
+        return ("colocar", lista)
+    return ("ver", lista)
+
+
+def responder_lista_tematica(cliente, pedido):
+    if pedido[0] == "todas":
+        nomes = usuario.nomes_das_listas()
+        if not nomes:
+            return criar_resultado('Você ainda não tem listas. Crie uma em Meu diário › 🏷 Listas, ou na página de um filme. 🏷')
+        linhas = [f"• {nome} ({len(usuario.filmes_da_lista_tematica(nome, filmes))})" for nome in nomes]
+        return criar_resultado("🏷 Suas listas:\n" + "\n".join(linhas))
+
+    acao, lista = pedido
+    if acao == "ver":
+        titulos = usuario.filmes_da_lista_tematica(lista, filmes)
+        if not titulos:
+            return criar_resultado(f'A lista "{lista}" ainda está vazia.')
+        return criar_resultado(montar_lista(f'🏷 Lista "{lista}" ({len(titulos)}):', titulos))
+
+    filme_alvo = encontrar_filme_citado(cliente) or filme_atual
+    if filme_alvo is None:
+        return criar_resultado(f'Qual título? Por exemplo: "coloca Titanic na lista {lista}".')
+    nome = descrever_filme_curto(filme_alvo)
+    ja_esta = usuario.esta_na_lista_tematica(lista, filme_alvo)
+    if acao == "colocar":
+        if ja_esta:
+            return criar_resultado(f'{nome} já está na lista "{lista}". 🏷')
+        usuario.alternar_na_lista_tematica(lista, filme_alvo)
+        return criar_resultado(f'🏷 Coloquei {nome} na lista "{lista}".', tipo="usuario_atualizado")
+    if not ja_esta:
+        return criar_resultado(f'{nome} não está na lista "{lista}".')
+    usuario.alternar_na_lista_tematica(lista, filme_alvo)
+    return criar_resultado(f'Tirei {nome} da lista "{lista}".', tipo="usuario_atualizado")
 
 
 # =========================================================
@@ -4169,6 +4269,12 @@ def responder_mensagem(cliente):
         rota("retrospectiva do ano (números do diário naquele ano)")
         return responder_retrospectiva(cliente)
 
+    # ---------------- Meta do ano ----------------
+    pedido_meta = detectar_pedido_meta(cliente)
+    if pedido_meta is not None:
+        rota("meta do ano (ver ou definir)")
+        return responder_meta(pedido_meta)
+
     # ---------------- "O que meu diário diz sobre mim?" ----------------
     if eh_pedido_retrato(cliente):
         rota("retrato do diário (IA lê as suas notas e anotações)")
@@ -4183,6 +4289,12 @@ def responder_mensagem(cliente):
     if eh_vi_de_novo(cliente):
         rota('"vi de novo": nova sessão do título no diário')
         return registrar_vi_de_novo(cliente)
+
+    # ---------------- Listas temáticas: "coloca esse na lista pra chorar" ----------------
+    pedido_lista = detectar_pedido_lista_tematica(cliente)
+    if pedido_lista is not None:
+        rota("lista temática (ver, colocar ou tirar)")
+        return responder_lista_tematica(cliente, pedido_lista)
 
     # ---------------- Lista "Quero assistir": "salva esse pra depois" ----------------
     # Vem antes do histórico: "me recomenda algo da minha lista" não é
