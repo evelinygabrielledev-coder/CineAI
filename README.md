@@ -88,28 +88,28 @@ OMDB_API_KEY=sua_chave_omdb_aqui
 ### 4. Baixar os pôsteres e montar o catálogo
 
 ```bash
-python importar_tmdb.py          # filmes + pôsteres
-python importar_series.py        # séries + pôsteres
-python importar_avaliacoes.py    # IMDb / Rotten Tomatoes (limite de 1.000 por dia no plano grátis)
-python importar_trailers.py      # trailers que faltarem
+python importadores/importar_tmdb.py          # filmes + pôsteres
+python importadores/importar_series.py        # séries + pôsteres
+python importadores/importar_avaliacoes.py    # IMDb / Rotten Tomatoes (limite de 1.000 por dia no plano grátis)
+python importadores/importar_trailers.py      # trailers que faltarem
 ```
 
 ### 5. Abrir o CineAI
 
 ```bash
-python interface.py
+python main.py
 ```
 
 Na primeira vez ele calcula os embeddings do catálogo (demora um pouco); depois fica salvo
-em `embeddings_cache.pkl`.
+em `dados/embeddings_cache.pkl`.
 
 ---
 
 ## ✅ Testes
 
 ```bash
-python testes.py              # modo rápido: catálogo pequeno de teste, sem IA de verdade
-python testes.py --completo   # usa o catálogo real
+python testes/testes.py              # modo rápido: catálogo pequeno de teste, sem IA de verdade
+python testes/testes.py --completo   # usa o catálogo real
 ```
 
 Os testes usam uma pasta temporária e **nunca mexem** no seu `usuario.json` nem no `conversas.json`.
@@ -118,17 +118,22 @@ Os testes usam uma pasta temporária e **nunca mexem** no seu `usuario.json` nem
 
 ## 📁 Estrutura
 
-| Arquivo | O que faz |
-|---|---|
-| `interface.py` | Janela do programa (chat, catálogo, diário, painel do RAG) |
-| `filmes.py` | Cérebro do CineAI: regras, filtros, busca semântica e respostas |
-| `perfil.py` | Perfil de gosto a partir das suas notas |
-| `usuario.py` | Favoritos, assistidos, notas e anotações (`usuario.json`) |
-| `conversas.py` | Conversas salvas (`conversas.json`) |
-| `rastreio.py` | Grava as etapas de cada resposta para o Painel do RAG |
-| `importar_*.py` | Montam o catálogo a partir do TMDB e da OMDb |
-| `testes.py` | Testes automáticos |
-| `filmes.json` | Catálogo (filmes e séries) |
+```
+assistente_filmes/
+├── main.py            ← abre o CineAI (python main.py)
+├── cineai/            ← o programa
+│   ├── interface.py   janela (chat, catálogo, diário, painel do RAG)
+│   ├── filmes.py      cérebro: regras, filtros, busca semântica e respostas
+│   ├── perfil.py      perfil de gosto (notas, favoritos e anotações)
+│   ├── usuario.py     favoritos, diário, notas e anotações (dados/usuario.json)
+│   ├── conversas.py   conversas salvas (dados/conversas.json)
+│   ├── rastreio.py    etapas de cada resposta para o Painel do RAG
+│   └── caminhos.py    onde fica cada arquivo
+├── importadores/      ← montam o catálogo a partir do TMDB e da OMDb
+├── dados/             ← catálogo (filmes.json), pôsteres e os seus dados
+├── testes/            ← testes automáticos
+└── docs/              ← prints do README
+```
 
 ---
 

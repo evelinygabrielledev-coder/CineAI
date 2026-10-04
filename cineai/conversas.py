@@ -30,8 +30,12 @@ from pathlib import Path
 
 
 # Os testes automáticos usam outra pasta para não mexer nas suas conversas.
-PASTA_DADOS = Path(os.environ.get("CINEAI_PASTA_USUARIO", Path(__file__).resolve().parent))
+from cineai.caminhos import PASTA_USUARIO
+from cineai.usuario import trazer_arquivo_do_lugar_antigo
+
+PASTA_DADOS = PASTA_USUARIO                       # dados/ (os testes trocam por uma pasta temporária)
 CAMINHO_CONVERSAS = PASTA_DADOS / "conversas.json"
+trazer_arquivo_do_lugar_antigo("conversas.json")
 
 MAXIMO_CONVERSAS = 50          # as mais antigas são apagadas automaticamente
 TAMANHO_MAXIMO_TITULO = 45

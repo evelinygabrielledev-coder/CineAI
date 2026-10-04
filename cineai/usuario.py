@@ -28,8 +28,28 @@ from pathlib import Path
 
 
 # Os testes automáticos usam outra pasta para não mexer nos seus dados.
-PASTA_DADOS = Path(os.environ.get("CINEAI_PASTA_USUARIO", Path(__file__).resolve().parent))
+from cineai.caminhos import PASTA_PROJETO, PASTA_USUARIO
+
+PASTA_DADOS = PASTA_USUARIO                       # dados/ (os testes trocam por uma pasta temporária)
 CAMINHO_USUARIO = PASTA_DADOS / "usuario.json"
+
+
+def trazer_arquivo_do_lugar_antigo(nome_arquivo):
+    """
+    Antes da organização em pastas, os seus dados ficavam soltos na raiz do projeto.
+    Se ainda estiverem lá (e não em dados/), são movidos uma vez, sem perder nada.
+    """
+    if "CINEAI_PASTA_USUARIO" in os.environ:
+        return   # nos testes (pasta temporária) nunca mexemos nos seus arquivos de verdade
+    caminho_novo = PASTA_DADOS / nome_arquivo
+    caminho_antigo = PASTA_PROJETO / nome_arquivo
+    if not caminho_novo.exists() and caminho_antigo.exists() and caminho_antigo != caminho_novo:
+        PASTA_DADOS.mkdir(parents=True, exist_ok=True)
+        caminho_antigo.replace(caminho_novo)
+        print(f"{nome_arquivo} foi movido para a pasta dados/.")
+
+
+trazer_arquivo_do_lugar_antigo("usuario.json")
 
 # anotacoes = "Minhas anotações" de cada filme | quero_assistir = guardados "pra depois"
 # configuracoes = coisas suas que não são filmes (ex.: o nome na capa do diário)

@@ -26,7 +26,7 @@ import unicodedata
 
 import numpy as np
 
-import usuario
+from cineai import usuario
 
 
 # =========================================================

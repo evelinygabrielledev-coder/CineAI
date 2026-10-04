@@ -26,19 +26,17 @@ import numpy as np
 import ollama
 from sentence_transformers import SentenceTransformer
 
-import perfil
-import usuario
-from rastreio import rastro
+from cineai import perfil, usuario
+from cineai.caminhos import CAMINHO_CACHE_EMBEDDINGS, CAMINHO_CATALOGO, PASTA_PROJETO
+from cineai.rastreio import rastro
 
 
 # =========================================================
 # CONFIGURAÇÃO
 # =========================================================
-PASTA_PROJETO = Path(__file__).parent
 
 # Os testes automáticos podem trocar o catálogo e o cache por versões de teste.
-CAMINHO_JSON = Path(os.environ.get("CINEAI_CATALOGO", PASTA_PROJETO / "filmes.json"))
-CAMINHO_CACHE_EMBEDDINGS = Path(os.environ.get("CINEAI_CACHE", PASTA_PROJETO / "embeddings_cache.pkl"))
+CAMINHO_JSON = CAMINHO_CATALOGO   # dados/filmes.json (os testes trocam por um catálogo pequeno)
 
 MODELO_LLM = "qwen3:1.7b"
 LIMITE_SIMILARIDADE = 0.25

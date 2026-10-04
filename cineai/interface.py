@@ -12,11 +12,9 @@ from tkinter import messagebox
 import customtkinter as ctk
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageTk
 
-import conversas
-import filmes
-import perfil
-import usuario
-from rastreio import formatar_ms, rastro
+from cineai import conversas, filmes, perfil, usuario
+from cineai.caminhos import PASTA_POSTERS
+from cineai.rastreio import formatar_ms, rastro
 
 
 # =========================================================
@@ -26,7 +24,6 @@ from rastreio import formatar_ms, rastro
 # película 5-4-3-2-1, dourado do Oscar e anotações em caneta azul.
 ctk.set_appearance_mode("light")
 
-PASTA_POSTERS = Path(__file__).parent / "posters"
 
 # ---------------- Papel ----------------
 COR_FUNDO = "#F1E4C8"            # página envelhecida (fundo das telas)
@@ -5444,4 +5441,10 @@ atualizar_recomendacoes()
 atualizar_meus_filmes()
 atualizar_painel_rag()
 mostrar_inicio()
-janela.mainloop()
+def iniciar():
+    """Abre a janela do CineAI (o main.py chama isto)."""
+    janela.mainloop()
+
+
+if __name__ == "__main__":
+    iniciar()

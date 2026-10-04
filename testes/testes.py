@@ -3,11 +3,11 @@ Testes automáticos do CineAI.
 
 Como rodar (dentro da pasta do projeto):
 
-    python testes.py              -> modo RÁPIDO: leva segundos.
+    python testes/testes.py              -> modo RÁPIDO: leva segundos.
                                      Usa um catálogo de teste com 21 filmes e uma
                                      IA simulada. Não precisa do Ollama aberto.
 
-    python testes.py --completo   -> modo COMPLETO: usa o seu filmes.json de verdade,
+    python testes/testes.py --completo   -> modo COMPLETO: usa o seu dados/filmes.json de verdade,
                                      o modelo de embeddings e o Ollama (deixe aberto).
                                      Mais lento, mas testa o app como ele é.
 
@@ -34,6 +34,10 @@ from datetime import date
 from pathlib import Path
 
 import numpy as np
+
+# A pasta do projeto (um nível acima de testes/) entra no caminho do Python,
+# para "from cineai import ..." funcionar rodando daqui.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 # =========================================================
@@ -247,11 +251,7 @@ if not MODO_COMPLETO:
 
 # Só agora importamos o CineAI (depois de configurar caminhos e simulações)
 print("Carregando o CineAI" + (" com o catálogo real..." if MODO_COMPLETO else " (modo rápido)..."))
-import conversas  # noqa: E402
-import filmes     # noqa: E402
-import perfil     # noqa: E402
-import usuario    # noqa: E402
-import rastreio   # noqa: E402
+from cineai import conversas, filmes, perfil, rastreio, usuario  # noqa: E402
 
 
 apenas_modo_rapido = unittest.skipIf(MODO_COMPLETO, "depende do catálogo de teste")
@@ -1164,7 +1164,7 @@ class TestVitoriasRapidas(TesteCineAI):
     def test_escolhe_trailer_em_portugues(self):
         """Entre os vídeos do TMDB, o trailer em português do YouTube vence."""
         try:
-            import importar_tmdb
+            from importadores import importar_tmdb
         except ImportError:
             self.skipTest("biblioteca requests não instalada")
         videos = {"results": [

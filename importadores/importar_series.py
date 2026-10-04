@@ -6,18 +6,21 @@ As séries entram no filmes.json com "tipo": "serie", ao lado dos filmes.
 Os filmes que já estão lá não são alterados.
 
 Como usar (na pasta do projeto):
-    python importar_series.py
+    python importadores/importar_series.py
 
 Depois, para completar:
-    python importar_avaliacoes.py   -> IMDb / Rotten das séries novas
-    python importar_trailers.py     -> trailers das séries novas
+    python importadores/importar_avaliacoes.py   -> IMDb / Rotten das séries novas
+    python importadores/importar_trailers.py     -> trailers das séries novas
 
 Pode rodar de novo quando quiser: as séries são atualizadas (temporadas,
 status...) e as notas que já foram importadas continuam.
 """
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # deixa achar as pastas cineai/ e importadores/
 import json
 
-import importar_tmdb as tmdb
+from importadores import importar_tmdb as tmdb  # noqa: E402
 
 QUANTIDADE_SERIES = 400
 MAXIMO_ATORES = 6
@@ -170,7 +173,7 @@ def salvar_catalogo(catalogo):
 
 def importar_series():
     tmdb.chave_api = tmdb.ler_chave_api()
-    tmdb.PASTA_POSTERS.mkdir(exist_ok=True)
+    tmdb.PASTA_POSTERS.mkdir(parents=True, exist_ok=True)
 
     catalogo = carregar_catalogo()
     filmes_do_catalogo = [item for item in catalogo if item.get("tipo", "filme") != "serie"]
@@ -238,7 +241,7 @@ def importar_series():
     print(
         f"\nPronto! {len(series_novas)} séries + {len(filmes_do_catalogo)} filmes "
         f"em {tmdb.CAMINHO_JSON.name}.\n"
-        "Agora rode:  python importar_avaliacoes.py   (notas IMDb/Rotten das séries)"
+        "Agora rode:  python importadores/importar_avaliacoes.py   (notas IMDb/Rotten das séries)"
     )
 
 

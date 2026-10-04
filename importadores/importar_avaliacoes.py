@@ -10,13 +10,16 @@ Como usar:
            OMDB_API_KEY=sua_chave_omdb
        (a TMDB_API_KEY continua lá: ela é usada para achar o código IMDb.)
     3. Rode:
-           python importar_avaliacoes.py
+           python importadores/importar_avaliacoes.py
 
 O plano grátis da OMDb permite 1.000 consultas por dia.
 O progresso é salvo aos poucos: se parar no meio, rode de novo que
 ele continua de onde parou (filmes já consultados são pulados).
-Para consultar TODOS de novo:  python importar_avaliacoes.py --refazer
+Para consultar TODOS de novo:  python importadores/importar_avaliacoes.py --refazer
 """
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # deixa achar as pastas cineai/ e importadores/
 
 import json
 import os
@@ -31,8 +34,9 @@ import requests
 # =========================================================
 # CONFIGURAÇÕES
 # =========================================================
-PASTA_PROJETO = Path(__file__).resolve().parent
-CAMINHO_JSON = PASTA_PROJETO / "filmes.json"
+from cineai.caminhos import CAMINHO_CATALOGO, PASTA_PROJETO  # noqa: E402
+
+CAMINHO_JSON = CAMINHO_CATALOGO   # dados/filmes.json  (o .env continua na pasta do projeto)
 
 URL_TMDB = "https://api.themoviedb.org/3"
 URL_OMDB = "https://www.omdbapi.com/"

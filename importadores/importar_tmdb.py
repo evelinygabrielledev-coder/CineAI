@@ -2,10 +2,10 @@
 Importa filmes do TMDB para o filmes.json do CineAI.
 
 Como usar:
-    1. Crie um arquivo chamado .env nesta mesma pasta com a linha:
+    1. Crie um arquivo chamado .env na pasta do projeto (assistente_filmes) com a linha:
            TMDB_API_KEY=sua_chave_aqui
     2. Rode:
-           python importar_tmdb.py
+           python importadores/importar_tmdb.py
 
 O que o script faz:
     - Faz uma cópia do filmes.json atual em filmes_manual.json (só na 1ª vez).
@@ -17,6 +17,9 @@ O que o script faz:
 
 Pode rodar de novo quando quiser: pôsteres já baixados não são baixados outra vez.
 """
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # deixa achar as pastas cineai/ e importadores/
 
 import json
 import os
@@ -39,14 +42,14 @@ import requests
 # OPÇÃO 2 (recomendada): deixe vazio e use o arquivo .env.
 CHAVE_API_MANUAL = ""
 
-PASTA_PROJETO = Path(__file__).resolve().parent
-CAMINHO_ENV = PASTA_PROJETO / ".env"
+from cineai.caminhos import (  # noqa: E402  (depois do ajuste do caminho lá em cima)
+    CAMINHO_CATALOGO, CAMINHO_CATALOGO_MANUAL, CAMINHO_ENV, PASTA_POSTERS, PASTA_PROJETO
+)
 
 # Nomes que o Windows/Bloco de Notas às vezes cria sem querer.
 NOMES_ALTERNATIVOS_ENV = [".env", ".env.txt", "arquivo.env", "env", "env.txt"]
-CAMINHO_JSON = PASTA_PROJETO / "filmes.json"
-CAMINHO_BACKUP_MANUAL = PASTA_PROJETO / "filmes_manual.json"
-PASTA_POSTERS = PASTA_PROJETO / "posters"
+CAMINHO_JSON = CAMINHO_CATALOGO                  # dados/filmes.json
+CAMINHO_BACKUP_MANUAL = CAMINHO_CATALOGO_MANUAL  # dados/filmes_manual.json
 
 QUANTIDADE_FILMES = 1500
 MAXIMO_ATORES = 6
@@ -458,7 +461,7 @@ def importar():
     global chave_api
     chave_api = ler_chave_api()
 
-    PASTA_POSTERS.mkdir(exist_ok=True)
+    PASTA_POSTERS.mkdir(parents=True, exist_ok=True)
 
     catalogo = []
     ids_no_catalogo = set()

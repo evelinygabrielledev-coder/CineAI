@@ -5,16 +5,19 @@ Usa a mesma chave do TMDB do importar_tmdb.py (arquivo .env com TMDB_API_KEY=...
 Não mexe em mais nada do catálogo: só preenche o campo "trailer_youtube".
 
 Como usar (na pasta do projeto):
-    python importar_trailers.py            -> só os filmes que ainda não foram consultados
-    python importar_trailers.py --refazer  -> consulta todos de novo
+    python importadores/importar_trailers.py            -> só os filmes que ainda não foram consultados
+    python importadores/importar_trailers.py --refazer  -> consulta todos de novo
 
 Filmes sem trailer no TMDB continuam funcionando: o botão ▶ do CineAI
 abre uma busca no YouTube pelo nome do filme.
 """
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))  # deixa achar as pastas cineai/ e importadores/
 import json
 import sys
 
-import importar_tmdb as tmdb
+from importadores import importar_tmdb as tmdb  # noqa: E402
 
 SALVAR_A_CADA = 25  # grava o filmes.json a cada 25 filmes (se fechar no meio, não perde tudo)
 
