@@ -635,12 +635,15 @@ def abrir_detalhes(filme):
 
     def clicar_estrela(nota_clicada):
         # Clicar de novo na mesma estrela apaga a nota.
+        ja_tinha_visto = usuario.foi_assistido(filme)
         if usuario.obter_nota(filme) == nota_clicada:
             usuario.definir_nota(filme, None)
         else:
             usuario.definir_nota(filme, nota_clicada)
         atualizar_botoes()
         ao_mudar_listas()
+        if not ja_tinha_visto and usuario.foi_assistido(filme):   # a nota marcou como visto agora
+            ponte.perguntar_quando_viu(filme, None, pai=detalhes, depois=atualizar_botoes)
 
     for nota_estrela in range(1, usuario.NOTA_MAXIMA + 1):
         botao_estrela = ctk.CTkButton(
@@ -967,15 +970,19 @@ def abrir_detalhes(filme):
             animar_carimbo_do_adesivo("escala_carimbo")   # o WATCHED é carimbado
         montar_anotacoes()   # anotações aparecem (ou somem) junto
         ao_mudar_listas()
+        if ficou_assistido:
+            ponte.perguntar_quando_viu(filme, None, pai=detalhes, depois=atualizar_botoes)
 
     botao_favorito.configure(command=clicar_favorito)
 
     def clicar_vi_de_novo(event=None):
         if not usuario.foi_assistido(filme):
             return
-        usuario.registrar_revisita(filme)
+        sessao = usuario.registrar_revisita(filme)
         atualizar_botoes()
         ao_mudar_listas()
+        if sessao is not None:
+            ponte.perguntar_quando_viu(filme, sessao, pai=detalhes, depois=atualizar_botoes)
 
     link_vi_de_novo.bind("<Button-1>", clicar_vi_de_novo)
     link_listas.bind("<Button-1>", lambda event: abrir_listas_do_filme(

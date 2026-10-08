@@ -4,6 +4,8 @@ tela/meu_diario.py — Página Meu diário: Capa, Diário (entradas por mês), F
 Parte da janela do CineAI (veja cineai/interface.py, que junta todas as partes).
 """
 from cineai.tela.catalogo import *  # noqa: F401,F403  (tudo das partes anteriores)
+from datetime import timedelta
+
 from cineai.tela.ponte import ponte
 
 
@@ -255,22 +257,109 @@ def montar_anotacao_da_entrada(area, filme, escala, editando=False, sessao=None)
 ANO_MAIS_ANTIGO_NO_EDITOR = 1930
 
 
-def abrir_editor_de_data(filme, sessao=None):
+def perguntar_quando_viu(filme, sessao=None, pai=None, depois=None):
+    """
+    Logo depois de marcar um título como visto: "quando você viu?".
+    O título já foi anotado com a data de hoje; o bilhete só corrige se não foi hoje.
+        hoje ✓        fecha (fica hoje). Fechar no X também deixa hoje.
+        ontem         troca para ontem
+        outro dia…    abre o editor de data (dia / mês / ano)
+        não sei 🤷    deixa a entrada sem data ("?" no diário)
+    sessao=None é a 1ª vez; 0, 1... é um "vi de novo".
+    pai: a janela de onde veio o clique (a página do filme, por exemplo).
+    depois: chamada depois de escolher, para quem abriu atualizar a tela.
+    """
+    pai = pai or janela
+
+    bilhete = ctk.CTkToplevel(pai)
+    bilhete.title("Quando você viu?")
+    bilhete.geometry("430x210")
+    bilhete.resizable(False, False)
+    bilhete.configure(fg_color=COR_PAPEL)
+    bilhete.transient(pai)
+    pai.update_idletasks()
+    bilhete.geometry(f"+{pai.winfo_rootx() + max(40, pai.winfo_width() // 2 - 215)}+{pai.winfo_rooty() + 180}")
+    bilhete.after(50, bilhete.grab_set)   # só depois de a janela aparecer
+
+    ctk.CTkLabel(
+        bilhete, text="quando você viu?", font=(FONTE_MANUSCRITA, 24, "bold"),
+        text_color=COR_TITULO_MANUSCRITO
+    ).pack(pady=(16, 0))
+    ctk.CTkLabel(
+        bilhete, text=filme["nome"], font=(FONTE, 13, "italic"), text_color=COR_TEXTO_SECUNDARIO
+    ).pack()
+    ctk.CTkLabel(
+        bilhete, text="anotei como hoje. Se não foi hoje, é só escolher:",
+        font=(FONTE_MANUSCRITA, 15), text_color=COR_TEXTO_SUAVE
+    ).pack(pady=(2, 0))
+
+    def terminar():
+        if bilhete.winfo_exists():
+            bilhete.destroy()
+        ao_mudar_listas()   # diário, capa e polaroides mudam juntos
+        if depois is not None:
+            depois()
+
+    def escolher_data(nova_data):
+        usuario.definir_data_assistido(filme, nova_data, sessao=sessao)
+        terminar()
+
+    def outro_dia():
+        bilhete.destroy()
+        abrir_editor_de_data(filme, sessao, pai=pai, depois=depois)
+
+    bilhete.protocol("WM_DELETE_WINDOW", terminar)   # fechar no X = fica hoje
+
+    linha_botoes = ctk.CTkFrame(bilhete, fg_color="transparent")
+    linha_botoes.pack(pady=(14, 0))
+    estilo_neutro = {
+        "height": 34, "corner_radius": 4, "fg_color": COR_PAPEL_ESCURO, "hover_color": COR_BOTAO_NEUTRO_HOVER,
+        "text_color": COR_VINHO, "font": (FONTE_MANUSCRITA, 16, "bold"),
+    }
+    ctk.CTkButton(
+        linha_botoes, text="hoje ✓", width=80, height=34, corner_radius=4, fg_color=COR_VERMELHO,
+        hover_color=COR_VERMELHO_HOVER, text_color=COR_TEXTO_CAPA, font=(FONTE_MANUSCRITA, 16, "bold"),
+        command=terminar
+    ).pack(side="left", padx=4)
+    ctk.CTkButton(
+        linha_botoes, text="ontem", width=75, command=lambda: escolher_data(date.today() - timedelta(days=1)),
+        **estilo_neutro
+    ).pack(side="left", padx=4)
+    ctk.CTkButton(linha_botoes, text="outro dia…", width=100, command=outro_dia, **estilo_neutro).pack(side="left", padx=4)
+    ctk.CTkButton(
+        linha_botoes, text="não sei 🤷", width=100, command=lambda: escolher_data(None), **estilo_neutro
+    ).pack(side="left", padx=4)
+
+
+def abrir_editor_de_data(filme, sessao=None, pai=None, depois=None):
     """
     Bilhetinho para corrigir quando você assistiu (dia / mês / ano).
     Útil para o que você marcou hoje, mas viu anos atrás.
+    Se você não lembra, "não sei 🤷" deixa a entrada sem data.
     sessao=None corrige a 1ª vez; 0, 1... corrigem cada "vi de novo".
+    pai e depois: como em perguntar_quando_viu (quando vem da página do filme).
     """
-    data_atual = usuario.data_da_sessao(usuario.chave_filme(filme), sessao) or date.today()
+    data_guardada = usuario.data_da_sessao(usuario.chave_filme(filme), sessao)
+    data_atual = data_guardada or date.today()
+    pai = pai or janela
 
-    editor = ctk.CTkToplevel(janela)
+    def terminar():
+        editor.destroy()
+        ao_mudar_listas()   # diário, capa e carimbo WATCHED das polaroides mudam juntos
+        if depois is not None:
+            depois()
+
+    editor = ctk.CTkToplevel(pai)
     editor.title("Quando você assistiu?")
-    editor.geometry("360x250")
+    editor.geometry("400x300")
     editor.resizable(False, False)
     editor.configure(fg_color=COR_PAPEL)
-    editor.transient(janela)
-    janela.update_idletasks()
-    editor.geometry(f"+{janela.winfo_rootx() + 380}+{janela.winfo_rooty() + 220}")  # perto do diário
+    editor.transient(pai)
+    pai.update_idletasks()
+    if pai is janela:
+        editor.geometry(f"+{janela.winfo_rootx() + 380}+{janela.winfo_rooty() + 220}")  # perto do diário
+    else:
+        editor.geometry(f"+{pai.winfo_rootx() + max(40, pai.winfo_width() // 2 - 200)}+{pai.winfo_rooty() + 160}")
     editor.after(50, editor.grab_set)   # só depois de a janela aparecer
 
     ctk.CTkLabel(
@@ -280,6 +369,11 @@ def abrir_editor_de_data(filme, sessao=None):
     ctk.CTkLabel(
         editor, text=filme["nome"], font=(FONTE, 13, "italic"), text_color=COR_TEXTO_SECUNDARIO
     ).pack()
+    if data_guardada is None:
+        ctk.CTkLabel(
+            editor, text="agora: sem data (você não sabia quando viu)", font=(FONTE_MANUSCRITA, 14),
+            text_color=COR_TEXTO_SUAVE
+        ).pack()
 
     linha_campos = ctk.CTkFrame(editor, fg_color="transparent")
     linha_campos.pack(pady=(14, 4))
@@ -323,8 +417,11 @@ def abrir_editor_de_data(filme, sessao=None):
         except ValueError as erro:
             aviso.configure(text=str(erro))
             return
-        editor.destroy()
-        ao_mudar_listas()   # diário, capa e carimbo WATCHED das polaroides mudam juntos
+        terminar()
+
+    def nao_sei_a_data():
+        usuario.definir_data_assistido(filme, None, sessao=sessao)
+        terminar()
 
     linha_botoes = ctk.CTkFrame(editor, fg_color="transparent")
     linha_botoes.pack(pady=(8, 0))
@@ -332,6 +429,11 @@ def abrir_editor_de_data(filme, sessao=None):
         linha_botoes, text="hoje", width=90, height=34, corner_radius=4, fg_color=COR_PAPEL_ESCURO,
         hover_color=COR_BOTAO_NEUTRO_HOVER, text_color=COR_VINHO, font=(FONTE_MANUSCRITA, 16, "bold"),
         command=lambda: preencher(date.today())
+    ).pack(side="left", padx=6)
+    ctk.CTkButton(
+        linha_botoes, text="não sei 🤷", width=100, height=34, corner_radius=4, fg_color=COR_PAPEL_ESCURO,
+        hover_color=COR_BOTAO_NEUTRO_HOVER, text_color=COR_VINHO, font=(FONTE_MANUSCRITA, 16, "bold"),
+        command=nao_sei_a_data
     ).pack(side="left", padx=6)
     ctk.CTkButton(
         linha_botoes, text="salvar ✓", width=120, height=34, corner_radius=4, fg_color=COR_VERMELHO,
@@ -596,10 +698,12 @@ def criar_item_da_checklist(folha, filme, escala, imagens):
 
         def concluir():
             if usuario.foi_assistido(filme):
-                usuario.registrar_revisita(filme)        # era "pra rever": vira uma sessão nova no diário
+                sessao = usuario.registrar_revisita(filme)   # era "pra rever": vira uma sessão nova no diário
             else:
-                usuario.alternar_assistido(filme)        # vira entrada no diário
+                usuario.alternar_assistido(filme)            # vira entrada no diário
+                sessao = None
             ao_mudar_listas()
+            perguntar_quando_viu(filme, sessao)              # anotou hoje; se não foi hoje, ela escolhe
         janela.after(ATRASO_RISCAR_MS, concluir)
 
     def tirar_da_lista(event=None):
@@ -1329,4 +1433,5 @@ def atualizar_meus_filmes(voltar_ao_topo=True):
 # Partes que vêm ANTES desta usam estes nomes pela ponte (veja tela/ponte.py).
 ponte.registrar(
     atualizar_meus_filmes=atualizar_meus_filmes,
+    perguntar_quando_viu=perguntar_quando_viu,
 )
