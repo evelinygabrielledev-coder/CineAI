@@ -666,6 +666,33 @@ class TestDiario(TesteCineAI):
         with self.assertRaises(ValueError):
             usuario.definir_data_assistido(self.filme("A Origem"), date(2020, 1, 1))  # não foi visto
 
+    def test_nao_sei_a_data(self):
+        """'Não sei quando vi': a entrada fica sem data, vai para o começo do diário e aceita data depois."""
+        from datetime import date
+        self.marcar_tres()   # Titanic, Shrek, Dunkirk: todos hoje
+        usuario.definir_data_assistido(self.filme("Shrek"), None)
+        self.assertIsNone(usuario.data_em_que_assistiu(self.filme("Shrek")))
+        self.assertEqual(usuario.numero_da_entrada(self.filme("Shrek")), 1)
+        entradas = usuario.entradas_do_diario(filmes.filmes)
+        self.assertEqual(self.nomes(entradas)[-1], "Shrek")
+        self.assertIsNone(entradas[-1]["data"])
+        usuario.dados_usuario = usuario.carregar_dados()   # "fecha e abre": continua sem data
+        self.assertIsNone(usuario.data_em_que_assistiu(self.filme("Shrek")))
+        self.assertTrue(usuario.foi_assistido(self.filme("Shrek")))
+        usuario.definir_data_assistido(self.filme("Shrek"), date(2019, 5, 2))   # lembrou depois
+        self.assertEqual(usuario.data_em_que_assistiu(self.filme("Shrek")), date(2019, 5, 2))
+
+    def test_revisita_sem_data(self):
+        """Um 'vi de novo' sem data fica logo depois da 1ª vez daquele título."""
+        from datetime import date
+        titanic = self.filme("Titanic")
+        usuario.alternar_assistido(titanic)
+        usuario.definir_data_assistido(titanic, date(2010, 1, 1))
+        sessao = usuario.registrar_revisita(titanic)
+        usuario.definir_data_assistido(titanic, None, sessao=sessao)
+        entradas = usuario.entradas_do_diario(filmes.filmes, usuario.ORDEM_DIARIO_ANTIGOS)
+        self.assertEqual([(e["vez"], e["data"]) for e in entradas], [(1, date(2010, 1, 1)), (2, None)])
+
     def test_diario_vazio_e_data_estranha(self):
         """Sem nada visto: lista vazia. Data inválida no arquivo: data None (não quebra)."""
         self.assertEqual(usuario.entradas_do_diario(filmes.filmes), [])

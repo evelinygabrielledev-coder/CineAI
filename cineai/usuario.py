@@ -386,14 +386,24 @@ def data_da_sessao(chave, sessao=None):
 def sessoes_em_ordem_cronologica():
     """
     Todas as sessões [(chave, sessao)], da mais antiga para a mais nova, pela data.
-    Mesma data: vale a ordem em que foram marcadas. Sem data vai para o fim.
+    Mesma data: vale a ordem em que foram marcadas.
+    Sem data ("não sei quando vi"): a 1ª vez vai para o começo (quase sempre foi há muito
+    tempo); um "vi de novo" sem data fica logo depois da 1ª vez daquele título.
     """
+    def data_para_ordenar(chave, sessao):
+        data = data_da_sessao(chave, sessao)
+        if data is not None:
+            return data
+        if sessao is None:
+            return date.min
+        return data_da_sessao(chave, None) or date.min
+
     sessoes = []
     for posicao, chave in enumerate(dados_usuario["assistidos"]):
         sessoes.append((chave, None, posicao, -1))
         for indice in range(len(revisitas_do_registro(chave))):
             sessoes.append((chave, indice, posicao, indice))
-    sessoes.sort(key=lambda item: (data_da_sessao(item[0], item[1]) or date.max, item[2], item[3]))
+    sessoes.sort(key=lambda item: (data_para_ordenar(item[0], item[1]), item[2], item[3]))
     return [(chave, sessao) for chave, sessao, _, _ in sessoes]
 
 
@@ -453,23 +463,25 @@ DATA_MAIS_ANTIGA_PERMITIDA = date(1900, 1, 1)
 def definir_data_assistido(filme, nova_data, sessao=None):
     """
     Corrige o dia em que você viu o título (ex.: marcou hoje algo que viu em 2015).
+    nova_data=None quer dizer "não sei quando vi": a entrada fica sem data.
     sessao=None corrige a 1ª vez; 0, 1... corrigem cada "vi de novo".
     Não aceita data no futuro nem título que você ainda não marcou como visto.
     """
     chave = chave_filme(filme)
     if chave not in dados_usuario["assistidos"]:
         raise ValueError("Esse título ainda não está marcado como visto.")
-    if nova_data > date.today():
+    if nova_data is not None and nova_data > date.today():
         raise ValueError("Essa data ainda não chegou. 🙂")
-    if nova_data < DATA_MAIS_ANTIGA_PERMITIDA:
+    if nova_data is not None and nova_data < DATA_MAIS_ANTIGA_PERMITIDA:
         raise ValueError("Essa data é antiga demais.")
+    texto_data = nova_data.isoformat() if nova_data is not None else None
     if sessao is None:
-        dados_usuario["assistidos"][chave]["adicionado_em"] = nova_data.isoformat()
+        dados_usuario["assistidos"][chave]["adicionado_em"] = texto_data
     else:
         revisitas = revisitas_do_registro(chave)
         if not 0 <= sessao < len(revisitas):
             raise ValueError("Essa sessão não existe mais.")
-        revisitas[sessao]["data"] = nova_data.isoformat()
+        revisitas[sessao]["data"] = texto_data
     salvar_dados()
 
 

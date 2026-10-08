@@ -253,11 +253,12 @@ def importar(catalogo, caminho, buscar_id=None, simular=False, hoje=None):
             restantes = sessoes[1:]
         else:
             restantes = sessoes
-            # Marcou no CineAI depois (ex.: hoje), mas no Letterboxd consta que viu antes:
+            # Marcou no CineAI depois (ex.: hoje), mas no Letterboxd consta que viu antes,
+            # ou no CineAI está "não sei quando vi" e o Letterboxd sabe:
             # a 1ª vez passa a ser a data do Letterboxd (é a mesma sessão, só registrada antes).
             primeira_data_lb = sessoes[0][0]
             data_no_cineai = converter_data(assistidos[chave].get("adicionado_em"))
-            if primeira_data_lb and data_no_cineai and primeira_data_lb < data_no_cineai \
+            if primeira_data_lb and (data_no_cineai is None or primeira_data_lb < data_no_cineai) \
                     and not assistidos[chave].get("revisitas"):
                 assistidos[chave]["adicionado_em"] = primeira_data_lb.isoformat()
                 if sessoes[0][1] and chave not in anotacoes:
